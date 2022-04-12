@@ -1,9 +1,7 @@
 #ifndef HTTPPARSER_HPP
 #define HTTPPARSER_HPP
 
-class test{
+class test
+{};
 
-};
-
-
-#endif //HTTPPARSER_HPP
+#endif // HTTPPARSER_HPP

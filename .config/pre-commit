@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+    against=HEAD
+else
+    # Initial commit: diff against an empty tree object
+    against=$(git hash-object -t tree /dev/null)
+fi
+
+exec 1>&2
+
+# Check whether clang-format is exist or not.
+if !(type "clang-format" > /dev/null 2>&1); then
+    cat << EOS
+There is not clang-format.
+Please install clang-format.
+EOS
+    exit 1
+fi
+
+sum=0
+array=()
+for file in $(git diff --cached --name-only --diff-filter=AM $against -- | grep -E '\.(c|cc|cpp|cxx|wh|hpp)$'); do
+
+    diff -q $file <(clang-format $file) 1>/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        #diff -u --color=auto $file <(clang-format $file)
+        echo -e "\e[1m${file}\e[m"
+        diff -u $file <(clang-format $file) | sed -e '1,2d'
+        echo -e "\n"
+        sum=$(expr $sum + 1)
+        array=("${array[@]}" "$file")
+    fi
+done
+
+if [ ${sum} -eq 0 ]; then
+    exit 0
+else
+    echo -e "\e[1mPlease modify following files."
+    for((i = 0; i < ${#array[@]}; i++)){
+        echo "* ${array[i]}"
+    }
+    echo -ne "\e[m"
+    exit 1
+fi
+
