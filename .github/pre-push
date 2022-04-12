@@ -1,0 +1,11 @@
+#!/bin/zsh
+
+set -eux
+
+echo "Running pre-push hook"
+if [ "$(uname)" = 'Darwin' ]; then
+  clang-format -i -style=file `find src include -type f` # && clang-tidy `find src include -type f` -- -I./include
+elif [ "$(uname)" = 'Linux' ]; then
+  clang-format-12 -i -style=file `find src include -type f`  # && clang-tidy-12 `find src include -type f` -- -I./include
+fi
+exit $?
