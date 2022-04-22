@@ -10,7 +10,9 @@ DPSDIR    :=    ./dps
 INCLUDE   := -I$(INCDIR)
 VPATH     := src:
 
-SRCS      := src/main.cpp
+SRCS      := main.cpp \
+			ServerSocket.cpp \
+			SocketAddress.cpp \
 
 OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
 DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
@@ -23,7 +25,7 @@ $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS) $(LIBS)
 
 $(OBJDIR)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
 
 -include $(DPS)
 
