@@ -26,6 +26,6 @@ httpRequest& httpParser::parse(std::string request_message)
     {
         std::cout << "get uri error" << std::endl;
     }
-    httpRequest req(method, uri);
-    return req;
+    httpRequest *req = new httpRequest(method, uri);
+    return *req;
 }
