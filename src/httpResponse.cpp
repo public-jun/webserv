@@ -1,20 +1,19 @@
-#include "httpResponse.hpp"
+#include "HTTPResponse.hpp"
 #include <iostream>
+#include <sys/socket.h>
+#include <sys/types.h>
 
-httpResponse::httpResponse(int status_code, std::string header, std::string body, std::size_t body_size)
-    : status_code_(status_code), header_(header), body_(body), body_size_(body_size)
-{
-}
+HTTPResponse::HTTPResponse(int sock, int status_code, std::string header,
+                           std::string body)
+    : sock_(sock), status_code_(status_code), header_(header), body_(body)
+{}
 
-httpResponse::~httpResponse()
-{
-}
+HTTPResponse::~HTTPResponse() {}
 
-void httpResponse::create()
+void HTTPResponse::create()
 {
     // 文字列で扱って大丈夫？バイナリの可能性は？
     // TODO:レスポンスのサイズをつくる
-    std::size_t no_body_len;
 
     if (status_code_ == 200)
     {
@@ -27,5 +26,15 @@ void httpResponse::create()
     else
     {
         std::cout << "Not support status" << status_code_ << std::endl;
+    }
+    message_size_ = response_message_.size();
+}
+
+void HTTPResponse::sendMessage()
+{
+    int ret = send(sock_, response_message_.c_str(), message_size_, 0);
+    if (ret == -1)
+    {
+        std::cout << "send error" << std::endl;
     }
 }

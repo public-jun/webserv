@@ -1,16 +1,16 @@
 #ifndef HTTPPARSER_HPP
 #define HTTPPARSER_HPP
+#include "HTTPRequest.hpp"
 #include <string>
-#include "httpRequest.hpp"
 
-class httpParser
+class HTTPParser
 {
 private:
     /* data */
 public:
-    httpParser();
-    httpRequest& parse(std::string request_message);
-    ~httpParser();
+    HTTPParser();
+    HTTPRequest& parse(std::string request_message);
+    ~HTTPParser();
 };
 
 #endif // HTTPPARSER_HPP
