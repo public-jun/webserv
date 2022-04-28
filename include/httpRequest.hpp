@@ -14,6 +14,9 @@ private:
 public:
     HTTPRequest(std::string method, std::string uri);
     ~HTTPRequest();
+    std::string& getMethod();
+    std::string& getURI();
+    void         setURI(std::string uri);
 };
 
 #endif

@@ -1,16 +1,17 @@
 #include "ClientSocket.hpp"
 #include <iostream>
+#include <stdexcept>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 ClientSocket::ClientSocket(int server_sock)
 {
-    socklen_t addr_size = sizeof(addr_);
-    sock_ = accept(server_sock, addr_, &addr_size);
+    sock_ = accept(server_sock, NULL, NULL);
     if (sock_ == -1)
     {
         std::cout << "accept error" << std::endl;
+        throw std::runtime_error("accept error");
     }
 }
 

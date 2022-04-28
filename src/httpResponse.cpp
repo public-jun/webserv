@@ -17,7 +17,8 @@ void HTTPResponse::create()
 
     if (status_code_ == 200)
     {
-        response_message_ = "HTTP/1.1 200 OK\r\n" + header_ + "\r\n" + body_;
+        response_message_ =
+            "HTTP/1.1 200 OK\r\n" + header_ + "\r\n\r\n" + body_;
     }
     else if (status_code_ == 404)
     {
@@ -32,6 +33,7 @@ void HTTPResponse::create()
 
 void HTTPResponse::sendMessage()
 {
+    std::cout << "<<message>>\n" << response_message_ << std::endl;
     int ret = send(sock_, response_message_.c_str(), message_size_, 0);
     if (ret == -1)
     {

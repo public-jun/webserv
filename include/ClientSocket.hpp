@@ -5,8 +5,6 @@
 class ClientSocket : public Socket
 {
 private:
-    struct sockaddr* addr_;
-
 public:
     ClientSocket(int w_addr);
     ~ClientSocket();

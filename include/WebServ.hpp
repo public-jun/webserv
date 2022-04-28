@@ -9,7 +9,8 @@ public:
     WebServ();
     ~WebServ();
     void run();
-    int recvRequestMessage(int sock, char* request_message, unsigned int buf_size);
+    int  recvRequestMessage(int sock, char* request_message,
+                            unsigned int buf_size);
 
 private:
     ServerSocket* s_sock_;
