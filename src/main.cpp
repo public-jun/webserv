@@ -1,14 +1,11 @@
-#include <ServerSocket.hpp>
-#include <iostream>
+#include "WebServ.hpp"
 
 int main()
 {
-    ServerSocket s_sock;
-    s_sock.bindSocket();
-    s_sock.listenSocket();
+    WebServ serv;
+    serv.run();
     return 0;
 }
-
 
 // 初期化 // サーバーソケットクラス、
 

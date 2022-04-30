@@ -11,8 +11,14 @@ INCLUDE   := -I$(INCDIR)
 VPATH     := src:
 
 SRCS      := main.cpp \
+			Socket.cpp \
+			ClientSocket.cpp \
 			ServerSocket.cpp \
 			SocketAddress.cpp \
+			HTTPParser.cpp \
+			HTTPRequest.cpp \
+			HTTPResponse.cpp \
+			WebServ.cpp \
 
 OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
 DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))

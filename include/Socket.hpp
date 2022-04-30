@@ -7,8 +7,10 @@ protected:
     int sock_;
 
 public:
-    Socket(){};
-    ~Socket(){};
+    Socket();
+    ~Socket();
+
+    int getSocket() const;
 };
 
 #endif
