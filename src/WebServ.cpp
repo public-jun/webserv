@@ -8,41 +8,39 @@
 #include "HTTPResponse.hpp"
 #include "WebServ.hpp"
 
+#define BUF_SIZE 1024
+
 WebServ::WebServ() {}
 
 WebServ::~WebServ() { delete s_sock_; }
-
-int WebServ::recvRequestMessage(int sock, char* request_message,
-                                unsigned int buf_size)
-{
-    int recv_size;
-
-    recv_size = recv(sock, request_message, buf_size, 0);
-
-    return recv_size;
-}
 
 void WebServ::run()
 {
     _serverSocketRun();
     while (true)
     {
-        // accept
+        // クライアントと接続する
         ClientSocket c_sock(s_sock_->getSocket());
 
-        // httpserver
-        char buf[1024];
-        recv(c_sock.getSocket(), buf, 1024, 0);
+        // クライアントのソケットからメッセージを読み取る
+        char buf[BUF_SIZE];
+        if (recv(c_sock.getSocket(), buf, BUF_SIZE, 0) == -1)
+        {
+            throw std::runtime_error("recv error");
+        }
+
+        // メッセージをパースしてHTTPRequestを作る
         HTTPParser  parser;
         HTTPRequest req = parser.parse(std::string(buf));
+
         if (req.getMethod() == "GET")
         {
             if (req.getURI() == "/")
             {
                 req.setURI(std::string("/index.html"));
             }
-            // getProcessing
-            // uriを受け取ってbodyとstatusを取得
+
+            // uriで指定されたファイルを読み取る
             std::ifstream ifs(req.getURI().erase(0, 1));
             std::string   tmp, file_content;
             if (ifs.fail())
@@ -55,6 +53,7 @@ void WebServ::run()
                 file_content += tmp + "\n";
             }
 
+            // レスポンスヘッダーを作る
             std::ostringstream oss;
             std::string        length;
             oss << file_content.length() << std::flush;
@@ -62,6 +61,8 @@ void WebServ::run()
             std::string  header("Content-Length: " + length);
             HTTPResponse response(c_sock.getSocket(), 200, header,
                                   file_content);
+
+            // レスポンスを作成して送信
             response.create();
             response.sendMessage();
         }
