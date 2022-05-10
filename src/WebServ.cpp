@@ -8,6 +8,11 @@
 #include "HTTPResponse.hpp"
 #include "WebServ.hpp"
 
+#include <sys/select.h>
+#include <poll.h>
+#include <unistd.h>
+#include <sys/event.h>
+
 #define BUF_SIZE 1024
 
 WebServ::WebServ() {}
@@ -17,17 +22,48 @@ WebServ::~WebServ() { delete s_sock_; }
 void WebServ::run()
 {
     _serverSocketRun();
+
+    int ret;
+      int kq;
+      struct kevent kev;
+
+      kq = kqueue();
+      if (kq == -1) {
+        perror("kqueue");
+        exit(1);
+      }
+      EV_SET(&kev, s_sock_->getSocket(), EVFILT_READ, EV_ADD, 0, 0, NULL);
+      ret = kevent(kq, &kev, 1, NULL, 0, NULL);
+      if (ret == -1) {
+        perror("kevent");
+        exit(1);
+      }
     while (true)
     {
-        // クライアントと接続する
-        ClientSocket c_sock(s_sock_->getSocket());
+       int n;
+       char buf[BUF_SIZE];
+       int sock;
 
-        // クライアントのソケットからメッセージを読み取る
-        char buf[BUF_SIZE];
-        if (recv(c_sock.getSocket(), buf, BUF_SIZE, 0) == -1)
-        {
-            throw std::runtime_error("recv error");
-        }
+       n = kevent(kq, NULL, 0, &kev, 1, NULL);
+
+       if (n == -1) {
+         perror("kevent");
+         exit(1);
+       }
+       if ((int)kev.ident == s_sock_->getSocket()){
+         int acc = accept(kev.ident, NULL, NULL);
+         if (acc != -1){
+           EV_SET(&kev, acc, EVFILT_READ, EV_ADD, 0, 0, NULL);
+           n = kevent(kq, &kev, 1, NULL, 0, NULL);
+           if (n == -1) {
+             perror("kevent");
+             exit(1);
+           }
+         }
+       } else {
+         sock = kev.ident;
+         printf("ディスクリプタ %d 番が読み込み可能です。\n", sock);
+         recv(sock, buf, sizeof(buf), 0);
 
         // メッセージをパースしてHTTPRequestを作る
         HTTPParser  parser;
@@ -59,7 +95,7 @@ void WebServ::run()
             oss << file_content.length() << std::flush;
             length = oss.str();
             std::string  header("Content-Length: " + length);
-            HTTPResponse response(c_sock.getSocket(), 200, header,
+            HTTPResponse response(sock, 200, header,
                                   file_content);
 
             // レスポンスを作成して送信
@@ -71,6 +107,7 @@ void WebServ::run()
             // 404
         }
 
+      }
         // close
     }
     // close
