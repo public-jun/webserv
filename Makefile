@@ -25,6 +25,7 @@ DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
 
 RM        := rm -rf
 
+.PHONY: all
 all: makedir $(NAME)
 
 $(NAME): $(OBJS)
@@ -35,17 +36,29 @@ $(OBJDIR)/%.o: %.cpp
 
 -include $(DPS)
 
+.PHONY: makedir
 makedir :
 	mkdir -p $(OBJDIR)
 	mkdir -p $(DPSDIR)
 
+.PHONY: clean
 clean:
 	rm -rf $(OBJDIR) $(DPSDIR)
 
+.PHONY: fclean
 fclean: clean
 	$(RM) $(NAME) *.dSYM tester
 
+.PHONY: re
 re: fclean all
+
+.PHONY: tidy
+tidy:
+	clang-tidy `find src include -type f` -- -I$(INCDIR)
+
+.PHONY: tidy-fix
+tidy-fix:
+	clang-tidy `find src include -type f` --fix -- -I$(INCDIR)
 
 ################# google test ####################
 
