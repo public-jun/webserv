@@ -6,8 +6,7 @@ HTTPParser::HTTPParser() {}
 
 HTTPParser::~HTTPParser() {}
 
-HTTPRequest& HTTPParser::parse(std::string request_message)
-{
+HTTPRequest& HTTPParser::parse(std::string request_message) {
     std::string::iterator it =
         std::find(request_message.begin(), request_message.end(), '\n');
     std::string line(request_message.begin(), it);
@@ -15,12 +14,10 @@ HTTPRequest& HTTPParser::parse(std::string request_message)
     std::istringstream iss(line);
     std::string        method, uri;
     iss >> method >> uri;
-    if (method.empty())
-    {
+    if (method.empty()) {
         std::cout << "get method error" << std::endl;
     }
-    if (uri.empty())
-    {
+    if (uri.empty()) {
         std::cout << "get uri error" << std::endl;
     }
     HTTPRequest* req = new HTTPRequest(method, uri);

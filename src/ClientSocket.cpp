@@ -5,9 +5,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-ClientSocket::ClientSocket(int server_sock)
-{
-  (void)server_sock;
+ClientSocket::ClientSocket(int server_sock) {
+    (void)server_sock;
     // sock_ = accept(server_sock, NULL, NULL);
     // if (sock_ == -1)
     // {
@@ -16,4 +15,4 @@ ClientSocket::ClientSocket(int server_sock)
     // }
 }
 
-ClientSocket::~ClientSocket() { close(sock_);}
+ClientSocket::~ClientSocket() { close(sock_); }
