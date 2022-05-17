@@ -12,7 +12,7 @@ private:
     SocketAddress addr_;
 
 public:
-    static const unsigned short MAX_QUE = 1024;
+    static const unsigned short max_que = 1024;
     ServerSocket();
     ~ServerSocket();
 

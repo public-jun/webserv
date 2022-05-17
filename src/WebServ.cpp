@@ -20,7 +20,7 @@ WebServ::WebServ() {}
 WebServ::~WebServ() { delete s_sock_; }
 
 void WebServ::run() {
-    _serverSocketRun();
+    serverSocketRun();
 
     // int ret;
     int           kq;
@@ -108,7 +108,7 @@ void WebServ::run() {
     // close
 }
 
-void WebServ::_serverSocketRun() {
+void WebServ::serverSocketRun() {
     /* ServerSocket* s_sock_ = new ServerSocket(); */
     s_sock_ = new ServerSocket();
     s_sock_->bindSocket();

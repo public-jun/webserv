@@ -28,7 +28,7 @@ void ServerSocket::bindSocket() {
 }
 
 void ServerSocket::listenSocket() {
-    if (listen(sock_, MAX_QUE) == -1) {
+    if (listen(sock_, max_que) == -1) {
         std::cout << "listen error" << std::endl;
         perror("bind");
         close(sock_);
