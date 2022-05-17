@@ -5,14 +5,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-ClientSocket::ClientSocket(int server_sock)
-{
-    sock_ = accept(server_sock, NULL, NULL);
-    if (sock_ == -1)
-    {
-        std::cout << "accept error" << std::endl;
-        throw std::runtime_error("accept error");
-    }
+ClientSocket::ClientSocket(int server_sock) {
+    (void)server_sock;
+    // sock_ = accept(server_sock, NULL, NULL);
+    // if (sock_ == -1)
+    // {
+    //     std::cout << "accept error" << std::endl;
+    //     throw std::runtime_error("accept error");
+    // }
 }
 
-ClientSocket::~ClientSocket() {}
+ClientSocket::~ClientSocket() { close(sock_); }

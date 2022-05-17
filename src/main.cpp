@@ -1,7 +1,6 @@
 #include "WebServ.hpp"
 
-int main()
-{
+int main() {
     WebServ serv;
     serv.run();
     return 0;
