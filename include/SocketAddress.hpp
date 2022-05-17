@@ -10,8 +10,8 @@ private:
     struct sockaddr_in socket_addr_;
 
 public:
-    static const unsigned short SERVER_PORT = 4242;
-    static const std::string    SERVER_ADDR;
+    static const unsigned short server_port = 4242;
+    static const std::string    server_addr;
     SocketAddress();
     ~SocketAddress();
 

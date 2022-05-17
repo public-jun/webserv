@@ -14,7 +14,7 @@ private:
     ServerSocket* s_sock_;
 
 private:
-    void _serverSocketRun();
+    void serverSocketRun();
 };
 
 #endif
