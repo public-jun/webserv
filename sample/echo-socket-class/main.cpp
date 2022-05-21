@@ -31,6 +31,14 @@ int main(void) {
            (void*)&ls1);
     change_list.push_back(ev);
 
+    ListeningSocket ls2;
+    ls2.Bind("127.0.0.1", 5001);
+    ls2.Listen();
+
+    EV_SET(&ev, ls2.GetSocketFd(), EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0,
+           (void*)&ls2);
+    change_list.push_back(ev);
+
     int kq = kqueue();
     if (kq < 0) {
         std::cerr << "KQUEUE ERR" << std::endl;
@@ -63,6 +71,7 @@ int main(void) {
             std::cout << "sockfd: " << active_list[i].ident << std::endl;
             Socket* sock = reinterpret_cast<Socket*>(active_list[i].udata);
             std::cout << "sock type: " << sock->GetSocketType() << std::endl;
+
             if (sock->GetSocketType() == Socket::LISTENING) {
                 std::cout << "Accept NEW SOCKET!" << std::endl;
                 struct sockaddr_in peer_sin;
