@@ -16,9 +16,9 @@ CheckOptions:
     value:           lower_case
   - key:             readability-identifier-naming.PrivateMemberSuffix
     value:           _
-  - key:             readability-identifier-naming.PublicMethodCase
-    value:           camelBack
-  - key:             readability-identifier-naming.privatemethodcase
-    value:           lower_case
-  - key:             readability-identifier-naming.PrivateMethodSuffix
+  - key:             readability-identifier-naming.ProtectedMemberSuffix
     value:           _
+  - key:             readability-identifier-naming.PublicMethodCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.PrivateMethodCase
+    value:           camelBack

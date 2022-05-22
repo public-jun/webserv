@@ -1,6 +1,6 @@
 #ifndef HTTPREQUEST_HPP
 #define HTTPREQUEST_HPP
-#include "ClientSocket.hpp"
+#include "StreamSocket.hpp"
 #include <string>
 
 class HTTPRequest
@@ -14,9 +14,9 @@ private:
 public:
     HTTPRequest(std::string method, std::string uri);
     ~HTTPRequest();
-    std::string& getMethod();
-    std::string& getURI();
-    void         setURI(std::string uri);
+    std::string& GetMethod();
+    std::string& GetURI();
+    void         SetURI(std::string uri);
 };
 
 #endif

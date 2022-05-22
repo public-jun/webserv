@@ -8,8 +8,10 @@ public:
     HTTPResponse(int sock, int status_code, std::string header,
                  std::string body);
     ~HTTPResponse();
-    void create();
-    void sendMessage();
+    HTTPResponse(const HTTPResponse& other);
+    HTTPResponse& operator=(const HTTPResponse& other);
+    void          Create();
+    void          SendMessage();
 
 private:
     int         sock_;

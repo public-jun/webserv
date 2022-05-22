@@ -1,4 +1,5 @@
 #include "HTTPParser.hpp"
+#include "HTTPRequest.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -6,7 +7,7 @@ HTTPParser::HTTPParser() {}
 
 HTTPParser::~HTTPParser() {}
 
-HTTPRequest& HTTPParser::parse(std::string request_message) {
+HTTPRequest* HTTPParser::Parse(std::string request_message) {
     std::string::iterator it =
         std::find(request_message.begin(), request_message.end(), '\n');
     std::string line(request_message.begin(), it);
@@ -21,5 +22,5 @@ HTTPRequest& HTTPParser::parse(std::string request_message) {
         std::cout << "get uri error" << std::endl;
     }
     HTTPRequest* req = new HTTPRequest(method, uri);
-    return *req;
+    return req;
 }

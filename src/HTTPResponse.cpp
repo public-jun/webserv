@@ -9,7 +9,19 @@ HTTPResponse::HTTPResponse(int sock, int status_code, std::string header,
 
 HTTPResponse::~HTTPResponse() {}
 
-void HTTPResponse::create() {
+HTTPResponse::HTTPResponse(const HTTPResponse& other) { *this = other; }
+
+HTTPResponse& HTTPResponse::operator=(const HTTPResponse& other) {
+    if (this != &other) {
+        sock_        = other.sock_;
+        status_code_ = other.status_code_;
+        header_      = other.header_;
+        body_        = other.body_;
+    }
+    return *this;
+}
+
+void HTTPResponse::Create() {
     // 文字列で扱って大丈夫？バイナリの可能性は？
     // TODO:レスポンスのサイズをつくる
 
@@ -24,7 +36,7 @@ void HTTPResponse::create() {
     message_size_ = response_message_.size();
 }
 
-void HTTPResponse::sendMessage() {
+void HTTPResponse::SendMessage() {
     std::cout << "<<message>>\n" << response_message_ << std::endl;
     int ret = send(sock_, response_message_.c_str(), message_size_, 0);
     if (ret == -1) {
