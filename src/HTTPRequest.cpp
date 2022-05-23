@@ -9,7 +9,7 @@ HTTPRequest::HTTPRequest(std::string method, std::string uri)
 
 HTTPRequest::~HTTPRequest() {}
 
-std::string& HTTPRequest::getMethod() { return method_; }
-std::string& HTTPRequest::getURI() { return uri_; }
+std::string& HTTPRequest::GetMethod() { return method_; }
+std::string& HTTPRequest::GetURI() { return uri_; }
 
-void HTTPRequest::setURI(std::string uri) { uri_ = uri; }
+void HTTPRequest::SetURI(std::string uri) { uri_ = uri; }

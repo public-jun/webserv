@@ -19,6 +19,6 @@ CheckOptions:
   - key:             readability-identifier-naming.ProtectedMemberSuffix
     value:           _
   - key:             readability-identifier-naming.PublicMethodCase
-    value:           camelBack
+    value:           CamelCase
   - key:             readability-identifier-naming.PrivateMethodCase
     value:           camelBack

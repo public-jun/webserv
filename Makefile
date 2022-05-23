@@ -3,7 +3,7 @@ NAME      := webserv
 CXX       := clang++
 CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 
-INCDIR    :=    ./include
+INCDIR    :=    ./src
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
@@ -11,14 +11,12 @@ INCLUDE   := -I$(INCDIR)
 VPATH     := src:
 
 SRCS      := main.cpp \
-			Socket.cpp \
-			ClientSocket.cpp \
-			ServerSocket.cpp \
-			SocketAddress.cpp \
+			EventActions.cpp \
 			HTTPParser.cpp \
 			HTTPRequest.cpp \
 			HTTPResponse.cpp \
-			WebServ.cpp \
+			ListeningSocket.cpp \
+			StreamSocket.cpp
 
 OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
 DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
