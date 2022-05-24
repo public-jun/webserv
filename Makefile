@@ -6,7 +6,7 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I./src -I ./src/request -I ./src/response -I ./src/socket -I ./src/event
+INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event
 
 VPATH     := src: \
 			src/request \
