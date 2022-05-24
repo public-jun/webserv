@@ -3,12 +3,16 @@ NAME      := webserv
 CXX       := clang++
 CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 
-INCDIR    :=    ./src
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I$(INCDIR)
-VPATH     := src:
+INCLUDE   := -I./src -I ./src/request -I ./src/response -I ./src/socket -I ./src/event
+
+VPATH     := src: \
+			src/request \
+			src/response \
+			src/socket \
+			src/event
 
 SRCS      := main.cpp \
 			EventActions.cpp \
@@ -30,7 +34,7 @@ $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS) $(LIBS)
 
 $(OBJDIR)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -I$(INCDIR) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
 
 -include $(DPS)
 
