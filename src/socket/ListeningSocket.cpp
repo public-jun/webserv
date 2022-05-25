@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+std::map<int, ListeningSocket*> ListeningSocket::all_listener;
+
 ListeningSocket::ListeningSocket() { SetSocketType(Socket::LISTENING); }
 
 ListeningSocket::~ListeningSocket() {}

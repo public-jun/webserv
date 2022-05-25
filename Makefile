@@ -14,15 +14,18 @@ VPATH     := src: \
 			src/socket \
 			src/event
 
-SRCS      := main.cpp \
-			EventActions.cpp \
-			HTTPParser.cpp \
-			HTTPRequest.cpp \
-			HTTPResponse.cpp \
+TESTSRCS  := EventActions.cpp \
 			ListeningSocket.cpp \
-			StreamSocket.cpp
+			StreamSocket.cpp \
+			HTTPRequest.cpp \
+			HTTPParser.cpp \
+			HTTPResponse.cpp
+
+SRCS := main.cpp \
+			$(TESTSRCS)
 
 OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
+TESTOBJS  := $(addprefix $(OBJDIR)/, $(notdir $(TESTSRCS:.cpp=.o)))
 DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
 
 RM        := rm -rf
@@ -31,7 +34,7 @@ RM        := rm -rf
 all: makedir $(NAME)
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS) $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
@@ -77,7 +80,7 @@ $(gtest):
 	mv googletest-release-1.11.0 $(gtestdir)
 
 test_compile = clang++ -std=c++11 \
-	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc ./src/request/HTTPRequest.cpp \
+	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc $(TESTOBJS) \
 	-g -fsanitize=address -fsanitize=undefined -fsanitize=leak \
 	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
 
@@ -85,7 +88,10 @@ test_compile = clang++ -std=c++11 \
 gtest: $(gtest)
 	$(test_compile)
 	./tester
-# ./tester # --gtest_filter=Vector.other
+
+gtestlist:
+	@./tester --gtest_list_tests
+	@echo "\nRUN ./tester --gtest_fileter=(TESTCASE).(TESTNAME)"
 
 .PHONY: cleangtest
 cleangtest:
