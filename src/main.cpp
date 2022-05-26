@@ -5,7 +5,6 @@
 #include "Socket.hpp"
 #include "StreamSocket.hpp"
 
-std::map<int, ListeningSocket*> ListeningSocket::all_listener;
 
 int main(void) {
     // Event Action set up
