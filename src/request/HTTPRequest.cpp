@@ -57,18 +57,29 @@ void HTTPRequest::parseFirstline(std::string line) {
     }
 
     // バリデート
-    if (method.empty() || uri.empty()) {
+    if (method.empty() || uri.empty() || !isToken(method)) {
         throwErrorBadrequest("error request line");
     }
 
-    if (methods.find(method) == methods.end()) {
-        throwErrorBadrequest("error request line");
-    }
     // バージョンが1.1以外なら505
 
     method_  = method;
     uri_     = uri;
     version_ = version;
+}
+
+// tokenとして適切な文字列か判定
+//
+// note: こういうのクラスのメソッドである意味がないからクラスの外に出したい
+// その場合、request/utils/isToken.cpp になる？
+bool HTTPRequest::isToken(std::string str) {
+    const std::string special = "!#$%&'*+-.^_`|~";
+    for (std::string::iterator it = str.begin(); it != str.end(); it++) {
+        if (!std::isalnum(*it) && special.find(*it) == special.npos) {
+            return false;
+        }
+    }
+    return true;
 }
 
 void HTTPRequest::parseHeaderLine(std::string line) {
@@ -80,10 +91,12 @@ void HTTPRequest::parseHeaderLine(std::string line) {
         value = line.substr(pos + 1, line.size() - pos);
     }
 
-    // TODO
-    // keyにスペースあるとNG
+    if (!isToken(key)) {
+        throwErrorBadrequest("error token");
+    }
 
     // valueの前後のスペースはtrim
+
     // valueの間にスペースはNG
 
     headers_.insert(std::make_pair(key, value));
