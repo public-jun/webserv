@@ -82,10 +82,22 @@ bool HTTPRequest::isToken(std::string str) {
     return true;
 }
 
+// nginxはタブ入れると400になるけどrfc的にはスペースでもタブでも大丈夫そう
+std::string HTTPRequest::trimSpace(const std::string& str,
+                                   const std::string  trim_char_set = " \t") {
+    std::string            result;
+    std::string::size_type left = str.find_first_not_of(trim_char_set);
+
+    if (left != str.npos) {
+        std::string::size_type right = str.find_last_not_of(trim_char_set);
+        result                       = str.substr(left, right - left + 1);
+    }
+    return result;
+}
+
 void HTTPRequest::parseHeaderLine(std::string line) {
-    std::cout << GREEN << "line: " << line << RESET << std::endl;
-    std::size_t pos = line.find(":");
-    std::string key, value;
+    std::string::size_type pos = line.find(":");
+    std::string            key, value;
     key = line.substr(0, pos);
     if (pos != line.npos) {
         value = line.substr(pos + 1, line.size() - pos);
@@ -96,6 +108,7 @@ void HTTPRequest::parseHeaderLine(std::string line) {
     }
 
     // valueの前後のスペースはtrim
+    value = trimSpace(value);
 
     // valueの間にスペースはNG
 
@@ -103,18 +116,16 @@ void HTTPRequest::parseHeaderLine(std::string line) {
 }
 
 bool HTTPRequest::isLastLine(std::string& str) {
-    const std::size_t crlf_size    = crlf.size();
-    std::size_t       line_end_pos = str.find(crlf);
-    std::string       next_line    = str.substr(line_end_pos + crlf_size);
+    const std::string::size_type crlf_size    = crlf.size();
+    std::string::size_type       line_end_pos = str.find(crlf);
+    std::string next_line = str.substr(line_end_pos + crlf_size);
 
     return next_line.size() >= crlf_size &&
            next_line.substr(0, crlf_size) == crlf;
 }
 
 void HTTPRequest::parseBody(std::string body) {
-    std::cout << "body: " << body << std::endl;
     if (body.empty()) {
-        std::cout << "empty body" << std::endl;
         return;
     }
     if (body.size() >= crlf.size() && body.substr(0, crlf.size()) == crlf) {
@@ -131,7 +142,7 @@ void HTTPRequest::throwErrorBadrequest(std::string err_message) {
 
 void HTTPRequest::parse() {
     try {
-        std::size_t line_end_pos = row_.find(crlf);
+        std::string::size_type line_end_pos = row_.find(crlf);
         if (line_end_pos == row_.npos) {
             throwErrorBadrequest("error request line");
         }
@@ -140,9 +151,9 @@ void HTTPRequest::parse() {
 
         std::string str = row_;
         while (status_ == 200 && !isLastLine(str)) {
-            std::size_t line_start_pos = line_end_pos + crlf.size();
-            str                        = str.substr(line_start_pos);
-            line_end_pos               = str.find(crlf);
+            std::string::size_type line_start_pos = line_end_pos + crlf.size();
+            str                                   = str.substr(line_start_pos);
+            line_end_pos                          = str.find(crlf);
 
             if (line_end_pos == row_.npos) {
                 throwErrorBadrequest("missing crlf");

@@ -37,9 +37,12 @@ private:
     void parseFirstline(std::string line);
     void parseHeaderLine(std::string line);
     void parseBody(std::string body);
-    bool isLastLine(std::string& str);
-    bool isToken(std::string str);
     void throwErrorBadrequest(std::string err_message);
+
+    bool        isLastLine(std::string& str);
+    bool        isToken(std::string str);
+    std::string trimSpace(const std::string& string,
+                          const std::string  trim_char_set);
 };
 
 #endif
