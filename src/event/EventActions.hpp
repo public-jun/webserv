@@ -7,8 +7,7 @@
 #include "Socket.hpp"
 
 class Socket;
-class EventActions
-{
+class EventActions {
 public:
     EventActions();
     ~EventActions();

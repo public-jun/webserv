@@ -4,8 +4,7 @@
 #include <set>
 #include <string>
 
-class HTTPRequest
-{
+class HTTPRequest {
 public:
     HTTPRequest(const std::string& row);
     HTTPRequest(std::string method, std::string uri);
