@@ -26,7 +26,7 @@ private:
     std::string                        request_message_;
     std::string                        method_;
     std::string                        request_target_;
-    std::string                        version_;
+    std::string                        HTTPVersion_;
     std::string                        body_;
     std::string                        row_;
     std::map<std::string, std::string> headers_;
@@ -39,7 +39,9 @@ private:
     void throwErrorBadrequest(std::string err_message);
 
     void varidateMethod(std::string& method);
-    void varidateRequestTarget(std::string& request_target);
+    void varidateRequestTarget(std::string request_target);
+    void varidateHTTPVersion(std::string version);
+    bool isdigit(std::string str);
 
     bool        isLastLine(std::string& str);
     bool        isToken(std::string str);

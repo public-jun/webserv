@@ -30,11 +30,12 @@ void testRequest(testcase* test) {
 
     ASSERT_EQ(test->expect_status, req.GetStatus());
     EXPECT_EQ(test->exepct_method, req.GetMethod());
-    EXPECT_EQ(test->expect_uri, req.GetURI());
+    EXPECT_EQ(test->expect_uri, req.GetRequestTarget());
     EXPECT_EQ(test->expect_version, req.GetVersion());
     EXPECT_EQ(test->expect_host, req.GetHeaderValue("Host"));
 }
 
+// expect status 200
 TEST(HTTPRequest, Simple) {
     testcase t = { "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n",
                    200,
@@ -68,32 +69,89 @@ TEST(HTTPRequest, SpecifyTarget) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
+// ERROR CASE
+// expect status 400
 TEST(HTTPRequest, LowercaseMethod) {
     testcase t = { "get / HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
-TEST(HTTPRequest, NoHost) {
-    testcase t = { "GET / HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
+/* TEST(HTTPRequest, NoHost) { */
+/*     testcase t = { "GET / HTTP/1.1\r\n\r\n", 400, "", "", "", "" }; */
+/*     testRequest(&t); */
+/*     printMessageIfFailed(t.message, testing::Test::HasFailure()); */
+/* } */
+
+TEST(HTTPRequest, VersionNotExistName) {
+    testcase t = { "GET / /1.1\r\nHost: localhost\r\n\r\n", 400, "", "", "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
-TEST(HTTPRequest, UnsupportedMethod) {
-    testcase t = {
-        "HOGE / HTTP/1.1\r\nHost: localhost\r\n\r\n", 405, "", "", "",
-    };
-    testRequest(&t);
-    printMessageIfFailed(t.message, testing::Test::HasFailure());
-}
-
-TEST(HTTPRequest, VersionNotSupported) {
-    testcase t = { "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n", 505, "", "",
+TEST(HTTPRequest, VersionLowerCase) {
+    testcase t = { "GET / http/1.1\r\nHost: localhost\r\n\r\n", 400, "", "",
                    "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
-TEST(HTTPRequest, KeyIncludeSpace) {}
+TEST(HTTPRequest, VersionMultipleDot) {
+    testcase t = { "GET / HTTP/1.1.1\r\nHost: localhost\r\n\r\n", 400, "", "",
+                   "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, VersionEndWithDot) {
+    testcase t = { "GET / HTTP/1.\r\nHost: localhost\r\n\r\n", 400, "", "",
+                   "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, VersionStartWithDot) {
+    testcase t = { "GET / HTTP/.1\r\nHost: localhost\r\n\r\n", 400, "", "",
+                   "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, VersionOnlyName) {
+    testcase t = { "GET / HTTP/\r\nHost: localhost\r\n\r\n", 400, "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, VersionNotExistSlash) {
+    testcase t = { "GET / HTTP1.1\r\nHost: localhost\r\n\r\n", 400, "", "",
+                   "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, VersionNotExistdot) {
+    testcase t = { "GET / HTTP/1\r\nHost: localhost\r\n\r\n", 400, "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+// expect other status code
+/* TEST(HTTPRequest, UnsupportedMethod) { */
+/*     testcase t = { */
+/*         "HOGE / HTTP/1.1\r\nHost: localhost\r\n\r\n", 405, "", "", "", */
+/*     }; */
+/*     testRequest(&t); */
+/*     printMessageIfFailed(t.message, testing::Test::HasFailure()); */
+/* } */
+
+/* TEST(HTTPRequest, VersionNotSupported) { */
+/*     testcase t = { "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n", 505, "", "",
+ */
+/*                    "" }; */
+/*     testRequest(&t); */
+/*     printMessageIfFailed(t.message, testing::Test::HasFailure()); */
+/* } */
+
+/* TEST(HTTPRequest, KeyIncludeSpace) {} */
 

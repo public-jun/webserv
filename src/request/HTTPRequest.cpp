@@ -32,7 +32,7 @@ std::string& HTTPRequest::GetMethod() { return method_; }
 
 std::string& HTTPRequest::GetRequestTarget() { return request_target_; }
 
-std::string& HTTPRequest::GetVersion() { return version_; }
+std::string& HTTPRequest::GetVersion() { return HTTPVersion_; }
 
 int HTTPRequest::GetStatus() { return status_; }
 
@@ -58,28 +58,76 @@ void HTTPRequest::varidateMethod(std::string& method) {
     }
 }
 
+bool HTTPRequest::isdigit(std::string str) {
+    for (std::string::iterator it = str.begin(); it != str.end(); it++) {
+        if (!std::isdigit(*it)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void HTTPRequest::varidateRequestTarget(std::string request_target) {
+    if (request_target.empty()) {
+        throwErrorBadrequest("error request target");
+    }
+}
+
+void HTTPRequest::varidateHTTPVersion(std::string version) {
+    if (version.empty()) {
+        throwErrorBadrequest("error HTTP version");
+    }
+
+    std::string::size_type pos = version.find("/");
+    if (pos == version.npos) {
+        throwErrorBadrequest("error not exist slash");
+    }
+
+    std::string name = version.substr(0, pos);
+    if (name != "HTTP") {
+        throwErrorBadrequest("error protocol name");
+    }
+
+    std::string            digit   = version.substr(pos + 1);
+    std::string::size_type dot_pos = digit.find_first_of('.');
+
+    // dotがあるか
+    // dotが複数ないか
+    if (dot_pos == digit.npos || dot_pos != digit.find_last_of('.')) {
+        throwErrorBadrequest("error version");
+    }
+
+    std::string before_dot = digit.substr(0, dot_pos);
+    std::string after_dot  = digit.substr(dot_pos + 1);
+    // dotの前後が空か
+    // dotの前後が数字か
+    if (before_dot.empty() || after_dot.empty() || !isdigit(before_dot) ||
+        !isdigit(after_dot)) {
+        throwErrorBadrequest("error version");
+    }
+}
+
 void HTTPRequest::parseFirstline(std::string line) {
     std::istringstream iss(line);
-    std::string        method, uri;
+    std::string        method, request_target;
     std::string        version = "HTTP/1.1";
 
-    iss >> method >> uri >> version;
+    iss >> method >> request_target >> version;
 
-    if (uri == "/") {
-        uri = "index.html";
+    if (request_target == "/") {
+        request_target = "index.html";
     }
 
     // バリデート
     varidateMethod(method);
-    if (method.empty() || uri.empty() || !isToken(method)) {
-        throwErrorBadrequest("error request line");
-    }
+    varidateRequestTarget(request_target);
+    varidateHTTPVersion(version);
 
     // バージョンが1.1以外なら505
 
     method_         = method;
-    request_target_ = uri;
-    version_        = version;
+    request_target_ = request_target;
+    HTTPVersion_    = version;
 }
 
 // tokenとして適切な文字列か判定
