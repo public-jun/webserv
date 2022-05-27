@@ -1,5 +1,6 @@
 #include "EventActions.hpp"
 
+#include <cerrno>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -7,6 +8,7 @@
 #include "ListeningSocket.hpp"
 #include "Socket.hpp"
 #include "StreamSocket.hpp"
+#include "SysError.hpp"
 
 #include <iostream>
 
@@ -14,14 +16,11 @@ EventActions::EventActions() { active_list_.resize(1024); }
 
 EventActions::~EventActions() {}
 
-bool EventActions::Init() {
+void EventActions::Init() {
     kqueue_fd_ = kqueue();
     if (kqueue_fd_ < 0) {
-        // err
-        std::cerr << "KQUEUE ERR" << std::endl;
-        return false;
+        throw SysError("kqueue", errno);
     }
-    return true;
 }
 
 bool EventActions::AddAcceptEvent(Socket* sock) {
@@ -114,8 +113,7 @@ void EventActions::ProcessEvent() {
 
     change_list_.clear();
     if (event_size < 0) {
-        // err
-        std::cerr << "KEVENT ERR" << std::endl;
+        throw SysError("kevent", errno);
     }
 
     onEvent(active_list_, event_size);
@@ -130,23 +128,18 @@ void EventActions::onEvent(std::vector<struct kevent> active_list,
         }
 
         if (sock->GetSocketType() == Socket::LISTENING) {
-            // 新しいクライアントからアクセス
             ListeningSocket* listener = dynamic_cast<ListeningSocket*>(sock);
             listener->OnAccept();
         } else if (sock->GetSocketType() == Socket::STREAM) {
+            StreamSocket* s_sock = dynamic_cast<StreamSocket*>(sock);
             if (active_list[i].flags == EV_EOF) {
-                std::cout << "---EOF---" << std::endl;
-                std::exit(1);
-            }
-            // ソケットから読み込み
-            if (active_list[i].filter == EVFILT_READ) {
+                s_sock->OnDisConnect();
+                delete s_sock;
+            } else if (active_list[i].filter == EVFILT_READ) {
                 std::cout << "Recv REQUEST" << std::endl;
-                StreamSocket* s_sock = dynamic_cast<StreamSocket*>(sock);
                 s_sock->OnRecv();
-                // ソケットへ書き込み
             } else if (active_list[i].filter == EVFILT_WRITE) {
                 std::cout << "Send RESPONSE" << std::endl;
-                StreamSocket* s_sock = dynamic_cast<StreamSocket*>(sock);
                 s_sock->OnSend();
                 delete s_sock;
             }

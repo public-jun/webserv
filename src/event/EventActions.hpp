@@ -12,7 +12,7 @@ public:
     EventActions();
     ~EventActions();
 
-    bool Init();
+    void Init();
 
     // Add event
     bool AddAcceptEvent(Socket* sock);
