@@ -16,6 +16,9 @@
 *.dylib
 *.dll
 
+# test libraries
+google_test/*
+
 # Fortran module files
 *.mod
 *.smod
@@ -31,6 +34,8 @@
 *.out
 *.app
 webserv
+tester
 
 #others
 compile_commands.json
+*.dSYM

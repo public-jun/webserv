@@ -5,8 +5,7 @@
 #include <string>
 
 class HTTPRequest;
-class HTTPParser
-{
+class HTTPParser {
 private:
     /* data */
 public:

@@ -5,8 +5,7 @@
 #include <netinet/in.h>
 
 class EventActions;
-class Socket
-{
+class Socket {
 public:
     enum SOCKET_TYPE {
         LISTENING,
@@ -17,7 +16,7 @@ public:
     Socket(int sock) : sock_fd_(sock) {}
     virtual ~Socket() {}
 
-    void       SetSocketType(SOCKET_TYPE type) { type_ = type; }
+    void        SetSocketType(SOCKET_TYPE type) { type_ = type; }
     SOCKET_TYPE GetSocketType() { return type_; }
 
     void SetSocketFd(const int& sock) { sock_fd_ = sock; }
@@ -31,7 +30,7 @@ public:
 
 protected:
     int                sock_fd_;
-    SOCKET_TYPE         type_;
+    SOCKET_TYPE        type_;
     struct sockaddr_in addr_;
 
     EventActions* actions_;

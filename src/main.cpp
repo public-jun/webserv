@@ -5,7 +5,6 @@
 #include "Socket.hpp"
 #include "StreamSocket.hpp"
 
-
 int main(void) {
     // Event Action set up
     EventActions event_actions;

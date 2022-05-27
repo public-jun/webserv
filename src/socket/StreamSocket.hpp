@@ -10,8 +10,7 @@
 class HTTPParser;
 class HTTPRequest;
 class HTTPResponse;
-class StreamSocket : public Socket
-{
+class StreamSocket : public Socket {
 public:
     StreamSocket();
     virtual ~StreamSocket();

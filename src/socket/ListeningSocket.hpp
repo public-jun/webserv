@@ -6,8 +6,7 @@
 
 #include "Socket.hpp"
 
-class ListeningSocket : public Socket
-{
+class ListeningSocket : public Socket {
 public:
     ListeningSocket();
     virtual ~ListeningSocket();

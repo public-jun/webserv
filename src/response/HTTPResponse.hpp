@@ -2,8 +2,7 @@
 #define HTTPRESPONSE_HPP
 #include <string>
 
-class HTTPResponse
-{
+class HTTPResponse {
 public:
     HTTPResponse(int sock, int status_code, std::string header,
                  std::string body);
