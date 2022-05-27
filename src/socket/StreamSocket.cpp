@@ -1,8 +1,10 @@
 #include "StreamSocket.hpp"
 
-#include "HTTPParser.hpp"
+// #include "HTTPParser.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
+#include "SysError.hpp"
+#include <cerrno>
 #include <unistd.h>
 
 #include <fstream>
@@ -43,8 +45,10 @@ void StreamSocket::Send() {
 }
 
 void StreamSocket::Close() {
-    if (sock_fd_ != 0) {
-        close(sock_fd_);
+    if (sock_fd_ <= 0) {
+        if (close(sock_fd_) < 0) {
+            throw SysError("close", errno);
+        }
         sock_fd_ = 0;
     }
 }
@@ -52,7 +56,7 @@ void StreamSocket::Close() {
 void StreamSocket::OnRecv() {
     read_size_ = recv(sock_fd_, buf_, buf_size_, 0);
     if (read_size_ < 0) {
-        // err
+        throw SysError("recv", errno);
     }
     buf_[read_size_] = '\0';
     // Request Parser
@@ -94,9 +98,6 @@ void StreamSocket::parseRequest() {
 
 void StreamSocket::OnSend() {
     res_->SendMessage();
-    // if (res < 0) {
-    // err
-    // }
     // del event
     OnDisConnect();
 }

@@ -1,6 +1,7 @@
 #include "ListeningSocket.hpp"
 
 #include <arpa/inet.h>
+#include <cerrno>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -9,6 +10,7 @@
 #include <utility>
 
 #include "StreamSocket.hpp"
+#include "SysError.hpp"
 
 #include <iostream>
 
@@ -16,14 +18,12 @@ std::map<int, ListeningSocket*> ListeningSocket::all_listener;
 
 ListeningSocket::ListeningSocket() { SetSocketType(Socket::LISTENING); }
 
-ListeningSocket::~ListeningSocket() {}
+ListeningSocket::~ListeningSocket() { Close(); }
 
-bool ListeningSocket::Bind(const std::string& ip, int port) {
+void ListeningSocket::Bind(const std::string& ip, int port) {
     sock_fd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (sock_fd_ < 0) {
-        // err
-        std::cerr << "SOCKET ERR" << std::endl;
-        return false;
+        throw SysError("socket", errno);
     }
     all_listener.insert(std::make_pair(sock_fd_, this));
 
@@ -37,42 +37,35 @@ bool ListeningSocket::Bind(const std::string& ip, int port) {
 
     if (bind(sock_fd_, (struct sockaddr*)&addr_, sizeof(addr_)) < 0) {
         // err
-        std::cerr << "BIND ERR" << std::endl;
-        Close();
-        return false;
+        throw SysError("bind", errno);
     }
-    return true;
 }
 
-bool ListeningSocket::Listen() {
+void ListeningSocket::Listen() {
     if (listen(sock_fd_, SOMAXCONN) < 0) {
-        // err
-        std::cerr << "BIND ERR" << std::endl;
-        Close();
-        return false;
+        throw SysError("listen", errno);
     }
 
     // NonBlocking
     if (fcntl(sock_fd_, F_SETFL, O_NONBLOCK) < 0) {
-        std::cerr << "BIND ERR" << std::endl;
-        Close();
-        return false;
+        throw SysError("fcntl", errno);
     }
     Accept();
-    return true;
 }
 
-bool ListeningSocket::Accept() {
+void ListeningSocket::Accept() {
     if (actions_) {
         actions_->AddAcceptEvent(this);
     }
-    return true;
 }
 
 void ListeningSocket::Close() {
-    if (sock_fd_ != 0) {
+    if (sock_fd_ <= 0) {
         all_listener.erase(sock_fd_);
-        close(sock_fd_);
+        if (close(sock_fd_) < 0) {
+            throw SysError("close", errno);
+        }
+        sock_fd_ = 0;
     }
 }
 
@@ -82,6 +75,9 @@ void ListeningSocket::OnAccept() {
 
     len      = sizeof(peer_sin);
     new_sock = accept(sock_fd_, (struct sockaddr*)&peer_sin, (socklen_t*)&len);
+    if (new_sock < 0) {
+        throw SysError("accept", errno);
+    }
 
     StreamSocket* s_sock = new StreamSocket();
     s_sock->SetSocketFd(new_sock);

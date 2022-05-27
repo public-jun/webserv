@@ -11,12 +11,12 @@ public:
     ListeningSocket();
     virtual ~ListeningSocket();
 
-    bool Bind(const std::string& ip, int port);
-    bool Listen();
+    void Bind(const std::string& ip, int port);
+    void Listen();
     void Close();
 
     // Add event
-    bool Accept();
+    void Accept();
 
     // Do event
     void OnAccept();

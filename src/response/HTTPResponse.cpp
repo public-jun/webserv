@@ -1,4 +1,6 @@
 #include "HTTPResponse.hpp"
+#include "SysError.hpp"
+#include <cerrno>
 #include <iostream>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -40,6 +42,7 @@ void HTTPResponse::SendMessage() {
     std::cout << "<<message>>\n" << response_message_ << std::endl;
     int ret = send(sock_, response_message_.c_str(), message_size_, 0);
     if (ret == -1) {
-        std::cout << "send error" << std::endl;
+        throw SysError("send", errno);
+        // std::cout << "send error" << std::endl;
     }
 }
