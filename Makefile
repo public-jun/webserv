@@ -61,11 +61,11 @@ re: fclean all
 
 .PHONY: tidy
 tidy:
-	clang-tidy `find src include -type f` -- -I$(INCDIR)
+	clang-tidy `find src -type f` -- $(INCLUDE)
 
 .PHONY: tidy-fix
 tidy-fix:
-	clang-tidy `find src include -type f` --fix -- -I$(INCDIR)
+	clang-tidy `find src include -type f` --fix -- $(INCLUDE)
 
 ################# google test ####################
 
