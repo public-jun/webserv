@@ -123,8 +123,6 @@ void HTTPRequest::parseFirstline(std::string line) {
     varidateRequestTarget(request_target);
     varidateHTTPVersion(version);
 
-    // バージョンが1.1以外なら505
-
     method_         = method;
     request_target_ = request_target;
     HTTPVersion_    = version;
@@ -198,6 +196,8 @@ void HTTPRequest::throwErrorBadrequest(std::string err_message) {
     throw std::runtime_error(err_message);
 }
 
+bool HTTPRequest::hostExists() { return !GetHeaderValue("Host").empty(); }
+
 void HTTPRequest::parse() {
     try {
         std::string::size_type line_end_pos = row_.find(crlf);
@@ -218,10 +218,15 @@ void HTTPRequest::parse() {
             }
             parseHeaderLine(str.substr(0, line_end_pos));
         }
+        if (!hostExists()) {
+            throwErrorBadrequest("no host");
+        }
         std::string body =
             str.substr(str.find(crlf) + crlf.size() + crlf.size());
         parseBody(body);
     } catch (std::runtime_error& e) {
         std::cout << RED << "exception: " << e.what() << RESET << std::endl;
     } catch (std::exception& e) {}
+
+    // バージョンが1.1以外なら505
 }

@@ -77,11 +77,13 @@ TEST(HTTPRequest, LowercaseMethod) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
-/* TEST(HTTPRequest, NoHost) { */
-/*     testcase t = { "GET / HTTP/1.1\r\n\r\n", 400, "", "", "", "" }; */
-/*     testRequest(&t); */
-/*     printMessageIfFailed(t.message, testing::Test::HasFailure()); */
-/* } */
+TEST(HTTPRequest, NoHost) {
+    testcase t = {
+        "GET / HTTP/1.1\r\n\r\n", 400, "GET", "index.html", "HTTP/1.1", ""
+    };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
 
 TEST(HTTPRequest, VersionNotExistName) {
     testcase t = { "GET / /1.1\r\nHost: localhost\r\n\r\n", 400, "", "", "" };
