@@ -11,7 +11,7 @@ public:
     HTTPRequest(std::string method, std::string uri);
     ~HTTPRequest();
     std::string&                       GetMethod();
-    std::string&                       GetURI();
+    std::string&                       GetRequestTarget();
     std::string&                       GetVersion();
     int                                GetStatus();
     std::map<std::string, std::string> GetHeaders();
@@ -26,7 +26,7 @@ public:
 private:
     std::string                        request_message_;
     std::string                        method_;
-    std::string                        uri_;
+    std::string                        request_target_;
     std::string                        version_;
     std::string                        body_;
     std::string                        row_;
@@ -39,10 +39,17 @@ private:
     void parseBody(std::string body);
     void throwErrorBadrequest(std::string err_message);
 
+    void varidateMethod(std::string& method);
+    void varidateRequestTarget(std::string& request_target);
+
     bool        isLastLine(std::string& str);
     bool        isToken(std::string str);
     std::string trimSpace(const std::string& string,
                           const std::string  trim_char_set);
+
+    bool isSupportedMethod();
+    bool isSupportedVersion();
+    bool hostExists();
 };
 
 #endif

@@ -65,12 +65,12 @@ void StreamSocket::parseRequest() {
     req_    = parser_->Parse(std::string(buf_));
 
     if (req_->GetMethod() == "GET") {
-        if (req_->GetURI() == "/") {
+        if (req_->GetRequestTarget() == "/") {
             req_->SetURI(std::string("/index.html"));
         }
 
         // uri で指定されたファイルを読み取る
-        std::ifstream ifs(req_->GetURI().erase(0, 1));
+        std::ifstream ifs(req_->GetRequestTarget().erase(0, 1));
         std::string   tmp, file_cotent;
         if (ifs.fail()) {
             // err
