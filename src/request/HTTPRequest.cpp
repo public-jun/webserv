@@ -60,15 +60,6 @@ void HTTPRequest::varidateMethod(std::string& method) {
     }
 }
 
-bool HTTPRequest::isdigit(std::string str) {
-    for (std::string::iterator it = str.begin(); it != str.end(); it++) {
-        if (!std::isdigit(*it)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 void HTTPRequest::varidateRequestTarget(std::string request_target) {
     if (request_target.empty()) {
         throwErrorBadrequest("error request target");
@@ -109,6 +100,7 @@ void HTTPRequest::varidateHTTPVersion(std::string version) {
     }
 }
 
+// リクエストの1行目をパースしてバリデート
 void HTTPRequest::parseFirstline(std::string line) {
     std::istringstream iss(line);
     std::string        method, request_target;
@@ -120,7 +112,6 @@ void HTTPRequest::parseFirstline(std::string line) {
         request_target = "index.html";
     }
 
-    // バリデート
     varidateMethod(method);
     varidateRequestTarget(request_target);
     varidateHTTPVersion(version);
@@ -173,7 +164,7 @@ void HTTPRequest::parseHeaderLine(std::string line) {
     }
 
     value = trimSpace(value);
-    if (value.find(crlf) != value.npos) {
+    if (value.find_first_of(crlf) != value.npos) {
         throwErrorBadrequest("error value");
     }
 
@@ -257,5 +248,14 @@ void HTTPRequest::parse() {
     } catch (std::runtime_error& e) {
         // std::cout << RED << "exception: " << e.what() << RESET << std::endl;
     } catch (std::exception& e) {}
+}
+
+bool HTTPRequest::isdigit(std::string str) {
+    for (std::string::iterator it = str.begin(); it != str.end(); it++) {
+        if (!std::isdigit(*it)) {
+            return false;
+        }
+    }
+    return true;
 }
 
