@@ -107,6 +107,18 @@ TEST(HTTPRequest, SpecifyTarget) {
 
 // ERROR CASE
 // expect status 400
+TEST(HTTPRequest, EmptyMethod) {
+    testcase t = { "/ HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, EmptyRequestTarget) {
+    testcase t = { "GET HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
 TEST(HTTPRequest, LowercaseMethod) {
     testcase t = { "get / HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
     testRequest(&t);
@@ -193,6 +205,13 @@ TEST(HTTPRequest, ValueContainLF) {
 TEST(HTTPRequest, KeyIncludeSpace) {
     testcase t = { "GET / HTTP/1.1\r\nHost : localhost\r\n\r\n", 400, "", "",
                    "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, EmptyKey) {
+    testcase t = { "GET / HTTP/1.1\r\nHost: localhost\r\n:hoge\r\n\r\n", 400,
+                   "", "", "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
