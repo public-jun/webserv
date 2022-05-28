@@ -208,6 +208,24 @@ void HTTPRequest::parseBody(std::string body) {
 
 bool HTTPRequest::hostExists() { return !GetHeaderValue("Host").empty(); }
 
+// 2行目以降のヘッダーをパース
+void HTTPRequest::parseHeaderLines(std::string&           str,
+                                   std::string::size_type line_end_pos) {
+    while (!isLastLine(str)) {
+        std::string::size_type line_start_pos = line_end_pos + crlf.size();
+        str                                   = str.substr(line_start_pos);
+        line_end_pos                          = str.find(crlf);
+
+        if (line_end_pos == row_.npos) {
+            throwErrorBadrequest("missing crlf");
+        }
+        parseHeaderLine(str.substr(0, line_end_pos));
+    }
+    if (!hostExists()) {
+        throwErrorBadrequest("no host");
+    }
+}
+
 void HTTPRequest::parse() {
     try {
         std::string::size_type line_end_pos = row_.find(crlf);
@@ -218,19 +236,7 @@ void HTTPRequest::parse() {
         parseFirstline(row_.substr(0, line_end_pos));
 
         std::string str = row_;
-        while (!isLastLine(str)) {
-            std::string::size_type line_start_pos = line_end_pos + crlf.size();
-            str                                   = str.substr(line_start_pos);
-            line_end_pos                          = str.find(crlf);
-
-            if (line_end_pos == row_.npos) {
-                throwErrorBadrequest("missing crlf");
-            }
-            parseHeaderLine(str.substr(0, line_end_pos));
-        }
-        if (!hostExists()) {
-            throwErrorBadrequest("no host");
-        }
+        parseHeaderLines(str, line_end_pos);
         std::string body =
             str.substr(str.find(crlf) + crlf.size() + crlf.size());
         parseBody(body);

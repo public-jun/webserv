@@ -42,6 +42,8 @@ private:
 
     void parse();
     void parseFirstline(std::string line);
+    void parseHeaderLines(std::string&           str,
+                          std::string::size_type line_end_pos);
     void parseHeaderLine(std::string line);
     void parseBody(std::string body);
 
