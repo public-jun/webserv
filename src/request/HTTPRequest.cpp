@@ -18,7 +18,8 @@ std::set<std::string> HTTPRequest::methods;
 
 const std::string HTTPRequest::crlf = "\r\n";
 
-HTTPRequest::HTTPRequest(const std::string& row) : row_(row), status_(200) {
+HTTPRequest::HTTPRequest(const std::string& row)
+    : row_(row), status_(status_ok) {
     HTTPRequest::methods.insert("GET");
     parse();
 }
@@ -191,8 +192,21 @@ void HTTPRequest::parseBody(std::string body) {
     body_ = body;
 }
 
-void HTTPRequest::throwErrorBadrequest(std::string err_message) {
-    status_ = 400;
+void HTTPRequest::throwErrorBadrequest(
+    std::string err_message = "bad request") {
+    status_ = status_bad_request;
+    throw std::runtime_error(err_message);
+}
+
+void HTTPRequest::throwErrorMethodNotAllowed(
+    std::string err_message = "method not allowed") {
+    status_ = status_method_not_allowed;
+    throw std::runtime_error(err_message);
+}
+
+void HTTPRequest::throwErrorVersionNotSupported(
+    std::string err_message = "version not supported") {
+    status_ = status_version_not_supported;
     throw std::runtime_error(err_message);
 }
 
@@ -208,7 +222,7 @@ void HTTPRequest::parse() {
         parseFirstline(row_.substr(0, line_end_pos));
 
         std::string str = row_;
-        while (status_ == 200 && !isLastLine(str)) {
+        while (status_ == status_ok && !isLastLine(str)) {
             std::string::size_type line_start_pos = line_end_pos + crlf.size();
             str                                   = str.substr(line_start_pos);
             line_end_pos                          = str.find(crlf);
@@ -224,9 +238,17 @@ void HTTPRequest::parse() {
         std::string body =
             str.substr(str.find(crlf) + crlf.size() + crlf.size());
         parseBody(body);
-    } catch (std::runtime_error& e) {
-        std::cout << RED << "exception: " << e.what() << RESET << std::endl;
-    } catch (std::exception& e) {}
 
-    // バージョンが1.1以外なら505
+        // 400以外のエラー処理
+        if (HTTPVersion_ != "HTTP/1.1") {
+            throwErrorVersionNotSupported();
+        }
+        if (methods.find(method_) == methods.end()) {
+            throwErrorMethodNotAllowed();
+        }
+    } catch (std::runtime_error& e) {
+        // std::cout << RED << "exception: " << e.what() << RESET << std::endl;
+    } catch (std::exception& e) {}
 }
+
+// TODO: keyをキャピタライズ

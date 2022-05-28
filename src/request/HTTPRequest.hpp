@@ -20,7 +20,14 @@ public:
     // 対応するメソッド一覧。仮でここで宣言
     static std::set<std::string> methods;
 
+    // 改行コード
     static const std::string crlf;
+
+    // ステータス
+    static const int status_ok                    = 200;
+    static const int status_bad_request           = 400;
+    static const int status_method_not_allowed    = 405;
+    static const int status_version_not_supported = 505;
 
 private:
     std::string                        request_message_;
@@ -37,6 +44,8 @@ private:
     void parseHeaderLine(std::string line);
     void parseBody(std::string body);
     void throwErrorBadrequest(std::string err_message);
+    void throwErrorMethodNotAllowed(std::string err_message);
+    void throwErrorVersionNotSupported(std::string err_message);
 
     void varidateMethod(std::string& method);
     void varidateRequestTarget(std::string request_target);

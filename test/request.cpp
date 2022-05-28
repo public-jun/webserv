@@ -85,6 +85,7 @@ TEST(HTTPRequest, NoHost) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
+// HTTP Version Error
 TEST(HTTPRequest, VersionNotExistName) {
     testcase t = { "GET / /1.1\r\nHost: localhost\r\n\r\n", 400, "", "", "" };
     testRequest(&t);
@@ -138,22 +139,28 @@ TEST(HTTPRequest, VersionNotExistdot) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
+TEST(HTTPRequest, KeyIncludeSpace) {}
+
 // expect other status code
-/* TEST(HTTPRequest, UnsupportedMethod) { */
-/*     testcase t = { */
-/*         "HOGE / HTTP/1.1\r\nHost: localhost\r\n\r\n", 405, "", "", "", */
-/*     }; */
-/*     testRequest(&t); */
-/*     printMessageIfFailed(t.message, testing::Test::HasFailure()); */
-/* } */
+TEST(HTTPRequest, UnsupportedMethod) {
+    testcase t = { "HOGE / HTTP/1.1\r\nHost: localhost\r\n\r\n",
+                   405,
+                   "HOGE",
+                   "index.html",
+                   "HTTP/1.1",
+                   "localhost" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
 
-/* TEST(HTTPRequest, VersionNotSupported) { */
-/*     testcase t = { "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n", 505, "", "",
- */
-/*                    "" }; */
-/*     testRequest(&t); */
-/*     printMessageIfFailed(t.message, testing::Test::HasFailure()); */
-/* } */
-
-/* TEST(HTTPRequest, KeyIncludeSpace) {} */
+TEST(HTTPRequest, VersionNotSupported) {
+    testcase t = { "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n",
+                   505,
+                   "GET",
+                   "index.html",
+                   "HTTP/3.0",
+                   "localhost" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
 
