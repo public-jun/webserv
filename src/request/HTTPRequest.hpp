@@ -47,8 +47,9 @@ private:
     void parseHeaderLine(std::string line);
     void parseBody(std::string body);
 
-    std::string trimSpace(const std::string& string,
-                          const std::string  trim_char_set);
+    std::string            trimSpace(const std::string& string,
+                                     const std::string  trim_char_set);
+    std::string::size_type mustFindCRLF(std::string& str);
 
     void throwErrorBadrequest(std::string err_message);
     void throwErrorMethodNotAllowed(std::string err_message);

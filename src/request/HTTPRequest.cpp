@@ -182,6 +182,15 @@ std::string HTTPRequest::trimSpace(const std::string& str,
     return result;
 }
 
+// 改行コードが見つからなかったら例外を投げる
+std::string::size_type HTTPRequest::mustFindCRLF(std::string& str) {
+    std::string::size_type line_end_pos = str.find(crlf);
+    if (line_end_pos == row_.npos) {
+        throwErrorBadrequest("missing crlf");
+    }
+    return line_end_pos;
+}
+
 void HTTPRequest::parseHeaderLine(std::string line) {
     std::string::size_type pos = line.find(":");
     std::string            key, value;
@@ -214,11 +223,8 @@ void HTTPRequest::parseHeaderLines(std::string&           str,
     while (!isLastLine(str)) {
         std::string::size_type line_start_pos = line_end_pos + crlf.size();
         str                                   = str.substr(line_start_pos);
-        line_end_pos                          = str.find(crlf);
+        line_end_pos                          = mustFindCRLF(str);
 
-        if (line_end_pos == row_.npos) {
-            throwErrorBadrequest("missing crlf");
-        }
         parseHeaderLine(str.substr(0, line_end_pos));
     }
     if (!hostExists()) {
@@ -236,11 +242,7 @@ void HTTPRequest::parseBody(std::string body) {
 
 void HTTPRequest::parse() {
     try {
-        std::string::size_type line_end_pos = row_.find(crlf);
-        if (line_end_pos == row_.npos) {
-            throwErrorBadrequest("error request line");
-        }
-
+        std::string::size_type line_end_pos = mustFindCRLF(row_);
         parseFirstline(row_.substr(0, line_end_pos));
 
         std::string str = row_;
@@ -253,7 +255,7 @@ void HTTPRequest::parse() {
         varidateVersionNotSuppoted();
         varidateMethodNotAllowed();
     } catch (std::runtime_error& e) {
-        // std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << std::endl;
     } catch (std::exception& e) {}
 }
 
