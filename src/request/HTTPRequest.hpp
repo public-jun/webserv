@@ -64,9 +64,6 @@ private:
 
     bool isLastLine(std::string& str);
     bool isdigit(std::string str);
-
-    bool isSupportedMethod();
-    bool isSupportedVersion();
     bool hostExists();
 };
 

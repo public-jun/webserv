@@ -11,10 +11,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#define GREEN "\033[32m"
-#define RED "\033[31m"
-#define RESET "\033[39m"
-
 std::set<std::string> HTTPRequest::methods;
 
 const std::string HTTPRequest::crlf = "\r\n";
@@ -210,14 +206,6 @@ void HTTPRequest::parseHeaderLine(std::string line) {
     headers_.insert(std::make_pair(key, value));
 }
 
-void HTTPRequest::parseBody(std::string body) {
-    if (body.empty()) {
-        return;
-    }
-    varidateBody(body);
-    body_ = body;
-}
-
 bool HTTPRequest::hostExists() { return !GetHeaderValue("Host").empty(); }
 
 // 2行目以降のヘッダーをパース
@@ -236,6 +224,14 @@ void HTTPRequest::parseHeaderLines(std::string&           str,
     if (!hostExists()) {
         throwErrorBadrequest("no host");
     }
+}
+
+void HTTPRequest::parseBody(std::string body) {
+    if (body.empty()) {
+        return;
+    }
+    varidateBody(body);
+    body_ = body;
 }
 
 void HTTPRequest::parse() {
@@ -257,7 +253,7 @@ void HTTPRequest::parse() {
         varidateVersionNotSuppoted();
         varidateMethodNotAllowed();
     } catch (std::runtime_error& e) {
-        std::cout << RED << "exception: " << e.what() << RESET << std::endl;
+        // std::cout << "exception: " << e.what() << std::endl;
     } catch (std::exception& e) {}
 }
 
@@ -278,4 +274,3 @@ bool HTTPRequest::isdigit(std::string str) {
     }
     return true;
 }
-
