@@ -47,6 +47,39 @@ TEST(HTTPRequest, Simple) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
+TEST(HTTPRequest, LowercaseHost) {
+    testcase t = { "GET / HTTP/1.1\r\nhost: localhost\r\n\r\n",
+                   200,
+                   "GET",
+                   "index.html",
+                   "HTTP/1.1",
+                   "localhost" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, SpaceBeforeValue) {
+    testcase t = { "GET / HTTP/1.1\r\nHost:     localhost\r\n\r\n",
+                   200,
+                   "GET",
+                   "index.html",
+                   "HTTP/1.1",
+                   "localhost" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, SpaceAfterValue) {
+    testcase t = { "GET / HTTP/1.1\r\nHost:localhost   \r\n\r\n",
+                   200,
+                   "GET",
+                   "index.html",
+                   "HTTP/1.1",
+                   "localhost" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
 TEST(HTTPRequest, NotSpecifyVersion) {
     testcase t = { "GET /\r\nHost: localhost\r\n\r\n",
                    200,
@@ -73,14 +106,6 @@ TEST(HTTPRequest, SpecifyTarget) {
 // expect status 400
 TEST(HTTPRequest, LowercaseMethod) {
     testcase t = { "get / HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
-    testRequest(&t);
-    printMessageIfFailed(t.message, testing::Test::HasFailure());
-}
-
-TEST(HTTPRequest, NoHost) {
-    testcase t = {
-        "GET / HTTP/1.1\r\n\r\n", 400, "GET", "index.html", "HTTP/1.1", ""
-    };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
@@ -135,6 +160,29 @@ TEST(HTTPRequest, VersionNotExistSlash) {
 
 TEST(HTTPRequest, VersionNotExistdot) {
     testcase t = { "GET / HTTP/1\r\nHost: localhost\r\n\r\n", 400, "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+// 2行目以降のヘッダーエラー
+TEST(HTTPRequest, NoHost) {
+    testcase t = {
+        "GET / HTTP/1.1\r\n\r\n", 400, "GET", "index.html", "HTTP/1.1", ""
+    };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, ValueContainCR) {
+    testcase t = { "GET / HTTP/1\r\nHost: local\rhost\r\n\r\n", 400, "", "",
+                   "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, ValueContainLF) {
+    testcase t = { "GET / HTTP/1\r\nHost: local\nhost\r\n\r\n", 400, "", "",
+                   "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
