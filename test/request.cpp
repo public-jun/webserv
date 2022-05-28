@@ -119,6 +119,18 @@ TEST(HTTPRequest, EmptyRequestTarget) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
+TEST(HTTPRequest, NotExistEmptyLine) {
+    testcase t = { "GET HTTP/1.1\r\n", 400, "", "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, 2EmptyLine) {
+    testcase t = { "GET HTTP/1.1\r\n\r\n\r\n", 400, "", "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
 TEST(HTTPRequest, LowercaseMethod) {
     testcase t = { "get / HTTP/1.1\r\n\r\n", 400, "", "", "", "" };
     testRequest(&t);
