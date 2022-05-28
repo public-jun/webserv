@@ -1,5 +1,6 @@
 #include "HTTPRequest.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -165,9 +166,16 @@ void HTTPRequest::parseHeaderLine(std::string line) {
         throwErrorBadrequest("error token");
     }
 
+    // host->Host
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    if (key.size() >= 1) {
+        key[0] = std::toupper(key[0]);
+    }
+
     value = trimSpace(value);
-    // OK: \t, \v, \f, \b
-    // NG: \r
+    if (value.find(crlf) != value.npos) {
+        throwErrorBadrequest("error value");
+    }
 
     headers_.insert(std::make_pair(key, value));
 }
@@ -251,4 +259,3 @@ void HTTPRequest::parse() {
     } catch (std::exception& e) {}
 }
 
-// TODO: keyをキャピタライズ
