@@ -84,7 +84,7 @@ void HTTPRequest::varidateBody(std::string body) {
 }
 
 void HTTPRequest::varidateRequestTarget(std::string request_target) {
-    // TODO
+    // TODO: バリデート
     if (request_target.empty()) {
         throwErrorBadrequest("error request target");
     }
@@ -137,6 +137,18 @@ void HTTPRequest::varidateToken(std::string token) {
         if (!std::isalnum(*it) && special.find(*it) == special.npos) {
             throwErrorBadrequest("error token");
         }
+    }
+}
+
+void HTTPRequest::varidateVersionNotSuppoted() {
+    if (HTTPVersion_ != "HTTP/1.1") {
+        throwErrorVersionNotSupported();
+    }
+}
+
+void HTTPRequest::varidateMethodNotAllowed() {
+    if (methods.find(method_) == methods.end()) {
+        throwErrorMethodNotAllowed();
     }
 }
 
@@ -237,19 +249,15 @@ void HTTPRequest::parse() {
 
         std::string str = row_;
         parseHeaderLines(str, line_end_pos);
-        std::string body =
-            str.substr(str.find(crlf) + crlf.size() + crlf.size());
+
+        std::string body = str.substr(str.find(crlf) + crlf.size() * 2);
         parseBody(body);
 
         // 400以外のエラー処理
-        if (HTTPVersion_ != "HTTP/1.1") {
-            throwErrorVersionNotSupported();
-        }
-        if (methods.find(method_) == methods.end()) {
-            throwErrorMethodNotAllowed();
-        }
+        varidateVersionNotSuppoted();
+        varidateMethodNotAllowed();
     } catch (std::runtime_error& e) {
-        // std::cout << RED << "exception: " << e.what() << RESET << std::endl;
+        std::cout << RED << "exception: " << e.what() << RESET << std::endl;
     } catch (std::exception& e) {}
 }
 

@@ -59,6 +59,8 @@ private:
     void varidateHTTPVersion(std::string version);
     void varidateToken(std::string token);
     void varidateBody(std::string body);
+    void varidateVersionNotSuppoted();
+    void varidateMethodNotAllowed();
 
     bool isLastLine(std::string& str);
     bool isdigit(std::string str);
