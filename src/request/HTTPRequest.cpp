@@ -49,9 +49,7 @@ std::map<std::string, std::string> HTTPRequest::GetHeaders() {
 void HTTPRequest::SetURI(std::string uri) { request_target_ = uri; }
 
 void HTTPRequest::varidateMethod(std::string& method) {
-    if (method.empty() || !isToken(method)) {
-        throwErrorBadrequest("error method");
-    }
+    varidateToken(method);
 
     for (std::string::iterator it = method.begin(); it != method.end(); it++) {
         if (!std::isupper(*it)) {
@@ -100,6 +98,22 @@ void HTTPRequest::varidateHTTPVersion(std::string version) {
     }
 }
 
+// token          = 1*tchar
+// tchar          = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+//               / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+//               / DIGIT / ALPHA
+void HTTPRequest::varidateToken(std::string token) {
+    if (token.empty()) {
+        throwErrorBadrequest("empty token");
+    }
+    const std::string special = "!#$%&'*+-.^_`|~";
+    for (std::string::iterator it = token.begin(); it != token.end(); it++) {
+        if (!std::isalnum(*it) && special.find(*it) == special.npos) {
+            throwErrorBadrequest("error token");
+        }
+    }
+}
+
 // リクエストの1行目をパースしてバリデート
 void HTTPRequest::parseFirstline(std::string line) {
     std::istringstream iss(line);
@@ -119,17 +133,6 @@ void HTTPRequest::parseFirstline(std::string line) {
     method_         = method;
     request_target_ = request_target;
     HTTPVersion_    = version;
-}
-
-// tokenとして適切な文字列か判定
-bool HTTPRequest::isToken(std::string str) {
-    const std::string special = "!#$%&'*+-.^_`|~";
-    for (std::string::iterator it = str.begin(); it != str.end(); it++) {
-        if (!std::isalnum(*it) && special.find(*it) == special.npos) {
-            return false;
-        }
-    }
-    return true;
 }
 
 // 前後のスペースをtrim
@@ -153,9 +156,7 @@ void HTTPRequest::parseHeaderLine(std::string line) {
         value = line.substr(pos + 1, line.size() - pos);
     }
 
-    if (!isToken(key)) {
-        throwErrorBadrequest("error token");
-    }
+    varidateToken(key);
 
     // host->Host
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);

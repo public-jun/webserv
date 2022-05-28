@@ -43,6 +43,10 @@ private:
     void parseFirstline(std::string line);
     void parseHeaderLine(std::string line);
     void parseBody(std::string body);
+
+    std::string trimSpace(const std::string& string,
+                          const std::string  trim_char_set);
+
     void throwErrorBadrequest(std::string err_message);
     void throwErrorMethodNotAllowed(std::string err_message);
     void throwErrorVersionNotSupported(std::string err_message);
@@ -50,12 +54,10 @@ private:
     void varidateMethod(std::string& method);
     void varidateRequestTarget(std::string request_target);
     void varidateHTTPVersion(std::string version);
-    bool isdigit(std::string str);
+    void varidateToken(std::string token);
 
-    bool        isLastLine(std::string& str);
-    bool        isToken(std::string str);
-    std::string trimSpace(const std::string& string,
-                          const std::string  trim_char_set);
+    bool isLastLine(std::string& str);
+    bool isdigit(std::string str);
 
     bool isSupportedMethod();
     bool isSupportedVersion();
