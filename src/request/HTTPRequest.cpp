@@ -48,6 +48,24 @@ std::map<std::string, std::string> HTTPRequest::GetHeaders() {
 
 void HTTPRequest::SetURI(std::string uri) { request_target_ = uri; }
 
+void HTTPRequest::throwErrorBadrequest(
+    std::string err_message = "bad request") {
+    status_ = status_bad_request;
+    throw std::runtime_error(err_message);
+}
+
+void HTTPRequest::throwErrorMethodNotAllowed(
+    std::string err_message = "method not allowed") {
+    status_ = status_method_not_allowed;
+    throw std::runtime_error(err_message);
+}
+
+void HTTPRequest::throwErrorVersionNotSupported(
+    std::string err_message = "version not supported") {
+    status_ = status_version_not_supported;
+    throw std::runtime_error(err_message);
+}
+
 void HTTPRequest::varidateMethod(std::string& method) {
     varidateToken(method);
 
@@ -58,7 +76,15 @@ void HTTPRequest::varidateMethod(std::string& method) {
     }
 }
 
+void HTTPRequest::varidateBody(std::string body) {
+    if (body.size() >= crlf.size() && body.substr(0, crlf.size()) == crlf) {
+        // 改行が3つ連続していた場合
+        throwErrorBadrequest("error body");
+    }
+}
+
 void HTTPRequest::varidateRequestTarget(std::string request_target) {
+    // TODO
     if (request_target.empty()) {
         throwErrorBadrequest("error request target");
     }
@@ -158,7 +184,7 @@ void HTTPRequest::parseHeaderLine(std::string line) {
 
     varidateToken(key);
 
-    // host->Host
+    // example: HOST -> Host
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     if (key.size() >= 1) {
         key[0] = std::toupper(key[0]);
@@ -172,42 +198,12 @@ void HTTPRequest::parseHeaderLine(std::string line) {
     headers_.insert(std::make_pair(key, value));
 }
 
-bool HTTPRequest::isLastLine(std::string& str) {
-    const std::string::size_type crlf_size    = crlf.size();
-    std::string::size_type       line_end_pos = str.find(crlf);
-    std::string next_line = str.substr(line_end_pos + crlf_size);
-
-    return next_line.size() >= crlf_size &&
-           next_line.substr(0, crlf_size) == crlf;
-}
-
 void HTTPRequest::parseBody(std::string body) {
     if (body.empty()) {
         return;
     }
-    if (body.size() >= crlf.size() && body.substr(0, crlf.size()) == crlf) {
-        // 改行が3つ連続していた場合
-        throwErrorBadrequest("error body");
-    }
+    varidateBody(body);
     body_ = body;
-}
-
-void HTTPRequest::throwErrorBadrequest(
-    std::string err_message = "bad request") {
-    status_ = status_bad_request;
-    throw std::runtime_error(err_message);
-}
-
-void HTTPRequest::throwErrorMethodNotAllowed(
-    std::string err_message = "method not allowed") {
-    status_ = status_method_not_allowed;
-    throw std::runtime_error(err_message);
-}
-
-void HTTPRequest::throwErrorVersionNotSupported(
-    std::string err_message = "version not supported") {
-    status_ = status_version_not_supported;
-    throw std::runtime_error(err_message);
 }
 
 bool HTTPRequest::hostExists() { return !GetHeaderValue("Host").empty(); }
@@ -222,7 +218,7 @@ void HTTPRequest::parse() {
         parseFirstline(row_.substr(0, line_end_pos));
 
         std::string str = row_;
-        while (status_ == status_ok && !isLastLine(str)) {
+        while (!isLastLine(str)) {
             std::string::size_type line_start_pos = line_end_pos + crlf.size();
             str                                   = str.substr(line_start_pos);
             line_end_pos                          = str.find(crlf);
@@ -249,6 +245,15 @@ void HTTPRequest::parse() {
     } catch (std::runtime_error& e) {
         // std::cout << RED << "exception: " << e.what() << RESET << std::endl;
     } catch (std::exception& e) {}
+}
+
+bool HTTPRequest::isLastLine(std::string& str) {
+    const std::string::size_type crlf_size    = crlf.size();
+    std::string::size_type       line_end_pos = str.find(crlf);
+    std::string next_line = str.substr(line_end_pos + crlf_size);
+
+    return next_line.size() >= crlf_size &&
+           next_line.substr(0, crlf_size) == crlf;
 }
 
 bool HTTPRequest::isdigit(std::string str) {

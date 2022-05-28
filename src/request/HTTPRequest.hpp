@@ -15,7 +15,8 @@ public:
     int                                GetStatus();
     std::map<std::string, std::string> GetHeaders();
     std::string                        GetHeaderValue(std::string key);
-    void                               SetURI(std::string uri);
+
+    void SetURI(std::string uri);
 
     // 対応するメソッド一覧。仮でここで宣言
     static std::set<std::string> methods;
@@ -23,7 +24,7 @@ public:
     // 改行コード
     static const std::string crlf;
 
-    // ステータス
+    // ステータスコード
     static const int status_ok                    = 200;
     static const int status_bad_request           = 400;
     static const int status_method_not_allowed    = 405;
@@ -55,6 +56,7 @@ private:
     void varidateRequestTarget(std::string request_target);
     void varidateHTTPVersion(std::string version);
     void varidateToken(std::string token);
+    void varidateBody(std::string body);
 
     bool isLastLine(std::string& str);
     bool isdigit(std::string str);
