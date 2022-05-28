@@ -6,20 +6,22 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event
+INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event -I ./src/exception
 
 VPATH     := src: \
 			src/request \
 			src/response \
 			src/socket \
-			src/event
+			src/event \
+			src/exception
 
 TESTSRCS  := EventActions.cpp \
 			ListeningSocket.cpp \
 			StreamSocket.cpp \
 			HTTPRequest.cpp \
 			HTTPParser.cpp \
-			HTTPResponse.cpp
+			HTTPResponse.cpp \
+			SysError.cpp
 
 SRCS := main.cpp \
 			$(TESTSRCS)
@@ -59,11 +61,11 @@ re: fclean all
 
 .PHONY: tidy
 tidy:
-	clang-tidy `find src include -type f` -- -I$(INCDIR)
+	clang-tidy `find src -type f` -- $(INCLUDE)
 
 .PHONY: tidy-fix
 tidy-fix:
-	clang-tidy `find src include -type f` --fix -- -I$(INCDIR)
+	clang-tidy `find src include -type f` --fix -- $(INCLUDE)
 
 ################# google test ####################
 
