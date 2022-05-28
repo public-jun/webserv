@@ -29,6 +29,9 @@ void testRequest(testcase* test) {
     HTTPRequest req(test->message);
 
     ASSERT_EQ(test->expect_status, req.GetStatus());
+    if (req.GetStatus() != 200) {
+        return;
+    }
     EXPECT_EQ(test->exepct_method, req.GetMethod());
     EXPECT_EQ(test->expect_uri, req.GetRequestTarget());
     EXPECT_EQ(test->expect_version, req.GetVersion());
@@ -174,20 +177,25 @@ TEST(HTTPRequest, NoHost) {
 }
 
 TEST(HTTPRequest, ValueContainCR) {
-    testcase t = { "GET / HTTP/1\r\nHost: local\rhost\r\n\r\n", 400, "", "",
+    testcase t = { "GET / HTTP/1.1\r\nHost: local\rhost\r\n\r\n", 400, "", "",
                    "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
 TEST(HTTPRequest, ValueContainLF) {
-    testcase t = { "GET / HTTP/1\r\nHost: local\nhost\r\n\r\n", 400, "", "",
+    testcase t = { "GET / HTTP/1.1\r\nHost: local\nhost\r\n\r\n", 400, "", "",
                    "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
-TEST(HTTPRequest, KeyIncludeSpace) {}
+TEST(HTTPRequest, KeyIncludeSpace) {
+    testcase t = { "GET / HTTP/1.1\r\nHost : localhost\r\n\r\n", 400, "", "",
+                   "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
 
 // expect other status code
 TEST(HTTPRequest, UnsupportedMethod) {
