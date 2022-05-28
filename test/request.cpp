@@ -119,8 +119,14 @@ TEST(HTTPRequest, EmptyRequestTarget) {
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
 
-TEST(HTTPRequest, NotExistEmptyLine) {
-    testcase t = { "GET HTTP/1.1\r\n", 400, "", "", "", "" };
+TEST(HTTPRequest, MissingEmptyLine) {
+    testcase t = { "GET HTTP/1.1\r\nHost: localhost\r\n", 400, "", "", "", "" };
+    testRequest(&t);
+    printMessageIfFailed(t.message, testing::Test::HasFailure());
+}
+
+TEST(HTTPRequest, MssingCRLF) {
+    testcase t = { "GET HTTP/1.1\r\nHost: localhost", 400, "", "", "", "" };
     testRequest(&t);
     printMessageIfFailed(t.message, testing::Test::HasFailure());
 }
