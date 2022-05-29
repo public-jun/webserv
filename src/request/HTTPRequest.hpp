@@ -51,13 +51,13 @@ private:
     void throwErrorMethodNotAllowed(const std::string err_message);
     void throwErrorVersionNotSupported(const std::string err_message);
 
-    void varidateMethod(const std::string& method);
-    void varidateRequestTarget(const std::string& request_target);
-    void varidateHTTPVersion(const std::string& version);
-    void varidateToken(const std::string& token);
-    void varidateBody(const std::string& body);
-    void varidateVersionNotSuppoted();
-    void varidateMethodNotAllowed();
+    void validateMethod(const std::string& method);
+    void validateRequestTarget(const std::string& request_target);
+    void validateHTTPVersion(const std::string& version);
+    void validateToken(const std::string& token);
+    void validateBody(const std::string& body);
+    void validateVersionNotSuppoted();
+    void validateMethodNotAllowed();
 
     std::string            trimSpace(const std::string& string,
                                      const std::string  trim_char_set) const;

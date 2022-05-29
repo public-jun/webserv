@@ -68,8 +68,8 @@ void HTTPRequest::throwErrorVersionNotSupported(
     throw std::runtime_error(err_message);
 }
 
-void HTTPRequest::varidateMethod(const std::string& method) {
-    varidateToken(method);
+void HTTPRequest::validateMethod(const std::string& method) {
+    validateToken(method);
 
     for (std::string::const_iterator it = method.begin(); it != method.end();
          it++) {
@@ -79,21 +79,21 @@ void HTTPRequest::varidateMethod(const std::string& method) {
     }
 }
 
-void HTTPRequest::varidateBody(const std::string& body) {
+void HTTPRequest::validateBody(const std::string& body) {
     if (body.size() >= crlf_size && body.substr(0, crlf_size) == crlf) {
         // 改行が3つ連続していた場合
         throwErrorBadrequest("error body");
     }
 }
 
-void HTTPRequest::varidateRequestTarget(const std::string& request_target) {
+void HTTPRequest::validateRequestTarget(const std::string& request_target) {
     // TODO: バリデート
     if (request_target.empty()) {
         throwErrorBadrequest("error request target");
     }
 }
 
-void HTTPRequest::varidateHTTPVersion(const std::string& version) {
+void HTTPRequest::validateHTTPVersion(const std::string& version) {
     if (version.empty()) {
         throwErrorBadrequest("error HTTP version");
     }
@@ -131,7 +131,7 @@ void HTTPRequest::varidateHTTPVersion(const std::string& version) {
 // tchar          = "!" / "#" / "$" / "%" / "&" / "'" / "*"
 //               / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
 //               / DIGIT / ALPHA
-void HTTPRequest::varidateToken(const std::string& token) {
+void HTTPRequest::validateToken(const std::string& token) {
     if (token.empty()) {
         throwErrorBadrequest("empty token");
     }
@@ -144,13 +144,13 @@ void HTTPRequest::varidateToken(const std::string& token) {
     }
 }
 
-void HTTPRequest::varidateVersionNotSuppoted() {
+void HTTPRequest::validateVersionNotSuppoted() {
     if (HTTPVersion_ != "HTTP/1.1") {
         throwErrorVersionNotSupported();
     }
 }
 
-void HTTPRequest::varidateMethodNotAllowed() {
+void HTTPRequest::validateMethodNotAllowed() {
     if (methods.find(method_) == methods.end()) {
         throwErrorMethodNotAllowed();
     }
@@ -168,9 +168,9 @@ void HTTPRequest::parseFirstline(const std::string& line) {
         request_target = "index.html";
     }
 
-    varidateMethod(method);
-    varidateRequestTarget(request_target);
-    varidateHTTPVersion(version);
+    validateMethod(method);
+    validateRequestTarget(request_target);
+    validateHTTPVersion(version);
 
     method_         = method;
     request_target_ = request_target;
@@ -217,7 +217,7 @@ void HTTPRequest::parseHeaderLine(const std::string& line) {
         value = line.substr(pos + 1, line.size() - pos);
     }
 
-    varidateToken(key);
+    validateToken(key);
 
     // example: HOST -> Host
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
@@ -239,7 +239,7 @@ void HTTPRequest::parseBody(std::string& body) {
     if (body.empty()) {
         return;
     }
-    varidateBody(body);
+    validateBody(body);
     body_ = body;
 }
 
@@ -261,7 +261,6 @@ void HTTPRequest::parse() {
         std::string::size_type line_end_pos = mustFindCRLF(row_);
         parseFirstline(row_.substr(0, line_end_pos));
 
-        // TODO: line_end_posを渡さないでできるようにする
         std::string str = row_.substr(line_end_pos + crlf_size);
         parseHeaderLines(str);
 
@@ -269,8 +268,8 @@ void HTTPRequest::parse() {
         parseBody(body);
 
         // 400以外のエラー処理
-        varidateVersionNotSuppoted();
-        varidateMethodNotAllowed();
+        validateVersionNotSuppoted();
+        validateMethodNotAllowed();
     } catch (std::runtime_error& e) {
         std::cout << "exception: " << e.what() << std::endl;
     } catch (std::exception& e) {
