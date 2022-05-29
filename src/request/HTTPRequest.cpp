@@ -217,21 +217,6 @@ void HTTPRequest::parseHeaderLine(std::string line) {
 
 bool HTTPRequest::hostExists() { return !GetHeaderValue("Host").empty(); }
 
-// 2行目以降のヘッダーをパース
-void HTTPRequest::parseHeaderLines(std::string&           str,
-                                   std::string::size_type line_end_pos) {
-    while (!isLastLine(str)) {
-        std::string::size_type line_start_pos = line_end_pos + crlf.size();
-        str                                   = str.substr(line_start_pos);
-        line_end_pos                          = mustFindCRLF(str);
-
-        parseHeaderLine(str.substr(0, line_end_pos));
-    }
-    if (!hostExists()) {
-        throwErrorBadrequest("no host");
-    }
-}
-
 void HTTPRequest::parseBody(std::string body) {
     if (body.empty()) {
         return;
@@ -240,15 +225,31 @@ void HTTPRequest::parseBody(std::string body) {
     body_ = body;
 }
 
+// 2行目以降のヘッダーをパース
+void HTTPRequest::parseHeaderLines(std::string& str) {
+    const std::string::size_type crlf_size = crlf.size();
+
+    while (str.substr(0, crlf_size) != crlf) {
+        std::string::size_type line_end_pos = mustFindCRLF(str);
+        parseHeaderLine(str.substr(0, line_end_pos));
+        str = str.substr(line_end_pos + crlf.size());
+        mustFindCRLF(str);
+    }
+    if (!hostExists()) {
+        throwErrorBadrequest("no host");
+    }
+}
+
 void HTTPRequest::parse() {
     try {
         std::string::size_type line_end_pos = mustFindCRLF(row_);
         parseFirstline(row_.substr(0, line_end_pos));
 
-        std::string str = row_;
-        parseHeaderLines(str, line_end_pos);
+        // TODO: line_end_posを渡さないでできるようにする
+        std::string str = row_.substr(line_end_pos + crlf.size());
+        parseHeaderLines(str);
 
-        std::string body = str.substr(str.find(crlf) + crlf.size() * 2);
+        std::string body = str.substr(crlf.size());
         parseBody(body);
 
         // 400以外のエラー処理
@@ -256,7 +257,9 @@ void HTTPRequest::parse() {
         varidateMethodNotAllowed();
     } catch (std::runtime_error& e) {
         std::cout << "exception: " << e.what() << std::endl;
-    } catch (std::exception& e) {}
+    } catch (std::exception& e) {
+        std::cout << "exception: " << e.what() << std::endl;
+    }
 }
 
 bool HTTPRequest::isLastLine(std::string& str) {
@@ -268,7 +271,7 @@ bool HTTPRequest::isLastLine(std::string& str) {
            next_line.substr(0, crlf_size) == crlf;
 }
 
-bool HTTPRequest::isdigit(std::string str) {
+bool HTTPRequest::isdigit(std::string& str) {
     for (std::string::iterator it = str.begin(); it != str.end(); it++) {
         if (!std::isdigit(*it)) {
             return false;

@@ -42,14 +42,9 @@ private:
 
     void parse();
     void parseFirstline(std::string line);
-    void parseHeaderLines(std::string&           str,
-                          std::string::size_type line_end_pos);
+    void parseHeaderLines(std::string& str);
     void parseHeaderLine(std::string line);
     void parseBody(std::string body);
-
-    std::string            trimSpace(const std::string& string,
-                                     const std::string  trim_char_set);
-    std::string::size_type mustFindCRLF(std::string& str);
 
     void throwErrorBadrequest(std::string err_message);
     void throwErrorMethodNotAllowed(std::string err_message);
@@ -63,9 +58,12 @@ private:
     void varidateVersionNotSuppoted();
     void varidateMethodNotAllowed();
 
-    bool isLastLine(std::string& str);
-    bool isdigit(std::string str);
-    bool hostExists();
+    std::string            trimSpace(const std::string& string,
+                                     const std::string  trim_char_set);
+    std::string::size_type mustFindCRLF(std::string& str);
+    bool                   isLastLine(std::string& str);
+    bool                   isdigit(std::string& str);
+    bool                   hostExists();
 };
 
 #endif
