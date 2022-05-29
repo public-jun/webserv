@@ -9,12 +9,12 @@ public:
     HTTPRequest(const std::string& row);
     HTTPRequest(std::string method, std::string uri);
     ~HTTPRequest();
-    std::string&                       GetMethod();
-    std::string&                       GetRequestTarget();
-    std::string&                       GetVersion();
-    int                                GetStatus();
-    std::map<std::string, std::string> GetHeaders();
-    std::string                        GetHeaderValue(std::string key);
+    const std::string&                        GetMethod() const;
+    std::string                               GetRequestTarget() const;
+    const std::string&                        GetVersion() const;
+    int                                       GetStatus() const;
+    const std::map<std::string, std::string>& GetHeaders() const;
+    const std::string GetHeaderValue(std::string key) const;
 
     void SetURI(std::string uri);
 
@@ -36,34 +36,33 @@ private:
     std::string                        request_target_;
     std::string                        HTTPVersion_;
     std::string                        body_;
-    std::string                        row_;
+    const std::string                  row_;
     std::map<std::string, std::string> headers_;
     int                                status_;
 
     void parse();
-    void parseFirstline(std::string line);
+    void parseFirstline(const std::string& line);
     void parseHeaderLines(std::string& str);
-    void parseHeaderLine(std::string line);
-    void parseBody(std::string body);
+    void parseHeaderLine(const std::string& line);
+    void parseBody(std::string& body);
 
-    void throwErrorBadrequest(std::string err_message);
-    void throwErrorMethodNotAllowed(std::string err_message);
-    void throwErrorVersionNotSupported(std::string err_message);
+    void throwErrorBadrequest(const std::string err_message);
+    void throwErrorMethodNotAllowed(const std::string err_message);
+    void throwErrorVersionNotSupported(const std::string err_message);
 
-    void varidateMethod(std::string& method);
-    void varidateRequestTarget(std::string request_target);
-    void varidateHTTPVersion(std::string version);
-    void varidateToken(std::string token);
-    void varidateBody(std::string body);
+    void varidateMethod(const std::string& method);
+    void varidateRequestTarget(const std::string& request_target);
+    void varidateHTTPVersion(const std::string& version);
+    void varidateToken(const std::string& token);
+    void varidateBody(const std::string& body);
     void varidateVersionNotSuppoted();
     void varidateMethodNotAllowed();
 
     std::string            trimSpace(const std::string& string,
-                                     const std::string  trim_char_set);
-    std::string::size_type mustFindCRLF(std::string& str);
-    bool                   isLastLine(std::string& str);
-    bool                   isdigit(std::string& str);
-    bool                   hostExists();
+                                     const std::string  trim_char_set) const;
+    std::string::size_type mustFindCRLF(const std::string& str);
+    bool                   isdigit(const std::string& str) const;
+    bool                   hostExists() const;
 };
 
 #endif

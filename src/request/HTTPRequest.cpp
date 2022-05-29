@@ -26,67 +26,72 @@ HTTPRequest::HTTPRequest(std::string method, std::string uri)
 
 HTTPRequest::~HTTPRequest() {}
 
-std::string& HTTPRequest::GetMethod() { return method_; }
+const std::string& HTTPRequest::GetMethod() const { return method_; }
 
-std::string& HTTPRequest::GetRequestTarget() { return request_target_; }
+std::string HTTPRequest::GetRequestTarget() const { return request_target_; }
 
-std::string& HTTPRequest::GetVersion() { return HTTPVersion_; }
+const std::string& HTTPRequest::GetVersion() const { return HTTPVersion_; }
 
-int HTTPRequest::GetStatus() { return status_; }
+int HTTPRequest::GetStatus() const { return status_; }
 
-std::string HTTPRequest::GetHeaderValue(std::string key) {
-    return headers_[key];
+const std::string HTTPRequest::GetHeaderValue(const std::string key) const {
+    std::map<std::string, std::string>::const_iterator it = headers_.find(key);
+    if (it == headers_.end()) {
+        return "";
+    }
+    return (*it).second;
 }
 
-std::map<std::string, std::string> HTTPRequest::GetHeaders() {
+const std::map<std::string, std::string>& HTTPRequest::GetHeaders() const {
     return headers_;
 }
 
 void HTTPRequest::SetURI(std::string uri) { request_target_ = uri; }
 
 void HTTPRequest::throwErrorBadrequest(
-    std::string err_message = "bad request") {
+    const std::string err_message = "bad request") {
     status_ = status_bad_request;
     throw std::runtime_error(err_message);
 }
 
 void HTTPRequest::throwErrorMethodNotAllowed(
-    std::string err_message = "method not allowed") {
+    const std::string err_message = "method not allowed") {
     status_ = status_method_not_allowed;
     throw std::runtime_error(err_message);
 }
 
 void HTTPRequest::throwErrorVersionNotSupported(
-    std::string err_message = "version not supported") {
+    const std::string err_message = "version not supported") {
     status_ = status_version_not_supported;
     throw std::runtime_error(err_message);
 }
 
-void HTTPRequest::varidateMethod(std::string& method) {
+void HTTPRequest::varidateMethod(const std::string& method) {
     varidateToken(method);
 
-    for (std::string::iterator it = method.begin(); it != method.end(); it++) {
+    for (std::string::const_iterator it = method.begin(); it != method.end();
+         it++) {
         if (!std::isupper(*it)) {
             throwErrorBadrequest("error method");
         }
     }
 }
 
-void HTTPRequest::varidateBody(std::string body) {
+void HTTPRequest::varidateBody(const std::string& body) {
     if (body.size() >= crlf.size() && body.substr(0, crlf.size()) == crlf) {
         // 改行が3つ連続していた場合
         throwErrorBadrequest("error body");
     }
 }
 
-void HTTPRequest::varidateRequestTarget(std::string request_target) {
+void HTTPRequest::varidateRequestTarget(const std::string& request_target) {
     // TODO: バリデート
     if (request_target.empty()) {
         throwErrorBadrequest("error request target");
     }
 }
 
-void HTTPRequest::varidateHTTPVersion(std::string version) {
+void HTTPRequest::varidateHTTPVersion(const std::string& version) {
     if (version.empty()) {
         throwErrorBadrequest("error HTTP version");
     }
@@ -124,12 +129,13 @@ void HTTPRequest::varidateHTTPVersion(std::string version) {
 // tchar          = "!" / "#" / "$" / "%" / "&" / "'" / "*"
 //               / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
 //               / DIGIT / ALPHA
-void HTTPRequest::varidateToken(std::string token) {
+void HTTPRequest::varidateToken(const std::string& token) {
     if (token.empty()) {
         throwErrorBadrequest("empty token");
     }
     const std::string special = "!#$%&'*+-.^_`|~";
-    for (std::string::iterator it = token.begin(); it != token.end(); it++) {
+    for (std::string::const_iterator it = token.begin(); it != token.end();
+         it++) {
         if (!std::isalnum(*it) && special.find(*it) == special.npos) {
             throwErrorBadrequest("error token");
         }
@@ -149,7 +155,7 @@ void HTTPRequest::varidateMethodNotAllowed() {
 }
 
 // リクエストの1行目をパースしてバリデート
-void HTTPRequest::parseFirstline(std::string line) {
+void HTTPRequest::parseFirstline(const std::string& line) {
     std::istringstream iss(line);
     std::string        method, request_target;
     std::string        version = "HTTP/1.1";
@@ -170,8 +176,9 @@ void HTTPRequest::parseFirstline(std::string line) {
 }
 
 // 前後のスペースをtrim
-std::string HTTPRequest::trimSpace(const std::string& str,
-                                   const std::string  trim_char_set = " ") {
+std::string
+HTTPRequest::trimSpace(const std::string& str,
+                       const std::string  trim_char_set = " ") const {
     std::string            result;
     std::string::size_type left = str.find_first_not_of(trim_char_set);
 
@@ -182,8 +189,17 @@ std::string HTTPRequest::trimSpace(const std::string& str,
     return result;
 }
 
+bool HTTPRequest::isdigit(const std::string& str) const {
+    for (std::string::const_iterator it = str.begin(); it != str.end(); it++) {
+        if (!std::isdigit(*it)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // 改行コードが見つからなかったら例外を投げる
-std::string::size_type HTTPRequest::mustFindCRLF(std::string& str) {
+std::string::size_type HTTPRequest::mustFindCRLF(const std::string& str) {
     std::string::size_type line_end_pos = str.find(crlf);
     if (line_end_pos == row_.npos) {
         throwErrorBadrequest("missing crlf");
@@ -191,7 +207,7 @@ std::string::size_type HTTPRequest::mustFindCRLF(std::string& str) {
     return line_end_pos;
 }
 
-void HTTPRequest::parseHeaderLine(std::string line) {
+void HTTPRequest::parseHeaderLine(const std::string& line) {
     std::string::size_type pos = line.find(":");
     std::string            key, value;
     key = line.substr(0, pos);
@@ -215,9 +231,9 @@ void HTTPRequest::parseHeaderLine(std::string line) {
     headers_.insert(std::make_pair(key, value));
 }
 
-bool HTTPRequest::hostExists() { return !GetHeaderValue("Host").empty(); }
+bool HTTPRequest::hostExists() const { return !GetHeaderValue("Host").empty(); }
 
-void HTTPRequest::parseBody(std::string body) {
+void HTTPRequest::parseBody(std::string& body) {
     if (body.empty()) {
         return;
     }
@@ -262,20 +278,3 @@ void HTTPRequest::parse() {
     }
 }
 
-bool HTTPRequest::isLastLine(std::string& str) {
-    const std::string::size_type crlf_size    = crlf.size();
-    std::string::size_type       line_end_pos = str.find(crlf);
-    std::string next_line = str.substr(line_end_pos + crlf_size);
-
-    return next_line.size() >= crlf_size &&
-           next_line.substr(0, crlf_size) == crlf;
-}
-
-bool HTTPRequest::isdigit(std::string& str) {
-    for (std::string::iterator it = str.begin(); it != str.end(); it++) {
-        if (!std::isdigit(*it)) {
-            return false;
-        }
-    }
-    return true;
-}
