@@ -15,6 +15,8 @@ std::set<std::string> HTTPRequest::methods;
 
 const std::string HTTPRequest::crlf = "\r\n";
 
+const std::string::size_type HTTPRequest::crlf_size = crlf.size();
+
 HTTPRequest::HTTPRequest(const std::string& row)
     : row_(row), status_(status_ok) {
     HTTPRequest::methods.insert("GET");
@@ -78,7 +80,7 @@ void HTTPRequest::varidateMethod(const std::string& method) {
 }
 
 void HTTPRequest::varidateBody(const std::string& body) {
-    if (body.size() >= crlf.size() && body.substr(0, crlf.size()) == crlf) {
+    if (body.size() >= crlf_size && body.substr(0, crlf_size) == crlf) {
         // 改行が3つ連続していた場合
         throwErrorBadrequest("error body");
     }
@@ -243,12 +245,10 @@ void HTTPRequest::parseBody(std::string& body) {
 
 // 2行目以降のヘッダーをパース
 void HTTPRequest::parseHeaderLines(std::string& str) {
-    const std::string::size_type crlf_size = crlf.size();
-
     while (str.substr(0, crlf_size) != crlf) {
         std::string::size_type line_end_pos = mustFindCRLF(str);
         parseHeaderLine(str.substr(0, line_end_pos));
-        str = str.substr(line_end_pos + crlf.size());
+        str = str.substr(line_end_pos + crlf_size);
         mustFindCRLF(str);
     }
     if (!hostExists()) {
@@ -262,10 +262,10 @@ void HTTPRequest::parse() {
         parseFirstline(row_.substr(0, line_end_pos));
 
         // TODO: line_end_posを渡さないでできるようにする
-        std::string str = row_.substr(line_end_pos + crlf.size());
+        std::string str = row_.substr(line_end_pos + crlf_size);
         parseHeaderLines(str);
 
-        std::string body = str.substr(crlf.size());
+        std::string body = str.substr(crlf_size);
         parseBody(body);
 
         // 400以外のエラー処理

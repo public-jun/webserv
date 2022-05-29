@@ -22,7 +22,8 @@ public:
     static std::set<std::string> methods;
 
     // 改行コード
-    static const std::string crlf;
+    static const std::string            crlf;
+    static const std::string::size_type crlf_size;
 
     // ステータスコード
     static const int status_ok                    = 200;
