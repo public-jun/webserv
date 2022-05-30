@@ -15,6 +15,8 @@ public:
     StreamSocket();
     virtual ~StreamSocket();
 
+    HTTPRequest* GetHTTPRequest();
+
     // Add event
     void Recv();
     void Send();

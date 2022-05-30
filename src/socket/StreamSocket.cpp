@@ -32,6 +32,8 @@ StreamSocket::~StreamSocket() {
     Close();
 }
 
+HTTPRequest* StreamSocket::GetHTTPRequest() { return req_; }
+
 void StreamSocket::Recv() {
     if (actions_) {
         actions_->AddRecvEvent(this);
