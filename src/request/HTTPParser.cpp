@@ -183,12 +183,9 @@ void HTTPParser::parseFirstline(const std::string& line) {
 }
 
 void HTTPParser::ParsePart(const std::string& buf) {
-    std::cout << "buf:\n[" << buf << "]" << std::endl;
     buf_ += buf;
 
     for (;;) {
-        // 空行があるか判定
-
         // 改行があるか判定
         std::string::size_type line_end_pos =
             buf_.find_first_of(HTTPRequest::crlf);
@@ -199,27 +196,22 @@ void HTTPParser::ParsePart(const std::string& buf) {
         std::string line = buf_.substr(0, line_end_pos);
         buf_             = buf_.substr(line_end_pos + HTTPRequest::crlf_size);
 
-        std::cout << "line: [" << line << "]" << std::endl;
-        std::cout << "buf_\n[" << buf_ << "]" << std::endl;
-
         switch (phase_) {
         case PH_FIRST_LINE:
-            std::cout << "[[ first line ]]" << std::endl;
             parseFirstline(line);
             phase_ = PH_HEADER_LINE;
             break;
 
         case PH_HEADER_LINE:
-            std::cout << "[[ header line ]]" << std::endl;
-
-            parseHeaderLine(line);
-            if (line == HTTPRequest::crlf) {
+            if (line == "") {
                 phase_ = PH_END;
+                break;
             }
+            parseHeaderLine(line);
             break;
 
         case PH_END:
-            std::cout << "parse end" << std::endl;
+            return;
         }
     }
 }
