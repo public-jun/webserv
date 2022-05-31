@@ -3,11 +3,11 @@
 #include <iostream>
 #include <sstream>
 
-HTTPParser::HTTPParser() {}
+HTTPParser::HTTPParser(HTTPRequest& req) : req_(req){};
 
 HTTPParser::~HTTPParser() {}
 
-HTTPRequest* HTTPParser::Parse(std::string request_message) {
+void HTTPParser::Parse(std::string request_message) {
     std::string::iterator it =
         std::find(request_message.begin(), request_message.end(), '\n');
     std::string line(request_message.begin(), it);
@@ -21,6 +21,176 @@ HTTPRequest* HTTPParser::Parse(std::string request_message) {
     if (uri.empty()) {
         std::cout << "get uri error" << std::endl;
     }
-    HTTPRequest* req = new HTTPRequest(method, uri);
-    return req;
+    req_.SetMethod(method);
+    req_.SetURI(uri);
 }
+
+void HTTPParser::throwErrorBadrequest(
+    const std::string err_message = "bad request") {
+    req_.SetStatus(HTTPRequest::status_bad_request);
+    throw std::runtime_error(err_message);
+}
+
+void HTTPParser::throwErrorMethodNotAllowed(
+    const std::string err_message = "method not allowed") {
+    req_.SetStatus(HTTPRequest::status_method_not_allowed);
+    throw std::runtime_error(err_message);
+}
+
+void HTTPParser::throwErrorVersionNotSupported(
+    const std::string err_message = "version not supported") {
+    req_.SetStatus(HTTPRequest::status_version_not_supported);
+    throw std::runtime_error(err_message);
+}
+
+void HTTPParser::validateMethod(const std::string& method) {
+    validateToken(method);
+
+    for (std::string::const_iterator it = method.begin(); it != method.end();
+         it++) {
+        if (!std::isupper(*it) && *it != '_' && *it != '-') {
+            throwErrorBadrequest("error method");
+        }
+    }
+}
+
+void HTTPParser::validateRequestTarget(const std::string& request_target) {
+    // TODO: バリデート
+    if (request_target.empty()) {
+        throwErrorBadrequest("error request target");
+    }
+}
+
+bool HTTPParser::isdigit(const std::string& str) const {
+    for (std::string::const_iterator it = str.begin(); it != str.end(); it++) {
+        if (!std::isdigit(*it)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void HTTPParser::validateHTTPVersion(const std::string& version) {
+    if (version.empty()) {
+        throwErrorBadrequest("error HTTP version");
+    }
+
+    std::string::size_type pos = version.find("/");
+    if (pos == version.npos) {
+        throwErrorBadrequest("error not exist slash");
+    }
+
+    std::string name = version.substr(0, pos);
+    if (name != "HTTP") {
+        throwErrorBadrequest("error protocol name");
+    }
+
+    std::string            digit   = version.substr(pos + 1);
+    std::string::size_type dot_pos = digit.find_first_of('.');
+
+    // dotがあるか
+    // dotが複数ないか
+    if (dot_pos == digit.npos || dot_pos != digit.find_last_of('.')) {
+        throwErrorBadrequest("error version");
+    }
+
+    std::string before_dot = digit.substr(0, dot_pos);
+    std::string after_dot  = digit.substr(dot_pos + 1);
+    // dotの前後が空か
+    // dotの前後が数字か
+    if (before_dot.empty() || after_dot.empty() || !isdigit(before_dot) ||
+        !isdigit(after_dot)) {
+        throwErrorBadrequest("error version");
+    }
+}
+
+// token  = 1*tchar
+// tchar  = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+//       / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+//       / DIGIT / ALPHA
+void HTTPParser::validateToken(const std::string& token) {
+    if (token.empty()) {
+        throwErrorBadrequest("empty token");
+    }
+    const std::string special = "!#$%&'*+-.^_`|~";
+    for (std::string::const_iterator it = token.begin(); it != token.end();
+         it++) {
+        if (!std::isalnum(*it) && special.find(*it) == special.npos) {
+            throwErrorBadrequest("error token");
+        }
+    }
+}
+
+void HTTPParser::parseFirstline(const std::string& line) {
+    std::cout << "line: " << line << std::endl;
+
+    std::istringstream iss(line);
+    std::string        method, request_target;
+    std::string        version = "HTTP/1.1";
+
+    iss >> method >> request_target >> version;
+
+    if (request_target == "/") {
+        request_target = "index.html";
+    }
+    validateMethod(method);
+    validateRequestTarget(request_target);
+    validateHTTPVersion(version);
+    // set
+}
+
+void HTTPParser::ParsePart(const std::string& buf) {
+    std::cout << "[buf]\n" << buf << std::endl;
+    buf_ += buf;
+    std::cout << "[buf_]\n" << buf_ << std::endl;
+
+    for (;;) {
+        // 空行があるか判定
+
+        // 改行があるか判定
+        std::string::size_type line_end_pos =
+            buf_.find_first_of(HTTPRequest::crlf);
+        if (line_end_pos == buf_.npos) {
+            return;
+        }
+
+        std::string line = buf_.substr(0, line_end_pos);
+        buf_             = buf_.substr(line_end_pos + HTTPRequest::crlf_size);
+
+        std::cout << "line: " << line << std::endl;
+        std::cout << "buf_: " << buf_ << std::endl;
+
+        switch (phase_) {
+        case PH_FIRST_LINE:
+            std::cout << "first line" << std::endl;
+            parseFirstline(line);
+            phase_ = PH_HEADER_LINE;
+            break;
+
+        case PH_HEADER_LINE:
+            std::cout << "header line" << std::endl;
+
+            if (line == HTTPRequest::crlf) {
+                phase_ = PH_END;
+            }
+            break;
+
+        case PH_END:
+            std::cout << "parse end" << std::endl;
+        }
+    }
+}
+
+/*
+ * 実装案
+ * - 改行ごとにパース
+ *  1. 読み込み
+ *  2. (GETの場合)空行あるか判定
+ *    - あれば最後までパースしてHTTPRequestを返す
+ *  3. 改行があるか判定
+ *    - なければ1にもどる
+ *    - あれば改行までパース->改行後の文字列は保持->3
+ *  - 改行がなかった場合、エラー吐かずに一生読み込もうとする
+ *
+ *
+ */

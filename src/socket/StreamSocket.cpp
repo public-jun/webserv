@@ -12,19 +12,20 @@
 #include <sstream>
 
 StreamSocket::StreamSocket()
-    : parser_(NULL), req_(NULL), res_(NULL), read_size_(0), buf_size_(2048) {
+    : req_(HTTPRequest()), parser_(HTTPParser(req_)), res_(NULL), read_size_(0),
+      buf_size_(2048) {
     SetSocketType(Socket::STREAM);
 }
 
 StreamSocket::~StreamSocket() {
-    if (parser_) {
-        delete parser_;
-        parser_ = NULL;
-    }
-    if (req_) {
-        delete req_;
-        req_ = NULL;
-    }
+    /* if (parser_) { */
+    /*     delete parser_; */
+    /*     parser_ = NULL; */
+    /* } */
+    /* if (req_) { */
+    /*     delete req_; */
+    /*     req_ = NULL; */
+    /* } */
     if (res_) {
         delete res_;
         res_ = NULL;
@@ -32,7 +33,7 @@ StreamSocket::~StreamSocket() {
     Close();
 }
 
-HTTPRequest* StreamSocket::GetHTTPRequest() { return req_; }
+HTTPRequest* StreamSocket::GetHTTPRequest() { return &req_; }
 
 void StreamSocket::Recv() {
     if (actions_) {
@@ -68,16 +69,15 @@ void StreamSocket::OnRecv() {
 }
 
 void StreamSocket::parseRequest() {
-    parser_ = new HTTPParser();
-    req_    = parser_->Parse(std::string(buf_));
+    parser_.Parse(std::string(buf_));
 
-    if (req_->GetMethod() == "GET") {
-        if (req_->GetRequestTarget() == "/") {
-            req_->SetURI(std::string("/index.html"));
+    if (req_.GetMethod() == "GET") {
+        if (req_.GetRequestTarget() == "/") {
+            req_.SetURI(std::string("/index.html"));
         }
 
         // uri で指定されたファイルを読み取る
-        std::ifstream ifs(req_->GetRequestTarget().erase(0, 1));
+        std::ifstream ifs(req_.GetRequestTarget().erase(0, 1));
         std::string   tmp, file_content;
         if (ifs.fail()) {
             // err

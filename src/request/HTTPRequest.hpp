@@ -6,6 +6,7 @@
 
 class HTTPRequest {
 public:
+    HTTPRequest();
     HTTPRequest(const std::string& row);
     HTTPRequest(std::string method, std::string uri);
     ~HTTPRequest();
@@ -16,7 +17,10 @@ public:
     const std::map<std::string, std::string>& GetHeaders() const;
     const std::string GetHeaderValue(std::string key) const;
 
-    void SetURI(std::string uri);
+    void SetURI(const std::string uri);
+    void SetMethod(const std::string method);
+    void SetHTTPVersion(const std::string version);
+    void SetStatus(const int status);
 
     // 対応するメソッド一覧。仮でここで宣言
     static std::set<std::string> methods;
