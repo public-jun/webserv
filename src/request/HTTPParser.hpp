@@ -29,7 +29,9 @@ private:
     void validateVersionNotSuppoted();
     void validateMethodNotAllowed();
 
-    bool isdigit(const std::string& str) const;
+    std::string trimSpace(const std::string& string,
+                          const std::string  trim_char_set) const;
+    bool        isdigit(const std::string& str) const;
 
     std::string  buf_;
     Phase        phase_;

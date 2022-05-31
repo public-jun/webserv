@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-HTTPParser::HTTPParser(HTTPRequest& req) : req_(req){};
+HTTPParser::HTTPParser(HTTPRequest& req) : phase_(PH_FIRST_LINE), req_(req){};
 
 HTTPParser::~HTTPParser() {}
 
@@ -121,6 +121,45 @@ void HTTPParser::validateToken(const std::string& token) {
     }
 }
 
+// 前後のスペースをtrim
+std::string HTTPParser::trimSpace(const std::string& str,
+                                  const std::string trim_char_set = " ") const {
+    std::string            result;
+    std::string::size_type left = str.find_first_not_of(trim_char_set);
+
+    if (left != str.npos) {
+        std::string::size_type right = str.find_last_not_of(trim_char_set);
+        result                       = str.substr(left, right - left + 1);
+    }
+    return result;
+}
+
+void HTTPParser::parseHeaderLine(const std::string& line) {
+    std::string::size_type pos = line.find(":");
+    std::string            key, value;
+    key = line.substr(0, pos);
+    if (pos != line.npos) {
+        value = line.substr(pos + 1, line.size() - pos);
+    }
+
+    validateToken(key);
+
+    // example: HOST -> Host
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    if (key.size() >= 1) {
+        key[0] = std::toupper(key[0]);
+    }
+
+    value = trimSpace(value);
+    if (value.find_first_of(HTTPRequest::crlf) != value.npos) {
+        throwErrorBadrequest("error value");
+    }
+
+    std::cout << "key: " << key << std::endl;
+    std::cout << "value: " << value << std::endl;
+    /* headers_.insert(std::make_pair(key, value)); */
+}
+
 void HTTPParser::parseFirstline(const std::string& line) {
     std::cout << "line: " << line << std::endl;
 
@@ -133,16 +172,19 @@ void HTTPParser::parseFirstline(const std::string& line) {
     if (request_target == "/") {
         request_target = "index.html";
     }
+    // validate
     validateMethod(method);
     validateRequestTarget(request_target);
     validateHTTPVersion(version);
+
     // set
+    req_.SetMethod(method);
+    req_.SetHTTPVersion(version);
 }
 
 void HTTPParser::ParsePart(const std::string& buf) {
-    std::cout << "[buf]\n" << buf << std::endl;
+    std::cout << "buf:\n[" << buf << "]" << std::endl;
     buf_ += buf;
-    std::cout << "[buf_]\n" << buf_ << std::endl;
 
     for (;;) {
         // 空行があるか判定
@@ -157,19 +199,20 @@ void HTTPParser::ParsePart(const std::string& buf) {
         std::string line = buf_.substr(0, line_end_pos);
         buf_             = buf_.substr(line_end_pos + HTTPRequest::crlf_size);
 
-        std::cout << "line: " << line << std::endl;
-        std::cout << "buf_: " << buf_ << std::endl;
+        std::cout << "line: [" << line << "]" << std::endl;
+        std::cout << "buf_\n[" << buf_ << "]" << std::endl;
 
         switch (phase_) {
         case PH_FIRST_LINE:
-            std::cout << "first line" << std::endl;
+            std::cout << "[[ first line ]]" << std::endl;
             parseFirstline(line);
             phase_ = PH_HEADER_LINE;
             break;
 
         case PH_HEADER_LINE:
-            std::cout << "header line" << std::endl;
+            std::cout << "[[ header line ]]" << std::endl;
 
+            parseHeaderLine(line);
             if (line == HTTPRequest::crlf) {
                 phase_ = PH_END;
             }
