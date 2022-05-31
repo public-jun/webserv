@@ -14,6 +14,8 @@ public:
     void ParsePart(const std::string& buf);
     void Parse(std::string request_message);
 
+    Phase GetPhase() const;
+
 private:
     void parseFirstline(const std::string& line);
     void parseHeaderLine(const std::string& line);

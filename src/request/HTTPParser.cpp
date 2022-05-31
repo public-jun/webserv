@@ -7,6 +7,8 @@ HTTPParser::HTTPParser(HTTPRequest& req) : phase_(PH_FIRST_LINE), req_(req){};
 
 HTTPParser::~HTTPParser() {}
 
+HTTPParser::Phase HTTPParser::GetPhase() const { return phase_; }
+
 void HTTPParser::Parse(std::string request_message) {
     std::string::iterator it =
         std::find(request_message.begin(), request_message.end(), '\n');
@@ -157,6 +159,7 @@ void HTTPParser::parseHeaderLine(const std::string& line) {
 
     std::cout << "key: " << key << std::endl;
     std::cout << "value: " << value << std::endl;
+    // TODO: set header
     /* headers_.insert(std::make_pair(key, value)); */
 }
 
