@@ -160,6 +160,7 @@ void HTTPParser::parseHeaderLine(const std::string& line) {
     std::cout << "key: " << key << std::endl;
     std::cout << "value: " << value << std::endl;
     // TODO: set header
+    req_.SetHeader(key, value);
     /* headers_.insert(std::make_pair(key, value)); */
 }
 

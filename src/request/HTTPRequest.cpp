@@ -17,7 +17,7 @@ const std::string HTTPRequest::crlf = "\r\n";
 
 const std::string::size_type HTTPRequest::crlf_size = crlf.size();
 
-HTTPRequest::HTTPRequest() {}
+HTTPRequest::HTTPRequest() : status_(status_ok) {}
 
 HTTPRequest::HTTPRequest(const std::string& row)
     : row_(row), status_(status_ok) {
@@ -59,6 +59,10 @@ void HTTPRequest::SetHTTPVersion(const std::string version) {
 }
 
 void HTTPRequest::SetStatus(const int status) { status_ = status; }
+
+void HTTPRequest::SetHeader(const std::string key, const std::string value) {
+    headers_.insert(std::make_pair(key, value));
+}
 
 void HTTPRequest::throwErrorBadrequest(
     const std::string err_message = "bad request") {

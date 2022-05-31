@@ -1,5 +1,6 @@
 #ifndef HTTPREQUEST_HPP
 #define HTTPREQUEST_HPP
+
 #include <map>
 #include <set>
 #include <string>
@@ -21,6 +22,7 @@ public:
     void SetMethod(const std::string method);
     void SetHTTPVersion(const std::string version);
     void SetStatus(const int status);
+    void SetHeader(const std::string key, const std::string value);
 
     // 対応するメソッド一覧。仮でここで宣言
     static std::set<std::string> methods;
