@@ -28,6 +28,7 @@ private:
     void validateRequestTarget(const std::string& request_target);
     void validateHTTPVersion(const std::string& version);
     void validateToken(const std::string& token);
+    void validateHost();
     void validateVersionNotSuppoted();
     void validateMethodNotAllowed();
 

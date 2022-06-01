@@ -124,6 +124,12 @@ void HTTPParser::validateToken(const std::string& token) {
     }
 }
 
+void HTTPParser::validateHost() {
+    if (req_.GetHeaderValue("Host").empty()) {
+        throwErrorBadrequest("empty host");
+    }
+}
+
 // 前後のスペースをtrim
 std::string HTTPParser::trimSpace(const std::string& str,
                                   const std::string trim_char_set = " ") const {
@@ -204,6 +210,7 @@ void HTTPParser::ParsePart(const std::string& buf) {
 
             case PH_HEADER_LINE:
                 if (line == "") {
+                    validateHost();
                     phase_ = PH_END;
                     break;
                 }
