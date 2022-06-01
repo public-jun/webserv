@@ -24,7 +24,7 @@ void HTTPParser::Parse(std::string request_message) {
         std::cout << "get uri error" << std::endl;
     }
     req_.SetMethod(method);
-    req_.SetURI(uri);
+    req_.SetRequestTarget(uri);
 }
 
 void HTTPParser::throwErrorBadrequest(
@@ -157,16 +157,10 @@ void HTTPParser::parseHeaderLine(const std::string& line) {
         throwErrorBadrequest("error value");
     }
 
-    std::cout << "key: " << key << std::endl;
-    std::cout << "value: " << value << std::endl;
-    // TODO: set header
     req_.SetHeader(key, value);
-    /* headers_.insert(std::make_pair(key, value)); */
 }
 
 void HTTPParser::parseFirstline(const std::string& line) {
-    std::cout << "line: " << line << std::endl;
-
     std::istringstream iss(line);
     std::string        method, request_target;
     std::string        version = "HTTP/1.1";
@@ -183,6 +177,7 @@ void HTTPParser::parseFirstline(const std::string& line) {
 
     // set
     req_.SetMethod(method);
+    req_.SetRequestTarget(request_target);
     req_.SetHTTPVersion(version);
 }
 
@@ -190,46 +185,33 @@ void HTTPParser::ParsePart(const std::string& buf) {
     buf_ += buf;
 
     for (;;) {
-        // 改行があるか判定
-        std::string::size_type line_end_pos =
-            buf_.find_first_of(HTTPRequest::crlf);
-        if (line_end_pos == buf_.npos) {
-            return;
-        }
-
-        std::string line = buf_.substr(0, line_end_pos);
-        buf_             = buf_.substr(line_end_pos + HTTPRequest::crlf_size);
-
-        switch (phase_) {
-        case PH_FIRST_LINE:
-            parseFirstline(line);
-            phase_ = PH_HEADER_LINE;
-            break;
-
-        case PH_HEADER_LINE:
-            if (line == "") {
-                phase_ = PH_END;
-                break;
+        try {
+            // 改行があるか判定
+            std::string::size_type line_end_pos = buf_.find(HTTPRequest::crlf);
+            if (line_end_pos == buf_.npos) {
+                return;
             }
-            parseHeaderLine(line);
-            break;
 
-        case PH_END:
-            return;
-        }
+            std::string line = buf_.substr(0, line_end_pos);
+            buf_ = buf_.substr(line_end_pos + HTTPRequest::crlf_size);
+
+            switch (phase_) {
+            case PH_FIRST_LINE:
+                parseFirstline(line);
+                phase_ = PH_HEADER_LINE;
+                break;
+
+            case PH_HEADER_LINE:
+                if (line == "") {
+                    phase_ = PH_END;
+                    break;
+                }
+                parseHeaderLine(line);
+                break;
+
+            case PH_END:
+                return;
+            }
+        } catch (std::runtime_error& e) { std::cerr << e.what() << std::endl; }
     }
 }
-
-/*
- * 実装案
- * - 改行ごとにパース
- *  1. 読み込み
- *  2. (GETの場合)空行あるか判定
- *    - あれば最後までパースしてHTTPRequestを返す
- *  3. 改行があるか判定
- *    - なければ1にもどる
- *    - あれば改行までパース->改行後の文字列は保持->3
- *  - 改行がなかった場合、エラー吐かずに一生読み込もうとする
- *
- *
- */

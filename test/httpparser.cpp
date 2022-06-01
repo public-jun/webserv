@@ -57,8 +57,8 @@ TEST(HTTPParser, ParsePart1) {
 
 TEST(HTTPParser, ParsePart2) {
     vector<string> m;
-    m.push_back("GET\r");
-    m.push_back("\n / HTTP/1.1\r\nHost: localhost\r\n");
+    m.push_back("GET / HTTP/1.1\r");
+    m.push_back("\nHost: localhost\r\n");
     m.push_back("\r\n");
 
     HTTPRequest req;
