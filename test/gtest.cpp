@@ -7,4 +7,5 @@
 
 /* Include all tests files */
 
+#include "httpparser.cpp"
 #include "request.cpp"
