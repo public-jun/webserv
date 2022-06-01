@@ -1,5 +1,6 @@
 #include "HTTPParser.hpp"
 #include "HTTPRequest.hpp"
+#include <exception>
 #include <iostream>
 #include <sstream>
 
@@ -212,6 +213,10 @@ void HTTPParser::ParsePart(const std::string& buf) {
             case PH_END:
                 return;
             }
-        } catch (std::runtime_error& e) { std::cerr << e.what() << std::endl; }
+        } catch (std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+        } catch (std::exception& e) {
+            std::cerr << "Unexpected error: " << e.what() << std::endl;
+        }
     }
 }
