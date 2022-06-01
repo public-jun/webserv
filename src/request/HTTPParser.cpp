@@ -203,8 +203,8 @@ void HTTPParser::parseFirstline(const std::string& line) {
 void HTTPParser::ParsePart(const std::string& buf) {
     buf_ += buf;
 
-    for (;;) {
-        try {
+    try {
+        for (;;) {
             // 改行があるか判定
             std::string::size_type line_end_pos = buf_.find(HTTPRequest::crlf);
             if (line_end_pos == buf_.npos) {
@@ -234,10 +234,10 @@ void HTTPParser::ParsePart(const std::string& buf) {
             case PH_END:
                 return;
             }
-        } catch (std::runtime_error& e) {
-            std::cerr << e.what() << std::endl;
-        } catch (std::exception& e) {
-            std::cerr << "Unexpected error: " << e.what() << std::endl;
         }
+    } catch (std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+    } catch (std::exception& e) {
+        std::cerr << "Unexpected error: " << e.what() << std::endl;
     }
 }
