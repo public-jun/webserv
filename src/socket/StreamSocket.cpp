@@ -73,7 +73,7 @@ void StreamSocket::parseRequest() {
 
     if (req_.GetMethod() == "GET") {
         if (req_.GetRequestTarget() == "/") {
-            req_.SetURI(std::string("/index.html"));
+            req_.SetRequestTarget(std::string("/index.html"));
         }
 
         // uri で指定されたファイルを読み取る

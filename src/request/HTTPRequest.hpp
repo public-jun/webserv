@@ -18,7 +18,7 @@ public:
     const std::map<std::string, std::string>& GetHeaders() const;
     const std::string GetHeaderValue(std::string key) const;
 
-    void SetURI(const std::string uri);
+    void SetRequestTarget(const std::string uri);
     void SetMethod(const std::string method);
     void SetHTTPVersion(const std::string version);
     void SetStatus(const int status);

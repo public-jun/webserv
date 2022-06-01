@@ -50,7 +50,9 @@ const std::map<std::string, std::string>& HTTPRequest::GetHeaders() const {
     return headers_;
 }
 
-void HTTPRequest::SetURI(const std::string uri) { request_target_ = uri; }
+void HTTPRequest::SetRequestTarget(const std::string request_target) {
+    request_target_ = request_target;
+}
 
 void HTTPRequest::SetMethod(const std::string method) { method_ = method; }
 
