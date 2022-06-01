@@ -130,6 +130,18 @@ void HTTPParser::validateHost() {
     }
 }
 
+void HTTPParser::validateVersionNotSuppoted() {
+    if (req_.GetVersion() != "HTTP/1.1") {
+        throwErrorVersionNotSupported();
+    }
+}
+
+void HTTPParser::validateMethodNotAllowed() {
+    if (req_.GetMethod() != "GET") {
+        throwErrorMethodNotAllowed();
+    }
+}
+
 // 前後のスペースをtrim
 std::string HTTPParser::trimSpace(const std::string& str,
                                   const std::string trim_char_set = " ") const {
@@ -211,6 +223,8 @@ void HTTPParser::ParsePart(const std::string& buf) {
             case PH_HEADER_LINE:
                 if (line == "") {
                     validateHost();
+                    validateVersionNotSuppoted();
+                    validateMethodNotAllowed();
                     phase_ = PH_END;
                     break;
                 }
