@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// =======================
 // ======= OK CASE =======
 
 TEST(HTTPParser, ParseAllAtOnce) {
@@ -85,7 +86,7 @@ TEST(HTTPParser, HeaderValueTrimSpace) {
     EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
 }
 
-TEST(HTTPParser, HeaderKey) {
+TEST(HTTPParser, NormalizeHeaderKey) {
     string      message("GET / HTTP/1.1\r\nHOST:localhost\r\n\r\n");
     HTTPRequest req;
     HTTPParser  parser(req);
@@ -95,6 +96,25 @@ TEST(HTTPParser, HeaderKey) {
     EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
 }
 
+TEST(HTTPParser, PhaseFirstLine) {
+    string      message("GET / ");
+    HTTPRequest req;
+    HTTPParser  parser(req);
+    parser.ParsePart(message);
+
+    EXPECT_EQ(HTTPParser::PH_FIRST_LINE, parser.GetPhase());
+}
+
+TEST(HTTPParser, PhaseHeaderLine) {
+    string      message("GET / HTTP/1.1\r\nHost:localhost\r\n");
+    HTTPRequest req;
+    HTTPParser  parser(req);
+    parser.ParsePart(message);
+
+    EXPECT_EQ(HTTPParser::PH_HEADER_LINE, parser.GetPhase());
+}
+
+// =======================
 // === Badrequest CASE ===
 
 TEST(HTTPParser, EmptyMethod) {
