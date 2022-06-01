@@ -11,8 +11,7 @@ public:
     HTTPParser(HTTPRequest& req);
     ~HTTPParser();
 
-    void ParsePart(const std::string& buf);
-    void Parse(std::string request_message);
+    void Parse(const std::string& buf);
 
     Phase GetPhase() const;
 

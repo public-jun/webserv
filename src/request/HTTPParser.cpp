@@ -10,24 +10,6 @@ HTTPParser::~HTTPParser() {}
 
 HTTPParser::Phase HTTPParser::GetPhase() const { return phase_; }
 
-void HTTPParser::Parse(std::string request_message) {
-    std::string::iterator it =
-        std::find(request_message.begin(), request_message.end(), '\n');
-    std::string line(request_message.begin(), it);
-
-    std::istringstream iss(line);
-    std::string        method, uri;
-    iss >> method >> uri;
-    if (method.empty()) {
-        std::cout << "get method error" << std::endl;
-    }
-    if (uri.empty()) {
-        std::cout << "get uri error" << std::endl;
-    }
-    req_.SetMethod(method);
-    req_.SetRequestTarget(uri);
-}
-
 void HTTPParser::throwErrorBadrequest(
     const std::string err_message = "bad request") {
     req_.SetStatus(HTTPRequest::status_bad_request);
@@ -200,7 +182,7 @@ void HTTPParser::parseFirstline(const std::string& line) {
     req_.SetHTTPVersion(version);
 }
 
-void HTTPParser::ParsePart(const std::string& buf) {
+void HTTPParser::Parse(const std::string& buf) {
     buf_ += buf;
 
     try {

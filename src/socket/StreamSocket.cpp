@@ -64,12 +64,17 @@ void StreamSocket::OnRecv() {
     buf_[read_size_] = '\0';
     // Request Parser
     parseRequest();
-    actions_->DelRecv(this);
-    Send();
+    if (parser_.GetPhase() == HTTPParser::PH_END) {
+        actions_->DelRecv(this);
+        Send();
+    }
 }
 
 void StreamSocket::parseRequest() {
     parser_.Parse(std::string(buf_));
+    if (parser_.GetPhase() != HTTPParser::PH_END) {
+        return;
+    }
 
     if (req_.GetMethod() == "GET") {
         if (req_.GetRequestTarget() == "/") {
@@ -77,7 +82,7 @@ void StreamSocket::parseRequest() {
         }
 
         // uri で指定されたファイルを読み取る
-        std::ifstream ifs(req_.GetRequestTarget().erase(0, 1));
+        std::ifstream ifs(req_.GetRequestTarget());
         std::string   tmp, file_content;
         if (ifs.fail()) {
             // err
