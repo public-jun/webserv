@@ -1,5 +1,7 @@
 #include "HTTPRequest.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -9,137 +11,46 @@
 #include <sstream>
 #include <stdexcept>
 
-#define GREEN "\033[32m"
-#define RED "\033[31m"
-#define RESET "\033[39m"
-
-std::set<std::string> HTTPRequest::methods;
-
 const std::string HTTPRequest::crlf = "\r\n";
 
-HTTPRequest::HTTPRequest(const std::string& row) : row_(row), status_(200) {
-    HTTPRequest::methods.insert("GET");
-    parse();
-}
+const std::string::size_type HTTPRequest::crlf_size = crlf.size();
 
-HTTPRequest::HTTPRequest(std::string method, std::string uri)
-    : method_(method), uri_(uri) {}
+HTTPRequest::HTTPRequest() : status_(status_ok) {}
 
 HTTPRequest::~HTTPRequest() {}
 
-std::string& HTTPRequest::GetMethod() { return method_; }
+const std::string& HTTPRequest::GetMethod() const { return method_; }
 
-std::string& HTTPRequest::GetURI() { return uri_; }
+std::string HTTPRequest::GetRequestTarget() const { return request_target_; }
 
-std::string& HTTPRequest::GetVersion() { return version_; }
+const std::string& HTTPRequest::GetVersion() const { return HTTPVersion_; }
 
-int HTTPRequest::GetStatus() { return status_; }
+int HTTPRequest::GetStatus() const { return status_; }
 
-std::string HTTPRequest::GetHeaderValue(std::string key) {
-    return headers_[key];
+const std::string HTTPRequest::GetHeaderValue(const std::string key) const {
+    std::map<std::string, std::string>::const_iterator it = headers_.find(key);
+    if (it == headers_.end()) {
+        return "";
+    }
+    return (*it).second;
 }
 
-std::map<std::string, std::string> HTTPRequest::GetHeaders() {
+const std::map<std::string, std::string>& HTTPRequest::GetHeaders() const {
     return headers_;
 }
 
-void HTTPRequest::SetURI(std::string uri) { uri_ = uri; }
-
-void HTTPRequest::parseFirstline(std::string line) {
-    std::istringstream iss(line);
-    std::string        method, uri;
-    std::string        version = "HTTP/1.1";
-
-    iss >> method >> uri >> version;
-
-    if (uri == "/") {
-        uri = "index.html";
-    }
-
-    // バリデート
-    if (method.empty() || uri.empty()) {
-        throwErrorBadrequest("error request line");
-    }
-
-    if (methods.find(method) == methods.end()) {
-        throwErrorBadrequest("error request line");
-    }
-    // バージョンが1.1以外なら505
-
-    method_  = method;
-    uri_     = uri;
-    version_ = version;
+void HTTPRequest::SetRequestTarget(const std::string request_target) {
+    request_target_ = request_target;
 }
 
-void HTTPRequest::parseHeaderLine(std::string line) {
-    std::cout << GREEN << "line: " << line << RESET << std::endl;
-    std::size_t pos = line.find(":");
-    std::string key, value;
-    key = line.substr(0, pos);
-    if (pos != line.npos) {
-        value = line.substr(pos + 1, line.size() - pos);
-    }
+void HTTPRequest::SetMethod(const std::string method) { method_ = method; }
 
-    // TODO
-    // keyにスペースあるとNG
+void HTTPRequest::SetHTTPVersion(const std::string version) {
+    HTTPVersion_ = version;
+}
 
-    // valueの前後のスペースはtrim
-    // valueの間にスペースはNG
+void HTTPRequest::SetStatus(const int status) { status_ = status; }
 
+void HTTPRequest::SetHeader(const std::string key, const std::string value) {
     headers_.insert(std::make_pair(key, value));
-}
-
-bool HTTPRequest::isLastLine(std::string& str) {
-    const std::size_t crlf_size    = crlf.size();
-    std::size_t       line_end_pos = str.find(crlf);
-    std::string       next_line    = str.substr(line_end_pos + crlf_size);
-
-    return next_line.size() >= crlf_size &&
-           next_line.substr(0, crlf_size) == crlf;
-}
-
-void HTTPRequest::parseBody(std::string body) {
-    std::cout << "body: " << body << std::endl;
-    if (body.empty()) {
-        std::cout << "empty body" << std::endl;
-        return;
-    }
-    if (body.size() >= crlf.size() && body.substr(0, crlf.size()) == crlf) {
-        // 改行が3つ連続していた場合
-        throwErrorBadrequest("error body");
-    }
-    body_ = body;
-}
-
-void HTTPRequest::throwErrorBadrequest(std::string err_message) {
-    status_ = 400;
-    throw std::runtime_error(err_message);
-}
-
-void HTTPRequest::parse() {
-    try {
-        std::size_t line_end_pos = row_.find(crlf);
-        if (line_end_pos == row_.npos) {
-            throwErrorBadrequest("error request line");
-        }
-
-        parseFirstline(row_.substr(0, line_end_pos));
-
-        std::string str = row_;
-        while (status_ == 200 && !isLastLine(str)) {
-            std::size_t line_start_pos = line_end_pos + crlf.size();
-            str                        = str.substr(line_start_pos);
-            line_end_pos               = str.find(crlf);
-
-            if (line_end_pos == row_.npos) {
-                throwErrorBadrequest("missing crlf");
-            }
-            parseHeaderLine(str.substr(0, line_end_pos));
-        }
-        std::string body =
-            str.substr(str.find(crlf) + crlf.size() + crlf.size());
-        parseBody(body);
-    } catch (std::runtime_error& e) {
-        std::cout << RED << "exception: " << e.what() << RESET << std::endl;
-    } catch (std::exception& e) {}
 }

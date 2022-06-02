@@ -15,6 +15,8 @@ public:
     StreamSocket();
     virtual ~StreamSocket();
 
+    HTTPRequest* GetHTTPRequest();
+
     // Add event
     void Recv();
     void Send();
@@ -29,8 +31,8 @@ private:
     void parseRequest();
 
 private:
-    HTTPParser*   parser_;
-    HTTPRequest*  req_;
+    HTTPRequest   req_;
+    HTTPParser    parser_;
     HTTPResponse* res_;
 
     int     read_size_;
