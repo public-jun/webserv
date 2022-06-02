@@ -8,3 +8,4 @@
 /* Include all tests files */
 
 #include "httpparser.cpp"
+#include "execve_array_test.cpp"
