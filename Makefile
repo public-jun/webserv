@@ -6,13 +6,14 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event -I ./src/exception
+INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event -I ./src/exception -I ./src/extended_c
 
 VPATH     := src: \
 			src/request \
 			src/response \
 			src/socket \
 			src/event \
+			src/extended_c \
 			src/exception
 
 TESTSRCS  := EventActions.cpp \
@@ -90,6 +91,7 @@ test_compile = clang++ -std=c++11 \
 gtest: $(gtest)
 	$(test_compile)
 	./tester
+# ./tester --gtest_filter=ExecveArray.other
 
 gtestlist:
 	@./tester --gtest_list_tests
