@@ -7,6 +7,7 @@
 #include "Socket.hpp"
 
 class Socket;
+class StreamSocket;
 class EventActions {
 public:
     EventActions();
@@ -28,6 +29,7 @@ public:
 
 private:
     void onEvent(std::vector<struct kevent> active_list, int event_size);
+    void handleStreamSocketEvent(StreamSocket* sock);
 
     int                        kqueue_fd_;
     std::vector<struct kevent> change_list_;

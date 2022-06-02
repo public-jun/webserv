@@ -7,7 +7,7 @@
 class EventActions;
 class Socket {
 public:
-    enum SOCKET_TYPE {
+    enum SocketType {
         LISTENING,
         STREAM,
     };
@@ -16,8 +16,8 @@ public:
     Socket(int sock) : sock_fd_(sock) {}
     virtual ~Socket() {}
 
-    void        SetSocketType(SOCKET_TYPE type) { type_ = type; }
-    SOCKET_TYPE GetSocketType() { return type_; }
+    void       SetSocketType(SocketType type) { type_ = type; }
+    SocketType GetSocketType() { return type_; }
 
     void SetSocketFd(const int& sock) { sock_fd_ = sock; }
     int  GetSocketFd() { return sock_fd_; }
@@ -30,7 +30,7 @@ public:
 
 protected:
     int                sock_fd_;
-    SOCKET_TYPE        type_;
+    SocketType         type_;
     struct sockaddr_in addr_;
 
     EventActions* actions_;

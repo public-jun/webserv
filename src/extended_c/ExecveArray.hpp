@@ -10,8 +10,8 @@ public:
         initExecveArray(strs.begin(), strs.end());
     }
 
-    char* const* get() const { return ptrs_.data(); }
-    size_t       get_size() { return str_.size(); }
+    char* const* Get() const { return ptrs_.data(); }
+    size_t       GetSize() { return str_.size(); }
 
 private:
     ExecveArray() {}
