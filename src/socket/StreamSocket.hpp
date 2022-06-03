@@ -12,10 +12,18 @@ class HTTPRequest;
 class HTTPResponse;
 class StreamSocket : public Socket {
 public:
+    enum EventType {
+        RECV_REQUEST,
+        SEND_RESPONSE,
+        WRITE_CGI,
+        READ_CGI,
+    };
+
     StreamSocket();
     virtual ~StreamSocket();
 
-    HTTPRequest* GetHTTPRequest();
+    HTTPRequest*     GetHTTPRequest();
+    const EventType& GetEventType() const;
 
     // Add event
     void Recv();
@@ -29,15 +37,17 @@ public:
 
 private:
     void parseRequest();
+    void setEventType(EventType type);
 
 private:
     HTTPRequest   req_;
     HTTPParser    parser_;
     HTTPResponse* res_;
 
-    int     read_size_;
-    ssize_t buf_size_;
-    char    buf_[2048];
+    EventType event_type_;
+    int       read_size_;
+    ssize_t   buf_size_;
+    char      buf_[2048];
 };
 
 #endif

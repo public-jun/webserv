@@ -135,14 +135,27 @@ void EventActions::onEvent(std::vector<struct kevent> active_list,
             if (active_list[i].flags == EV_EOF) {
                 s_sock->OnDisConnect();
                 delete s_sock;
-            } else if (active_list[i].filter == EVFILT_READ) {
-                std::cout << "Recv REQUEST" << std::endl;
-                s_sock->OnRecv();
-            } else if (active_list[i].filter == EVFILT_WRITE) {
-                std::cout << "Send RESPONSE" << std::endl;
-                s_sock->OnSend();
-                delete s_sock;
+            } else {
+                handleStreamSocketEvent(s_sock);
             }
         }
+    }
+}
+
+void EventActions::handleStreamSocketEvent(StreamSocket* sock) {
+    switch (sock->GetEventType()) {
+    case StreamSocket::RECV_REQUEST:
+        std::cout << "Recv REQUEST" << std::endl;
+        sock->OnRecv();
+        break;
+
+    case StreamSocket::SEND_RESPONSE:
+        std::cout << "Send RESPONSE" << std::endl;
+        sock->OnSend();
+        delete sock;
+        break;
+
+    default:
+        break;
     }
 }

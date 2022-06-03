@@ -12,8 +12,8 @@
 #include <sstream>
 
 StreamSocket::StreamSocket()
-    : req_(HTTPRequest()), parser_(HTTPParser(req_)), res_(NULL), read_size_(0),
-      buf_size_(2048) {
+    : req_(HTTPRequest()), parser_(HTTPParser(req_)), res_(NULL),
+      event_type_(RECV_REQUEST), read_size_(0), buf_size_(2048) {
     SetSocketType(Socket::STREAM);
 }
 
@@ -35,6 +35,10 @@ StreamSocket::~StreamSocket() {
 
 HTTPRequest* StreamSocket::GetHTTPRequest() { return &req_; }
 
+const StreamSocket::EventType& StreamSocket::GetEventType() const {
+    return event_type_;
+}
+
 void StreamSocket::Recv() {
     if (actions_) {
         actions_->AddRecvEvent(this);
@@ -45,6 +49,7 @@ void StreamSocket::Send() {
     if (actions_) {
         actions_->AddSendEvent(this);
     }
+    setEventType(SEND_RESPONSE);
 }
 
 void StreamSocket::Close() {
@@ -113,4 +118,8 @@ void StreamSocket::OnDisConnect() {
     if (actions_) {
         actions_->DelEvent(this);
     }
+}
+
+void StreamSocket::setEventType(StreamSocket::EventType type) {
+    event_type_ = type;
 }
