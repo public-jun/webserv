@@ -11,16 +11,8 @@ HTTPResponse::HTTPResponse(int sock, int status_code, std::string header,
 
 HTTPResponse::~HTTPResponse() {}
 
-HTTPResponse::HTTPResponse(const HTTPResponse& other) { *this = other; }
-
-HTTPResponse& HTTPResponse::operator=(const HTTPResponse& other) {
-    if (this != &other) {
-        sock_        = other.sock_;
-        status_code_ = other.status_code_;
-        header_      = other.header_;
-        body_        = other.body_;
-    }
-    return *this;
+void HTTPResponse::SetHeader(std::string key, std::string value) {
+    headers_.insert(std::make_pair(key, value));
 }
 
 void HTTPResponse::Create() {
