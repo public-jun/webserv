@@ -10,6 +10,7 @@ public:
     ~HTTPResponse();
 
     void SetHeader(std::string key, std::string value);
+    void SetBody(std::string body);
 
     void Create();
     void SendMessage();

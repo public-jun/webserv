@@ -15,6 +15,8 @@ void HTTPResponse::SetHeader(std::string key, std::string value) {
     headers_.insert(std::make_pair(key, value));
 }
 
+void HTTPResponse::SetBody(std::string body) { body_ = body; }
+
 void HTTPResponse::Create() {
     // 文字列で扱って大丈夫？バイナリの可能性は？
     // TODO:レスポンスのサイズをつくる
