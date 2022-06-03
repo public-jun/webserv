@@ -153,6 +153,7 @@ void EventActions::handleStreamSocketEvent(StreamSocket* sock) {
         std::cout << "Send RESPONSE" << std::endl;
         sock->OnSend();
         delete sock;
+        break;
 
     default:
         break;
