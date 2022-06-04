@@ -5,24 +5,31 @@
 
 class HTTPResponse {
 public:
-    HTTPResponse(int sock, int status_code, std::string header,
-                 std::string body);
+    HTTPResponse();
+    HTTPResponse(int sock, int status_code, std::string body);
     ~HTTPResponse();
 
-    void SetHeader(std::string key, std::string value);
-    void SetBody(std::string body);
+    void AppendHeader(std::string key, std::string value);
 
-    void Create();
-    void SendMessage();
+    void SetBody(std::string body);
+    void SetVersion(std::string version);
+
+    // いらないかも
+    void SetStatus(int status);
+
+    void                       Create();
+    void                       SendMessage();
+    std::string                ConvertToStr();
+    std::map<int, std::string> status_text;
 
 private:
     int                                sock_;
     int                                status_code_;
     std::map<std::string, std::string> headers_;
-    std::string                        header_;
+    std::string                        HTTPVersion_;
     std::string                        body_;
-    std::string                        response_message_;
-    std::size_t                        message_size_;
+
+    std::string message_;
 };
 
 #endif
