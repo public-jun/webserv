@@ -14,11 +14,6 @@ public:
     void SetBody(std::string body);
     void SetVersion(std::string version);
 
-    // いらないかも
-    void SetStatus(int status);
-
-    void                       Create();
-    void                       SendMessage();
     std::string                ConvertToStr();
     std::map<int, std::string> status_text;
 

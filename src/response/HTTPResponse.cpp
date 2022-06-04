@@ -30,27 +30,6 @@ void HTTPResponse::SetBody(std::string body) {
 
 void HTTPResponse::SetVersion(std::string version) { HTTPVersion_ = version; }
 
-void HTTPResponse::SetStatus(int status) { status_code_ = status; }
-
-void HTTPResponse::Create() {
-    std::ostringstream oss;
-    std::string        length;
-    oss << body_.size() << std::flush;
-    length = oss.str();
-    std::string size("Content-Length: " + length);
-
-    if (status_code_ == 200) {
-        message_ = "HTTP/1.1 200 OK\r\n" + size + "\r\n\r\n" + body_;
-    } else if (status_code_ == 404) {
-        message_ = "HTTP/1.1 404 Not Found\r\n" + size + "\r\n";
-    } else {
-        std::cout << "Not support status" << status_code_ << std::endl;
-    }
-
-    std::cout << "status: " << status_code_ << std::endl;
-    std::cout << "body: " << body_ << std::endl;
-}
-
 std::string HTTPResponse::ConvertToStr() {
     std::stringstream ss;
     ss << HTTPVersion_ << " " << status_code_ << " "
@@ -64,11 +43,4 @@ std::string HTTPResponse::ConvertToStr() {
     ss << body_;
 
     return ss.str();
-}
-
-void HTTPResponse::SendMessage() {
-    int ret = send(sock_, message_.c_str(), message_.size(), 0);
-    if (ret == -1) {
-        throw SysError("send", errno);
-    }
 }
