@@ -1,10 +1,5 @@
 #include "HTTPResponse.hpp"
-#include "SysError.hpp"
-#include <cerrno>
-#include <iostream>
 #include <sstream>
-#include <sys/socket.h>
-#include <sys/types.h>
 
 std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
