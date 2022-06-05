@@ -13,13 +13,14 @@ public:
     void SetBody(std::string body);
     void SetVersion(std::string version);
 
-    std::string                ConvertToStr();
-    std::map<int, std::string> status_text;
+    std::string ConvertToStr();
 
 private:
+    static std::map<int, std::string> status_text;
+
+    std::string                        HTTPVersion_;
     int                                status_code_;
     std::map<std::string, std::string> headers_;
-    std::string                        HTTPVersion_;
     std::string                        body_;
 
     std::string message_;

@@ -6,11 +6,17 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-HTTPResponse::HTTPResponse() : status_code_(200) {
+std::map<int, std::string> make_status_text() {
+    std::map<int, std::string> status_text;
     status_text[200] = "OK";
     status_text[400] = "Bad Request";
     status_text[404] = "Not Found";
+    return status_text;
 }
+
+std::map<int, std::string> HTTPResponse::status_text = make_status_text();
+
+HTTPResponse::HTTPResponse() : status_code_(200) {}
 
 HTTPResponse::~HTTPResponse() {}
 
