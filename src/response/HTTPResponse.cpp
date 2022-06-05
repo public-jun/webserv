@@ -28,6 +28,8 @@ void HTTPResponse::SetBody(std::string body) {
 
 void HTTPResponse::SetVersion(std::string version) { HTTPVersion_ = version; }
 
+void HTTPResponse::SetStatusCode(int status) { status_code_ = status; }
+
 std::string HTTPResponse::ConvertToStr() {
     std::stringstream ss;
     ss << HTTPVersion_ << " " << status_code_ << " "

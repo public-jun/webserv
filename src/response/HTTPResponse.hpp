@@ -12,6 +12,7 @@ public:
 
     void SetBody(std::string body);
     void SetVersion(std::string version);
+    void SetStatusCode(int status);
 
     std::string ConvertToStr();
 
