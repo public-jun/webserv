@@ -14,7 +14,7 @@ public:
     void SetVersion(std::string version);
     void SetStatusCode(int status);
 
-    std::string ConvertToStr();
+    std::string ConvertToStr() const;
 
 private:
     static std::map<int, std::string> status_text;

@@ -30,12 +30,13 @@ void HTTPResponse::SetVersion(std::string version) { HTTPVersion_ = version; }
 
 void HTTPResponse::SetStatusCode(int status) { status_code_ = status; }
 
-std::string HTTPResponse::ConvertToStr() {
+std::string HTTPResponse::ConvertToStr() const {
     std::stringstream ss;
     ss << HTTPVersion_ << " " << status_code_ << " "
        << status_text[status_code_] << "\r\n";
 
-    for (std::map<std::string, std::string>::iterator it = headers_.begin();
+    for (std::map<std::string, std::string>::const_iterator it =
+             headers_.begin();
          it != headers_.end(); it++) {
         ss << it->first << ": " << it->second << "\r\n";
     }
