@@ -1,6 +1,5 @@
 #include "StreamSocket.hpp"
 
-// #include "HTTPParser.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include "SysError.hpp"
@@ -12,26 +11,12 @@
 #include <sstream>
 
 StreamSocket::StreamSocket()
-    : req_(HTTPRequest()), parser_(HTTPParser(req_)), res_(NULL),
+    : req_(HTTPRequest()), parser_(HTTPParser(req_)), resp_(HTTPResponse()),
       event_type_(RECV_REQUEST), read_size_(0), buf_size_(2048) {
     SetSocketType(Socket::STREAM);
 }
 
-StreamSocket::~StreamSocket() {
-    /* if (parser_) { */
-    /*     delete parser_; */
-    /*     parser_ = NULL; */
-    /* } */
-    /* if (req_) { */
-    /*     delete req_; */
-    /*     req_ = NULL; */
-    /* } */
-    if (res_) {
-        delete res_;
-        res_ = NULL;
-    }
-    Close();
-}
+StreamSocket::~StreamSocket() { Close(); }
 
 HTTPRequest* StreamSocket::GetHTTPRequest() { return &req_; }
 
@@ -68,14 +53,6 @@ void StreamSocket::OnRecv() {
     }
     buf_[read_size_] = '\0';
     // Request Parser
-    parseRequest();
-    if (parser_.GetPhase() == HTTPParser::PH_END) {
-        actions_->DelRecv(this);
-        Send();
-    }
-}
-
-void StreamSocket::parseRequest() {
     parser_.Parse(std::string(buf_));
     if (parser_.GetPhase() != HTTPParser::PH_END) {
         return;
@@ -98,18 +75,25 @@ void StreamSocket::parseRequest() {
             file_content += tmp + "\n";
         }
 
-        std::ostringstream oss;
-        std::string        length;
-        oss << file_content.length() << std::flush;
-        length = oss.str();
-        std::string header("Content-Length: " + length);
-        res_ = new HTTPResponse(sock_fd_, 200, header, file_content);
-        res_->Create();
+        resp_.SetBody(file_content);
+        resp_.AppendHeader("Server", "Webserv/1.0.0");
+        resp_.SetVersion(req_.GetVersion());
+
+        actions_->DelRecv(this);
+        Send();
     }
 }
 
+void StreamSocket::parseRequest() {}
+
 void StreamSocket::OnSend() {
-    res_->SendMessage();
+    // res_->SendMessage();
+
+    std::string resp = resp_.ConvertToStr();
+    std::cout << "response: \n" << resp << std::endl;
+    if (send(sock_fd_, resp.c_str(), resp.size(), 0) == -1) {
+        throw SysError("send", errno);
+    }
     // del event
     OnDisConnect();
 }
