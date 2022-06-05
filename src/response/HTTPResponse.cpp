@@ -12,9 +12,6 @@ HTTPResponse::HTTPResponse() : status_code_(200) {
     status_text[404] = "Not Found";
 }
 
-HTTPResponse::HTTPResponse(int sock, int status_code, std::string body)
-    : sock_(sock), status_code_(status_code), body_(body) {}
-
 HTTPResponse::~HTTPResponse() {}
 
 void HTTPResponse::AppendHeader(std::string key, std::string value) {

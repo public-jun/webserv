@@ -6,7 +6,6 @@
 class HTTPResponse {
 public:
     HTTPResponse();
-    HTTPResponse(int sock, int status_code, std::string body);
     ~HTTPResponse();
 
     void AppendHeader(std::string key, std::string value);
@@ -18,7 +17,6 @@ public:
     std::map<int, std::string> status_text;
 
 private:
-    int                                sock_;
     int                                status_code_;
     std::map<std::string, std::string> headers_;
     std::string                        HTTPVersion_;
