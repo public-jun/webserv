@@ -40,9 +40,9 @@ private:
     void setEventType(EventType type);
 
 private:
-    HTTPRequest   req_;
-    HTTPParser    parser_;
-    HTTPResponse* res_;
+    HTTPRequest  req_;
+    HTTPParser   parser_;
+    HTTPResponse resp_;
 
     EventType event_type_;
     int       read_size_;
