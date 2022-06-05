@@ -19,12 +19,7 @@ void HTTPResponse::AppendHeader(std::string key, std::string value) {
     headers_.insert(std::make_pair(key, value));
 }
 
-void HTTPResponse::SetBody(std::string body) {
-    std::ostringstream oss;
-    oss << body.size() << std::flush;
-    AppendHeader("Content-Length", oss.str());
-    body_ = body;
-}
+void HTTPResponse::SetBody(std::string body) { body_ = body; }
 
 void HTTPResponse::SetVersion(std::string version) { HTTPVersion_ = version; }
 

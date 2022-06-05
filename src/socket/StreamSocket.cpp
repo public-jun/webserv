@@ -75,6 +75,9 @@ void StreamSocket::OnRecv() {
             file_content += tmp + "\n";
         }
 
+        std::stringstream ss;
+        ss << file_content.size() << std::flush;
+        resp_.AppendHeader("Content-Length", ss.str());
         resp_.SetBody(file_content);
         resp_.AppendHeader("Server", "Webserv/1.0.0");
         resp_.SetVersion(req_.GetVersion());
