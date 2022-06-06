@@ -1,10 +1,9 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include "EventActions.hpp"
+#include <map>
 #include <netinet/in.h>
 
-class EventActions;
 class Socket {
 public:
     enum SocketType {
@@ -12,8 +11,9 @@ public:
         STREAM,
     };
 
-    Socket() : sock_fd_(0) { actions_ = NULL; }
-    Socket(int sock) : sock_fd_(sock) {}
+    Socket() : sock_fd_(-1) {}
+    Socket(int sock, SocketType type) : sock_fd_(sock), type_(type) {}
+    Socket(SocketType type) : sock_fd_(-1), type_(type) {}
     virtual ~Socket() {}
 
     void       SetSocketType(SocketType type) { type_ = type; }
@@ -25,15 +25,10 @@ public:
     void SetAddress(struct sockaddr_in addr) { addr_ = addr; }
     const struct sockaddr_in& GetAddr() { return addr_; }
 
-    void          SetEventActions(EventActions* actions) { actions_ = actions; }
-    EventActions* GetEventActions() { return actions_; }
-
 protected:
     int                sock_fd_;
     SocketType         type_;
     struct sockaddr_in addr_;
-
-    EventActions* actions_;
 };
 
 #endif

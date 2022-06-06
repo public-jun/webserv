@@ -1,11 +1,9 @@
 #ifndef LISTENING_SOCKET_HPP
 #define LISTENING_SOCKET_HPP
 
-#include <map>
 #include <string>
 
 #include "Socket.hpp"
-
 class ListeningSocket : public Socket {
 public:
     ListeningSocket();
@@ -15,14 +13,7 @@ public:
     void Listen();
     void Close();
 
-    // Add event
-    void Accept();
-
-    // Do event
-    void OnAccept();
-
 private:
-    static std::map<int, ListeningSocket*> all_listener;
 };
 
 #endif
