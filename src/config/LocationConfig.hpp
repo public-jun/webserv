@@ -16,6 +16,7 @@ public:
   ~LocationConfig();
   LocationConfig &operator=(const LocationConfig &src);
 
+  void setTarget(std::string target);
   void setAllowedMethods(std::string allowed_method);
   void setRoot(std::string root);
   void setAutoIndex(std::string auto_index);
@@ -23,6 +24,7 @@ public:
   void setCgiExtensions(std::string cgi_extension);
   void setReturn(int status_code, std::string url);
 
+  std::string getTarget() const;
   std::vector<std::string> getAllowedMethods() const;
   std::string getRoot() const;
   e_auto_index_type getAutoIndex() const;
@@ -30,6 +32,7 @@ public:
   std::vector<std::string> getCgiExtensions() const;
   std::pair<int, std::string> getReturn() const;
 private:
+  std::string target_;
   std::vector<std::string> allowed_methods_;
   std::string root_;
   e_auto_index_type auto_index_;

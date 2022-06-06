@@ -106,6 +106,7 @@ void Config::printConfigs() {
     while (++j < location_configs.size()) {
       std::cout << "\t--------- location config" << std::endl;
       LocationConfig location_config = location_configs[j];
+      std::cout << "\ttarget\t\t:" << location_config.getTarget() << std::endl;
       std::cout << "\tallowed method\t:";
       std::vector<std::string> allowed_methods = location_config.getAllowedMethods();
       size_t k = -1;

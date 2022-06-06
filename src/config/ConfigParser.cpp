@@ -71,6 +71,7 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
   try {
     ConfigValidator::validateConfigFile(tokens);
     setupConfig(tokens);
+    Config::printConfigs();
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
@@ -106,11 +107,13 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end, Serve
   str_vec_itr it[2];
   it[BEGIN] = std::find(begin, end, Config::DERECTIVE_NAMES.at(LCTN));
   while (it[BEGIN] != end) {
+    std::string target = *++it[BEGIN];
     it[BEGIN] = std::find(it[BEGIN], end, "{");
     it[END] = it[BEGIN];
     Utils::findEndBrace(++it[END]);
 
     LocationConfig location_config = LocationConfig();
+    setupTarget(target, location_config);
     setupAllowedMethod(it, location_config);
     setupRoot(it, location_config);
     setupAutoIndex(it, location_config);
@@ -149,6 +152,10 @@ void ConfigParser::setupErrorPage(str_vec_itr it[2], ServerConfig &server_config
     if (error_page != it[END])
       server_config.setErrorPage(std::stoi(*++error_page), *++error_page);
   }
+}
+
+void ConfigParser::setupTarget(std::string target, LocationConfig &location_config) {
+  location_config.setTarget(target);
 }
 
 void ConfigParser::setupAllowedMethod(str_vec_itr it[2], LocationConfig &location_config) {

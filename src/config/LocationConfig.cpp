@@ -14,6 +14,7 @@ LocationConfig::~LocationConfig() {
 
 LocationConfig &LocationConfig::operator=(const LocationConfig &src) {
   if (this != &src) {
+    this->target_ = src.target_;
     this->allowed_methods_ = src.allowed_methods_;
     this->root_ = src.root_;
     this->auto_index_ = src.auto_index_;
@@ -22,6 +23,10 @@ LocationConfig &LocationConfig::operator=(const LocationConfig &src) {
     this->return_ = src.return_;
   }
   return (*this);
+}
+
+void LocationConfig::setTarget(std::string target) {
+  this->target_ = target;
 }
 
 void LocationConfig::setAllowedMethods(std::string allowed_method) {
@@ -46,6 +51,10 @@ void LocationConfig::setCgiExtensions(std::string cgi_extension) {
 
 void LocationConfig::setReturn(int status_code, std::string url) {
   this->return_ = std::make_pair(status_code, url);
+}
+
+std::string LocationConfig::getTarget() const {
+  return (this->target_);
 }
 
 std::vector<std::string> LocationConfig::getAllowedMethods() const {

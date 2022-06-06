@@ -32,6 +32,7 @@ private:
   static void setupServerName(str_vec_itr it[2], ServerConfig &server_config);
   static void setupMaxClientBodySize(str_vec_itr it[2], ServerConfig &server_config);
   static void setupErrorPage(str_vec_itr it[2], ServerConfig &server_config);
+  static void setupTarget(std::string target, LocationConfig &location_config);
   static void setupAllowedMethod(str_vec_itr it[2], LocationConfig &location_config);
   static void setupRoot(str_vec_itr it[2], LocationConfig &location_config);
   static void setupAutoIndex(str_vec_itr it[2], LocationConfig &location_config);
