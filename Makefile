@@ -6,7 +6,7 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event -I ./src/exception -I ./src/extended_c
+INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event -I ./src/exception -I ./src/extended_c -I ./src/config
 
 VPATH     := src: \
 			src/request \
@@ -14,7 +14,8 @@ VPATH     := src: \
 			src/socket \
 			src/event \
 			src/extended_c \
-			src/exception
+			src/exception \
+			src/config
 
 TESTSRCS  := EventActions.cpp \
 			ListeningSocket.cpp \
@@ -22,7 +23,13 @@ TESTSRCS  := EventActions.cpp \
 			HTTPRequest.cpp \
 			HTTPParser.cpp \
 			HTTPResponse.cpp \
-			SysError.cpp
+			SysError.cpp \
+			Config.cpp \
+			ConfigParser.cpp \
+			ConfigValidator.cpp \
+			LocationConfig.cpp \
+			ServerConfig.cpp \
+			Utils.cpp
 
 SRCS := main.cpp \
 			$(TESTSRCS)
