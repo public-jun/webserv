@@ -1,31 +1,34 @@
-#include <iostream>
-#include <map>
-
-#include "EventActions.hpp"
+// #include "EventAction.hpp"
+#include "EventExecutor.hpp"
+#include "EventRegister.hpp"
 #include "ListeningSocket.hpp"
-#include "Socket.hpp"
-#include "StreamSocket.hpp"
+
+#include "AcceptConn.hpp"
+#include "IOEvent.hpp"
+#include <unistd.h>
+
+#include <iostream>
 
 int main(void) {
     try {
-        // Event Action set up
-        EventActions event_actions;
-        event_actions.Init();
+        EventExecutor executor;
+        executor.Init();
 
-        // Listening Socket set up
-        ListeningSocket ls1, ls2;
-        ls1.SetEventActions(&event_actions);
-        ls1.Bind("127.0.0.1", 5000);
-        ls1.Listen();
+        ListeningSocket ls;
+        ls.Bind("127.0.0.1", 5000);
+        ls.Listen();
 
-        ls2.SetEventActions(&event_actions);
-        ls2.Bind("127.0.0.1", 5001);
-        ls2.Listen();
+        // イベントの追加
+        IOEvent* event = new AcceptConn(ls);
+        EventRegister::Instance().AddAcceptEvent(event);
 
-        // Event loop
         while (true) {
-            event_actions.ProcessEvent();
+            executor.ProcessEvent();
         }
+
+        ls.Close();
+        // 全てのsocketをclose
+        executor.ShutDown();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;

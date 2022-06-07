@@ -6,24 +6,29 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I ./src/request -I ./src/response -I ./src/socket -I ./src/event -I ./src/exception -I ./src/extended_c -I ./src/config
+INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c -I ./src/config
 
 VPATH     := src: \
+			src/event \
+			src/event/mode \
+			src/exception \
+			src/extended_c \
 			src/request \
 			src/response \
 			src/socket \
-			src/event \
-			src/extended_c \
-			src/exception \
 			src/config
 
-TESTSRCS  := EventActions.cpp \
+TESTSRCS  := AcceptConn.cpp \
+			ReadFile.cpp \
+			RecvRequest.cpp \
+			SendResponse.cpp \
+			EventExecutor.cpp \
+			EventRegister.cpp \
 			ListeningSocket.cpp \
-			StreamSocket.cpp \
-			HTTPRequest.cpp \
-			HTTPParser.cpp \
-			HTTPResponse.cpp \
 			SysError.cpp \
+			HTTPParser.cpp \
+			HTTPRequest.cpp \
+			HTTPResponse.cpp \
 			Config.cpp \
 			ConfigParser.cpp \
 			ConfigValidator.cpp \
@@ -98,7 +103,6 @@ test_compile = clang++ -std=c++11 \
 gtest: $(gtest)
 	$(test_compile)
 	./tester
-# ./tester --gtest_filter=ExecveArray.other
 
 gtestlist:
 	@./tester --gtest_list_tests
