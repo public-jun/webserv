@@ -9,8 +9,7 @@
 
 int main(void) {
     try {
-        EventAction& action = EventAction::GetInstance();
-        action.Init();
+        EventAction::GetInstance().Init();
 
         ListeningSocket ls;
         ls.Bind("127.0.0.1", 5000);
@@ -18,15 +17,15 @@ int main(void) {
         // イベントの追加
 
         IOEvent* event = new AcceptConn(ls);
-        action.AddAcceptEvent(event);
+        EventAction::GetInstance().AddAcceptEvent(event);
 
         while (true) {
-            action.ProcessEvent();
+            EventAction::GetInstance().ProcessEvent();
         }
 
         ls.Close();
         // 全てのsocketをclose
-        action.ShutDown();
+        EventAction::GetInstance().ShutDown();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;

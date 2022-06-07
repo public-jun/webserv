@@ -33,8 +33,7 @@ void SendResponse::Run() {
 }
 
 IOEvent* SendResponse::RegisterNext() {
-    EventAction& action = EventAction::GetInstance();
-    action.DelWriteEvent(this);
+    EventAction::GetInstance().DelWriteEvent(this);
 
     // To Do Keep alive
 

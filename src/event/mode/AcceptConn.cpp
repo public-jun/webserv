@@ -37,7 +37,6 @@ void AcceptConn::Run() {
 IOEvent* AcceptConn::RegisterNext() {
     IOEvent* recv_request = new RecvRequest(stream_sock_);
 
-    EventAction& action = EventAction::GetInstance();
-    action.AddReadEvent(recv_request);
+    EventAction::GetInstance().AddReadEvent(recv_request);
     return recv_request;
 }

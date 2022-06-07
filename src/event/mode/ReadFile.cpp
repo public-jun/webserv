@@ -55,9 +55,8 @@ IOEvent* ReadFile::RegisterNext() {
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
-    EventAction& action = EventAction::GetInstance();
-    action.DelReadEvent(this);
-    action.AddWriteEvent(send_response);
+    EventAction::GetInstance().DelReadEvent(this);
+    EventAction::GetInstance().AddWriteEvent(send_response);
 
     return send_response;
 }

@@ -24,7 +24,7 @@ public:
     void SetPolledFd(int fd) { polled_fd_ = fd; }
     int  GetPolledFd() { return polled_fd_; }
 
-    void               SetEventType(IOEventMode mode) { mode_ = mode; }
+    void               SetEventMode(IOEventMode mode) { mode_ = mode; }
     const IOEventMode& GetIOEventMode() const { return mode_; }
 
 protected:

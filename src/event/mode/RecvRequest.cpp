@@ -40,9 +40,8 @@ IOEvent* RecvRequest::prepareResponse() {
     if (req_.GetMethod() == "GET") {
         ReadFile* read_file = new ReadFile(stream_, req_);
 
-        EventAction& action = EventAction::GetInstance();
-        action.DelReadEvent(this);
-        action.AddReadEvent(read_file);
+        EventAction::GetInstance().DelReadEvent(this);
+        EventAction::GetInstance().AddReadEvent(read_file);
         return read_file;
     }
     return NULL;
