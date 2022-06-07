@@ -71,7 +71,6 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
   try {
     ConfigValidator::validateConfigFile(tokens);
     setupConfig(tokens);
-    Config::printConfigs();
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
