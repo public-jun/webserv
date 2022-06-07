@@ -194,7 +194,9 @@ bool ConfigValidator::isValidErrorPage(str_vec_itr begin) {
   if (*begin != Config::DERECTIVE_NAMES.at(ERR_PG))
     return (true);
   try {
-    int status_code = std::stoi(*++begin);
+    if (!isDigit(*++begin))
+      return (false);
+    int status_code = std::strtol((*begin).c_str(), NULL, 10);
     if (!(300 <= status_code && status_code <= 599))
       return (false);
   } catch (...) {
@@ -223,7 +225,9 @@ bool ConfigValidator::isValidReturn(str_vec_itr begin) {
   if (*begin != Config::DERECTIVE_NAMES.at(RTRN))
     return (true);
   try {
-    int status_code = std::stoi(*++begin);
+    if (!isDigit(*++begin))
+      return (false);
+    int status_code = std::strtol((*begin).c_str(), NULL, 10);
     if (!(0 <= status_code && status_code <= 599))
       return (false);
   } catch (...) {
@@ -236,11 +240,17 @@ bool ConfigValidator::isValidListen(str_vec_itr begin) {
   if (*begin != Config::DERECTIVE_NAMES.at(LSTN))
     return (true);
   try {
-    int listen = stoi(*++begin);
+    if (!isDigit(*++begin))
+      return (false);
+    int listen = strtol((*begin).c_str(), NULL, 10);
     if (!(0 <= listen && listen <= Config::MAX_PORT_NUM))
       return (false);
   } catch (...) {
     return (false);
   }
   return (true);
+}
+
+bool ConfigValidator::isDigit(const std::string &str) {
+  return str.find_first_not_of("0123456789") == std::string::npos;
 }

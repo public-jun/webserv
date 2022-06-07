@@ -128,7 +128,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end, Serve
 void ConfigParser::setupListen(str_vec_itr it[2], ServerConfig &server_config) {
   str_vec_itr listen = std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(LSTN));
   if (listen != it[END])
-    server_config.setListen(std::stoi(*++listen));
+    server_config.setListen(std::strtol((*++listen).c_str(), NULL, 10));
 }
 
 void ConfigParser::setupServerName(str_vec_itr it[2], ServerConfig &server_config) {
@@ -149,7 +149,7 @@ void ConfigParser::setupErrorPage(str_vec_itr it[2], ServerConfig &server_config
   while (error_page != it[END]) {
     error_page = std::find(error_page, it[END], Config::DERECTIVE_NAMES.at(ERR_PG));
     if (error_page != it[END])
-      server_config.setErrorPage(std::stoi(*++error_page), *++error_page);
+      server_config.setErrorPage(std::strtol((*++error_page).c_str(), NULL, 10), *++error_page);
   }
 }
 
@@ -192,5 +192,5 @@ void ConfigParser::setupCgiExtensions(str_vec_itr it[2], LocationConfig &locatio
 void ConfigParser::setupReturn(str_vec_itr it[2], LocationConfig &location_config) {
   str_vec_itr rtrn = std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(RTRN));
   if (rtrn != it[END])
-    location_config.setReturn(stoi(*++rtrn), *++rtrn);
+    location_config.setReturn(strtol((*++rtrn).c_str(), NULL, 10), *++rtrn);
 }

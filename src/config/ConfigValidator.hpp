@@ -55,6 +55,7 @@ private:
   static bool isValidAutoIndex(str_vec_itr begin);
   static bool isValidReturn(str_vec_itr begin);
   static bool isValidListen(str_vec_itr begin);
+  static bool isDigit(const std::string &str);
 };
 
 #endif
