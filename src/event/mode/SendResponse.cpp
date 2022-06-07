@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "EventAction.hpp"
+#include "EventRegister.hpp"
 #include "RecvRequest.hpp"
 #include "SysError.hpp"
 
@@ -33,7 +33,7 @@ void SendResponse::Run() {
 }
 
 IOEvent* SendResponse::RegisterNext() {
-    EventAction::GetInstance().DelWriteEvent(this);
+    EventRegister::Instance().DelWriteEvent(this);
 
     // To Do Keep alive
 

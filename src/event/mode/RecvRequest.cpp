@@ -3,7 +3,7 @@
 #include <cerrno>
 #include <unistd.h>
 
-#include "EventAction.hpp"
+#include "EventRegister.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
@@ -40,8 +40,8 @@ IOEvent* RecvRequest::prepareResponse() {
     if (req_.GetMethod() == "GET") {
         ReadFile* read_file = new ReadFile(stream_, req_);
 
-        EventAction::GetInstance().DelReadEvent(this);
-        EventAction::GetInstance().AddReadEvent(read_file);
+        EventRegister::Instance().DelReadEvent(this);
+        EventRegister::Instance().AddReadEvent(read_file);
         return read_file;
     }
     return NULL;

@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "EventAction.hpp"
+#include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include "IOEvent.hpp"
@@ -55,8 +55,8 @@ IOEvent* ReadFile::RegisterNext() {
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
-    EventAction::GetInstance().DelReadEvent(this);
-    EventAction::GetInstance().AddWriteEvent(send_response);
+    EventRegister::Instance().DelReadEvent(this);
+    EventRegister::Instance().AddWriteEvent(send_response);
 
     return send_response;
 }

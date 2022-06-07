@@ -2,7 +2,7 @@
 
 #include <netinet/in.h> // sockaddr_in
 
-#include "EventAction.hpp"
+#include "EventRegister.hpp"
 #include "ListeningSocket.hpp"
 #include "RecvRequest.hpp"
 #include "StreamSocket.hpp"
@@ -37,6 +37,6 @@ void AcceptConn::Run() {
 IOEvent* AcceptConn::RegisterNext() {
     IOEvent* recv_request = new RecvRequest(stream_sock_);
 
-    EventAction::GetInstance().AddReadEvent(recv_request);
+    EventRegister::Instance().AddReadEvent(recv_request);
     return recv_request;
 }

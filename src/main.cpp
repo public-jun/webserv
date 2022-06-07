@@ -1,4 +1,6 @@
-#include "EventAction.hpp"
+// #include "EventAction.hpp"
+#include "EventExecutor.hpp"
+#include "EventRegister.hpp"
 #include "ListeningSocket.hpp"
 
 #include "AcceptConn.hpp"
@@ -9,23 +11,24 @@
 
 int main(void) {
     try {
-        EventAction::GetInstance().Init();
+        EventExecutor executor;
+        executor.Init();
 
         ListeningSocket ls;
         ls.Bind("127.0.0.1", 5000);
         ls.Listen();
-        // イベントの追加
 
+        // イベントの追加
         IOEvent* event = new AcceptConn(ls);
-        EventAction::GetInstance().AddAcceptEvent(event);
+        EventRegister::Instance().AddAcceptEvent(event);
 
         while (true) {
-            EventAction::GetInstance().ProcessEvent();
+            executor.ProcessEvent();
         }
 
         ls.Close();
         // 全てのsocketをclose
-        EventAction::GetInstance().ShutDown();
+        executor.ShutDown();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
