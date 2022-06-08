@@ -26,6 +26,7 @@ TESTSRCS  := AcceptConn.cpp \
 			ListeningSocket.cpp \
 			SysError.cpp \
 			HTTPParser.cpp \
+			parse.cpp \
 			HTTPRequest.cpp \
 			HTTPResponse.cpp
 
