@@ -16,6 +16,8 @@ public:
     virtual void     Run();
     virtual IOEvent* RegisterNext();
 
+    static const int buf_size;
+
 private:
     RecvRequest();
     IOEvent* prepareResponse();
@@ -30,6 +32,8 @@ private:
 
     // RecvRequestによってできる出力
     std::string all_buf_;
+
+    Parser::State state_;
 };
 
 #endif
