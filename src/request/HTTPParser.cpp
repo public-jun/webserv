@@ -179,7 +179,7 @@ void parse_firstline(HTTPRequest& req, const std::string& line) {
 } // namespace
 
 namespace Parser {
-State::State(HTTPRequest& req) : req_(req) {}
+State::State(HTTPRequest& req) : phase_(FIRST_LINE), req_(req) {}
 
 std::string& State::Buf() { return buf_; }
 
@@ -193,7 +193,12 @@ void parse(State& state, const std::string new_buf) {
     Phase&       phase = state.Phase();
 
     try {
-        buf.append(new_buf, new_buf.size());
+        if (buf == "") {
+            buf = new_buf;
+        } else {
+            buf.append(new_buf, new_buf.size());
+        }
+
         for (;;) {
             // 改行があるか判定
             std::string::size_type line_end_pos = buf.find(HTTPRequest::crlf);
