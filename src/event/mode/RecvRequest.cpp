@@ -13,12 +13,11 @@ const int RecvRequest::buf_size = 2048;
 
 RecvRequest::RecvRequest()
     : IOEvent(RECV_REQUEST), stream_(StreamSocket()), req_(HTTPRequest()),
-      parser_(HTTPParser(req_)), state_(Parser::State(req_)) {}
+      state_(Parser::State(req_)) {}
 
 RecvRequest::RecvRequest(StreamSocket stream)
     : IOEvent(stream.GetSocketFd(), RECV_REQUEST), stream_(stream),
-      req_(HTTPRequest()), parser_(HTTPParser(req_)),
-      state_(Parser::State(req_)) {}
+      req_(HTTPRequest()), state_(Parser::State(req_)) {}
 
 RecvRequest::~RecvRequest() {}
 

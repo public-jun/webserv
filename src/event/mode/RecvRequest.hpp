@@ -28,11 +28,6 @@ private:
     HTTPRequest req_;
 
     // RecvRequestに必要な入力
-    HTTPParser parser_;
-
-    // RecvRequestによってできる出力
-    std::string all_buf_;
-
     Parser::State state_;
 };
 
