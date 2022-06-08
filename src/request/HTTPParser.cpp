@@ -1,4 +1,5 @@
 #include "HTTPParser.hpp"
+#include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
 #include <exception>
 #include <iostream>
@@ -179,6 +180,18 @@ void parse_firstline(HTTPRequest& req, const std::string& line) {
 } // namespace
 
 namespace Parser {
+
+SendError::SendError(StreamSocket stream) : stream_(stream) {}
+
+void SendError::Run() {}
+
+// TODO: どのstreamか分からん要相談
+IOEvent* SendError::RegisterNext() {
+    IOEvent* send_response = new SendResponse(stream_, "test");
+    EventRegister::Instance().AddWriteEvent(send_response);
+    return send_response;
+}
+
 State::State(HTTPRequest& req) : phase_(FIRST_LINE), req_(req) {}
 
 std::string& State::Buf() { return buf_; }
