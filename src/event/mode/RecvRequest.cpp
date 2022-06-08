@@ -45,7 +45,7 @@ IOEvent* RecvRequest::prepareResponse() {
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
-        if (CGI::isCGI(req_.GetRequestTarget())) {
+        if (CGI::IsCGI(req_.GetRequestTarget())) {
             CGI cgi(req_);
             cgi.Run();
             new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);

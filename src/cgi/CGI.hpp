@@ -12,7 +12,7 @@ public:
     CGI(const HTTPRequest req);
     ~CGI();
 
-    static bool isCGI(const std::string& target);
+    static bool IsCGI(const std::string& target);
     void        Run();
 
     int FdForReadFromCGI();
@@ -41,10 +41,10 @@ private:
 
     int pipe_for_cgi_write_[2];
 
-    static const std::map<std::string, std::string> binaries_;
-    static const std::map<std::string, std::string> commands_;
-    static std::map<std::string, std::string>       CreateBinaries();
-    static std::map<std::string, std::string>       CreateCommands();
+    static const std::map<std::string, std::string> binaries;
+    static const std::map<std::string, std::string> commands;
+    static std::map<std::string, std::string>       setBinaries();
+    static std::map<std::string, std::string>       setCommands();
 };
 
 #endif

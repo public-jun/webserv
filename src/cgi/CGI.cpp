@@ -15,9 +15,9 @@
 
 #include <iostream>
 
-const std::map<std::string, std::string> CGI::binaries_ = CGI::CreateBinaries();
+const std::map<std::string, std::string> CGI::binaries = CGI::setBinaries();
 
-const std::map<std::string, std::string> CGI::commands_ = CGI::CreateCommands();
+const std::map<std::string, std::string> CGI::commands = CGI::setCommands();
 
 CGI::CGI(const HTTPRequest req)
     : req_(req), extension_(std::string()), local_path_(std::string()) {
@@ -27,7 +27,7 @@ CGI::CGI(const HTTPRequest req)
 
 CGI::~CGI() {}
 
-bool CGI::isCGI(const std::string& target) {
+bool CGI::IsCGI(const std::string& target) {
     if (target.length() >= 3 && target.substr(target.length() - 3) == ".pl") {
         return true;
     } else if (target.length() >= 4 &&
@@ -43,12 +43,11 @@ bool CGI::isCGI(const std::string& target) {
 void CGI::Run() {
     cgiParseRequest();
     exec_binary_ = makeExecutableBinary();
-    args_ = makeArgs();
-    envs_ = makeEnvs();
+    args_        = makeArgs();
+    envs_        = makeEnvs();
     createPipe();
     cgiFork();
 }
-
 
 int CGI::FdForReadFromCGI() { return pipe_for_cgi_write_[0]; }
 
@@ -70,14 +69,14 @@ void CGI::cgiParseRequest() {
 
 std::string CGI::makeExecutableBinary() {
     // 拡張子によって実行ファイルのパスを決定する
-    return binaries_.find(extension_)->second;
+    return binaries.find(extension_)->second;
 }
 
 std::vector<std::string> CGI::makeArgs() {
     std::vector<std::string> args;
 
     // command設定
-    args.push_back(commands_.find(extension_)->second);
+    args.push_back(commands.find(extension_)->second);
     // 実行するスクリプトファイルのパス設定
     args.push_back("." + local_path_);
     // 残りの引数設定
@@ -163,22 +162,22 @@ void CGI::parentOperatePipe() {
     fcntl(pipe_for_cgi_write_[0], F_SETFL, O_NONBLOCK);
 }
 
-std::map<std::string, std::string> CGI::CreateBinaries() {
-    std::map<std::string, std::string> binaries;
+std::map<std::string, std::string> CGI::setBinaries() {
+    std::map<std::string, std::string> binaries_map;
 
-    binaries[".php"] = "/usr/bin/php";
-    binaries[".py"]  = "/usr/bin/python3";
-    binaries[".pl"]  = "/usr/local/bin/perl";
+    binaries_map[".php"] = "/usr/bin/php";
+    binaries_map[".py"]  = "/usr/bin/python3";
+    binaries_map[".pl"]  = "/usr/local/bin/perl";
 
-    return binaries;
+    return binaries_map;
 }
 
-std::map<std::string, std::string> CGI::CreateCommands() {
-    std::map<std::string, std::string> commands;
+std::map<std::string, std::string> CGI::setCommands() {
+    std::map<std::string, std::string> commands_map;
 
-    commands[".php"] = "php";
-    commands[".py"]  = "python3";
-    commands[".pl"]  = "perl";
+    commands_map[".php"] = "php";
+    commands_map[".py"]  = "python3";
+    commands_map[".pl"]  = "perl";
 
-    return commands;
+    return commands_map;
 }
