@@ -193,11 +193,7 @@ void parse(State& state, const std::string new_buf) {
     Phase&       phase = state.Phase();
 
     try {
-        if (buf == "") {
-            buf = new_buf;
-        } else {
-            buf.append(new_buf, new_buf.size());
-        }
+        buf.append(new_buf.c_str(), new_buf.size());
 
         for (;;) {
             // 改行があるか判定
