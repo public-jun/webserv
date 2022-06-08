@@ -27,12 +27,6 @@ public:
     static const std::string            crlf;
     static const std::string::size_type crlf_size;
 
-    // ステータスコード
-    static const int status_ok                    = 200;
-    static const int status_bad_request           = 400;
-    static const int status_method_not_allowed    = 405;
-    static const int status_version_not_supported = 505;
-
 private:
     std::string                        method_;
     std::string                        request_target_;

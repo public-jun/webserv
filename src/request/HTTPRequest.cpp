@@ -1,4 +1,5 @@
 #include "HTTPRequest.hpp"
+#include "HTTPStatus.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -15,7 +16,7 @@ const std::string HTTPRequest::crlf = "\r\n";
 
 const std::string::size_type HTTPRequest::crlf_size = crlf.size();
 
-HTTPRequest::HTTPRequest() : status_(status_ok) {}
+HTTPRequest::HTTPRequest() : status_(status::ok) {}
 
 HTTPRequest::~HTTPRequest() {}
 
