@@ -14,6 +14,8 @@ public:
     ~ReadCGI();
 
     virtual void     Run();
+    virtual void     Register();
+    virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
 private:
@@ -23,7 +25,7 @@ private:
     // ReadCGIに必要な入力
     StreamSocket stream_;
     HTTPRequest  req_;
-    bool is_finish_;
+    bool         is_finish_;
 
     // ReadCGIによってできる出力
     HTTPResponse resp_;

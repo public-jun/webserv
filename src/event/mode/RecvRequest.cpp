@@ -30,6 +30,10 @@ void RecvRequest::Run() {
     parser_.Parse(std::string(buf));
 }
 
+void RecvRequest::Register() { EventRegister::Instance().AddReadEvent(this); }
+
+void RecvRequest::Unregister() { EventRegister::Instance().DelReadEvent(this); }
+
 IOEvent* RecvRequest::RegisterNext() {
     if (parser_.GetPhase() != HTTPParser::PH_END) {
         return this;
@@ -53,8 +57,8 @@ IOEvent* RecvRequest::prepareResponse() {
             new_event = new ReadFile(stream_, req_);
         }
 
-        EventRegister::Instance().DelReadEvent(this);
-        EventRegister::Instance().AddReadEvent(new_event);
+        this->Unregister();
+        new_event->Register();
         return new_event;
     }
     return NULL;

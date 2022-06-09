@@ -40,6 +40,10 @@ void ReadCGI::Run() {
     }
 }
 
+void ReadCGI::Register() { EventRegister::Instance().AddReadEvent(this); }
+
+void ReadCGI::Unregister() { EventRegister::Instance().DelReadEvent(this); }
+
 IOEvent* ReadCGI::RegisterNext() {
     if (!is_finish_) {
         return this;
@@ -55,8 +59,7 @@ IOEvent* ReadCGI::RegisterNext() {
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
-    EventRegister::Instance().DelReadEvent(this);
-    EventRegister::Instance().AddWriteEvent(send_response);
-
+    this->Unregister();
+    send_response->Register();
     return send_response;
 }

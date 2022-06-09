@@ -14,6 +14,8 @@ public:
     virtual ~ReadFile();
 
     virtual void     Run();
+    virtual void     Register();
+    virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
 private:
