@@ -36,14 +36,18 @@ void WriteCGI::Run() {
     }
 }
 
+void WriteCGI::Register() {
+    EventRegister::Instance().AddWriteEvent(this);
+}
+
+void WriteCGI::Unregister() {
+    EventRegister::Instance().DelWriteEvent(this);
+}
+
 IOEvent* WriteCGI::RegisterNext() {
     Unregister();
 
     IOEvent* read_cgi = new ReadCGI(cgi_.FdForReadFromCGI(), stream_, req_);
     EventRegister::Instance().AddReadEvent(read_cgi);
     return read_cgi;
-}
-
-void WriteCGI::Unregister() {
-    EventRegister::Instance().DelWriteEvent(this);
 }

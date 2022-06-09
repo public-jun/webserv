@@ -1,43 +1,50 @@
 #ifndef HTTPPARSER_HPP
 #define HTTPPARSER_HPP
 #include "HTTPRequest.hpp"
+#include "StreamSocket.hpp"
+#include "mode/SendResponse.hpp"
 #include <string>
 
-class HTTPRequest;
-class HTTPParser {
+// TODO: 例外クラス実装、GETメソッド実装
 
+namespace HTTPParser {
+enum Phase { FIRST_LINE, HEADER_LINE, BODY, DONE };
+
+class SendError {
 public:
-    enum Phase { PH_FIRST_LINE, PH_HEADER_LINE, PH_END };
-    HTTPParser(HTTPRequest& req);
-    ~HTTPParser();
+    void SetStream(StreamSocket stream);
 
-    void Parse(const std::string& buf);
+protected:
+    StreamSocket stream_;
+};
 
-    Phase GetPhase() const;
+class SendBadrequest : public SendError, public IOEvent {
+public:
+    SendBadrequest();
+    SendBadrequest(StreamSocket stream);
+    virtual ~SendBadrequest();
+
+    virtual void     Run();
+    virtual IOEvent* RegisterNext();
+};
+
+class State {
+public:
+    State(HTTPRequest& req);
+
+    std::string& Buf();
+    Phase&       Phase();
+    HTTPRequest& Request();
 
 private:
-    void parseFirstline(const std::string& line);
-    void parseHeaderLine(const std::string& line);
-
-    void throwErrorBadrequest(const std::string err_message);
-    void throwErrorMethodNotAllowed(const std::string err_message);
-    void throwErrorVersionNotSupported(const std::string err_message);
-
-    void validateMethod(const std::string& method);
-    void validateRequestTarget(const std::string& request_target);
-    void validateHTTPVersion(const std::string& version);
-    void validateToken(const std::string& token);
-    void validateHost();
-    void validateVersionNotSuppoted();
-    void validateMethodNotAllowed();
-
-    std::string trimSpace(const std::string& string,
-                          const std::string  trim_char_set) const;
-    bool        isdigit(const std::string& str) const;
-
     std::string  buf_;
-    Phase        phase_;
+    enum Phase   phase_;
     HTTPRequest& req_;
+    /* std::size_t  size_; //初期化する */
 };
+
+void update_state(State& state, const std::string buf);
+
+} // namespace HTTPParser
 
 #endif // HTTPPARSER_HPP

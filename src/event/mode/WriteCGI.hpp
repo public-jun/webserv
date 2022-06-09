@@ -12,9 +12,9 @@ public:
     virtual ~WriteCGI();
 
     virtual void     Run();
+    virtual void     Register();
+    virtual void     Unregister();
     virtual IOEvent* RegisterNext();
-
-    virtual void Unregister();
 
 private:
     WriteCGI();
