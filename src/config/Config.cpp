@@ -6,7 +6,7 @@ const std::string Config::DELIMITERS = " {};";
 const std::map<const e_drctv_cd, std::string> Config::DERECTIVE_NAMES = Config::createDerectiveNames();
 const std::map<const e_drctv_cd, std::vector<std::string> > Config::DERECTIVE_MAP = Config::createDerectiveMap();
 const std::vector<std::string> Config::ALLOWED_METHODS = Config::createAllowedMethodsVec();
-std::vector<const ServerConfig> Config::server_configs_;
+std::map<int, const ServerConfig> Config::server_configs_;
 
 Config* Config::instance() {
   if(instance_ == 0)
@@ -83,14 +83,15 @@ const std::vector<std::string> Config::createAllowedMethodsVec() {
 }
 
 void Config::addServerConfig(const ServerConfig &server_config) {
-  server_configs_.push_back(server_config);
+  int port = server_config.getListen();
+  server_configs_.insert(std::make_pair(port, server_config));
 }
 
 void Config::printConfigs() {
-  size_t i = -1;
-  while (++i < Config::server_configs_.size()) {
+  std::map<int, const ServerConfig>::iterator itr = server_configs_.begin();
+  while (itr != server_configs_.end()) {
     std::cout << "--------- server config ------------" << std::endl;
-    ServerConfig server_config = Config::server_configs_[i];
+    ServerConfig server_config = itr->second;
     std::cout << "listen\t\t\t:" << server_config.getListen() << std::endl;
     std::cout << "server name\t\t:" << server_config.getServerName() << std::endl;
     std::cout << "max client body size\t:" << server_config.getMaxClientBodySize() << std::endl;
@@ -126,6 +127,6 @@ void Config::printConfigs() {
         std::cout << " " << cgi_extensions[l];
       std::cout << std::endl;
     }
-
+    itr++;
   }
 }
