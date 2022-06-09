@@ -5,7 +5,7 @@
 #include "HTTPStatus.hpp"
 #include <iostream>
 
-namespace Parser {
+namespace HTTPParser {
 
 SendBadrequest::SendBadrequest() {}
 
@@ -36,4 +36,4 @@ Phase& State::Phase() { return phase_; }
 
 HTTPRequest& State::Request() { return req_; }
 
-} // namespace Parser
+} // namespace HTTPParser

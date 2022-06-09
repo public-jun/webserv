@@ -187,6 +187,10 @@ bool split_to_line(std::string& buf, std::string& line) {
     return true;
 }
 
+bool can_parse_line(std::string& buf, std::string& line) {
+    return split_to_line(buf, line);
+}
+
 unsigned long str_to_ulong(const std::string& str) {
     const char*   p = str.c_str();
     char*         end;
@@ -200,18 +204,28 @@ unsigned long str_to_ulong(const std::string& str) {
     return value;
 }
 
-void might_set_body(Parser::State& state, const std::string& buf,
+void might_set_body(HTTPParser::State& state, const std::string& buf,
                     unsigned long content_length) {
     if (buf.size() >= content_length) {
         state.Request().SetBody(buf);
-        state.Phase() = Parser::DONE;
+        state.Phase() = HTTPParser::DONE;
     }
+}
+
+bool needs_parse_body(const std::string& method) { return method != "GET"; }
+
+bool has_done_header_line(const std::string& line) { return line == ""; }
+
+void validate_after_parse_header(HTTPRequest& req) {
+    validate_host(req);
+    validate_version_not_suppoted(req.GetVersion());
+    validate_method_not_allowed(req);
 }
 
 } // namespace
 
-namespace Parser {
-void parse(State& state, const std::string new_buf) {
+namespace HTTPParser {
+void update_state(State& state, const std::string new_buf) {
     HTTPRequest& req   = state.Request();
     std::string& buf   = state.Buf();
     Phase&       phase = state.Phase();
@@ -223,7 +237,7 @@ void parse(State& state, const std::string new_buf) {
             std::string line;
             switch (phase) {
             case FIRST_LINE:
-                if (!split_to_line(buf, line)) {
+                if (!can_parse_line(buf, line)) {
                     return;
                 }
                 parse_firstline(req, line);
@@ -231,20 +245,18 @@ void parse(State& state, const std::string new_buf) {
                 break;
 
             case HEADER_LINE:
-                if (!split_to_line(buf, line)) {
+                if (!can_parse_line(buf, line)) {
                     return;
                 }
-                if (line == "") {
-                    validate_host(req);
-                    validate_version_not_suppoted(req.GetVersion());
-                    validate_method_not_allowed(req);
+                if (has_done_header_line(line)) {
+                    validate_after_parse_header(req);
                     phase = BODY;
                 } else {
                     parse_header_line(req, line);
                 }
                 break;
             case BODY:
-                if (req.GetMethod() == "GET") {
+                if (!needs_parse_body(req.GetMethod())) {
                     phase = DONE;
                     return;
                 }
@@ -263,4 +275,4 @@ void parse(State& state, const std::string new_buf) {
         std::cerr << "Unexpected error: " << e.what() << std::endl;
     }
 }
-} // namespace Parser
+} // namespace HTTPParser

@@ -7,7 +7,7 @@
 
 // TODO: 例外クラス実装、GETメソッド実装
 
-namespace Parser {
+namespace HTTPParser {
 enum Phase { FIRST_LINE, HEADER_LINE, BODY, DONE };
 
 class SendError {
@@ -43,8 +43,8 @@ private:
     /* std::size_t  size_; //初期化する */
 };
 
-void parse(State& state, const std::string buf);
+void update_state(State& state, const std::string buf);
 
-} // namespace Parser
+} // namespace HTTPParser
 
 #endif // HTTPPARSER_HPP

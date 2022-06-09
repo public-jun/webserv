@@ -16,7 +16,7 @@ public:
     virtual void     Run();
     virtual IOEvent* RegisterNext();
 
-    static const int buf_size;
+    static const std::size_t buf_size;
 
 private:
     RecvRequest();
@@ -28,7 +28,7 @@ private:
     HTTPRequest req_;
 
     // RecvRequestに必要な入力
-    Parser::State state_;
+    HTTPParser::State state_;
 };
 
 #endif
