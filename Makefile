@@ -6,18 +6,22 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c
+INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c -I ./src/config -I ./src/cgi
 
 VPATH     := src: \
+			src/cgi \
 			src/event \
 			src/event/mode \
 			src/exception \
 			src/extended_c \
 			src/request \
 			src/response \
-			src/socket
+			src/socket \
+			src/config
 
-TESTSRCS  := AcceptConn.cpp \
+TESTSRCS  := CGI.cpp \
+			AcceptConn.cpp \
+			ReadCGI.cpp \
 			ReadFile.cpp \
 			RecvRequest.cpp \
 			SendResponse.cpp \
@@ -28,7 +32,13 @@ TESTSRCS  := AcceptConn.cpp \
 			HTTPParser.cpp \
 			parse.cpp \
 			HTTPRequest.cpp \
-			HTTPResponse.cpp
+			HTTPResponse.cpp \
+			Config.cpp \
+			ConfigParser.cpp \
+			ConfigValidator.cpp \
+			LocationConfig.cpp \
+			ServerConfig.cpp \
+			Utils.cpp
 
 SRCS := main.cpp \
 			$(TESTSRCS)
