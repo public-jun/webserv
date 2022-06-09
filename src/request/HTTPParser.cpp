@@ -1,19 +1,29 @@
 #include "HTTPParser.hpp"
 #include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
+#include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include <iostream>
 
 namespace Parser {
 
-SendError::SendError(StreamSocket stream) : stream_(stream) {}
+SendBadrequest::SendBadrequest() {}
 
-SendError::~SendError() {}
+/* SendBadrequest::SendBadrequest(StreamSocket stream) : stream_(stream) {} */
 
-void SendError::Run() {}
+SendBadrequest::~SendBadrequest() {}
+
+void SendBadrequest::Run() {}
 
 // TODO: 要相談
-IOEvent* SendError::RegisterNext() {
-    IOEvent* send_response = new SendResponse(stream_, "test");
+// parse関数内でthrowするときにstreamをsetするのがめんどい
+// parse内でRecvRequestで一回catchしてstreamをsetしてthrowする？
+IOEvent* SendBadrequest::RegisterNext() {
+    HTTPResponse resp;
+    // set
+    resp.SetStatusCode(status::bad_request);
+
+    IOEvent* send_response = new SendResponse(stream_, resp.ConvertToStr());
     EventRegister::Instance().AddWriteEvent(send_response);
     return send_response;
 }
