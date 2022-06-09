@@ -112,7 +112,8 @@ void validate_version_not_suppoted(const std::string& version) {
 }
 
 void validate_method_not_allowed(const HTTPRequest& req) {
-    if (req.GetMethod() != "GET") {
+    if (req.GetMethod() != "GET" && req.GetMethod() != "POST" &&
+        req.GetMethod() != "DELETE") {
         throw_error_method_not_allowed();
     }
 }
@@ -174,6 +175,39 @@ void parse_firstline(HTTPRequest& req, const std::string& line) {
     req.SetRequestTarget(request_target);
     req.SetHTTPVersion(version);
 }
+
+bool split_to_line(std::string& buf, std::string& line) {
+    std::string::size_type line_end_pos = buf.find(HTTPRequest::crlf);
+    if (line_end_pos == buf.npos) {
+        return false;
+    }
+
+    line = buf.substr(0, line_end_pos);
+    buf  = buf.substr(line_end_pos + HTTPRequest::crlf_size);
+    return true;
+}
+
+unsigned long str_to_ulong(const std::string& str) {
+    const char*   p = str.c_str();
+    char*         end;
+    unsigned long value = std::strtoul(p, &end, 10);
+    if (p == end) {
+        throw std::invalid_argument("str_to_ulong");
+    }
+    if (errno == ERANGE) {
+        throw std::out_of_range("str_to_ulong");
+    }
+    return value;
+}
+
+void might_set_body(Parser::State& state, const std::string& buf,
+                    unsigned long content_length) {
+    if (buf.size() >= content_length) {
+        state.Request().SetBody(buf);
+        state.Phase() = Parser::DONE;
+    }
+}
+
 } // namespace
 
 namespace Parser {
@@ -186,30 +220,37 @@ void parse(State& state, const std::string new_buf) {
         buf.append(new_buf.c_str(), new_buf.size());
 
         for (;;) {
-            // 改行があるか判定
-            std::string::size_type line_end_pos = buf.find(HTTPRequest::crlf);
-            if (line_end_pos == buf.npos) {
-                return;
-            }
-
-            std::string line = buf.substr(0, line_end_pos);
-            buf = buf.substr(line_end_pos + HTTPRequest::crlf_size);
-
+            std::string line;
             switch (phase) {
             case FIRST_LINE:
+                if (!split_to_line(buf, line)) {
+                    return;
+                }
                 parse_firstline(req, line);
                 phase = HEADER_LINE;
                 break;
 
             case HEADER_LINE:
+                if (!split_to_line(buf, line)) {
+                    return;
+                }
                 if (line == "") {
                     validate_host(req);
                     validate_version_not_suppoted(req.GetVersion());
                     validate_method_not_allowed(req);
-                    phase = DONE;
-                    break;
+                    phase = BODY;
+                } else {
+                    parse_header_line(req, line);
                 }
-                parse_header_line(req, line);
+                break;
+            case BODY:
+                if (req.GetMethod() == "GET") {
+                    phase = DONE;
+                    return;
+                }
+                might_set_body(
+                    state, buf,
+                    str_to_ulong(req.GetHeaderValue("Content-length")));
                 break;
 
             case DONE:
