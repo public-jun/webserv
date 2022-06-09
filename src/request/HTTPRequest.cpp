@@ -1,4 +1,5 @@
 #include "HTTPRequest.hpp"
+#include "HTTPStatus.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -15,7 +16,7 @@ const std::string HTTPRequest::crlf = "\r\n";
 
 const std::string::size_type HTTPRequest::crlf_size = crlf.size();
 
-HTTPRequest::HTTPRequest() : status_(status_ok) {}
+HTTPRequest::HTTPRequest() : status_(status::ok) {}
 
 HTTPRequest::~HTTPRequest() {}
 
@@ -39,6 +40,8 @@ const std::map<std::string, std::string>& HTTPRequest::GetHeaders() const {
     return headers_;
 }
 
+const std::string& HTTPRequest::GetBody() const { return body_; }
+
 void HTTPRequest::SetRequestTarget(const std::string request_target) {
     request_target_ = request_target;
 }
@@ -54,3 +57,5 @@ void HTTPRequest::SetStatus(const int status) { status_ = status; }
 void HTTPRequest::SetHeader(const std::string key, const std::string value) {
     headers_.insert(std::make_pair(key, value));
 }
+
+void HTTPRequest::SetBody(const std::string body) { body_ = body; }
