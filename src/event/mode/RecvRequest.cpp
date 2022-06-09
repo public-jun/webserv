@@ -3,10 +3,14 @@
 #include <cerrno>
 #include <unistd.h>
 
+#include "CGI.hpp"
 #include "EventRegister.hpp"
+#include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
+
+#include <iostream>
 
 RecvRequest::RecvRequest()
     : IOEvent(RECV_REQUEST), stream_(StreamSocket()), req_(HTTPRequest()),
@@ -37,12 +41,21 @@ IOEvent* RecvRequest::RegisterNext() {
 }
 
 IOEvent* RecvRequest::prepareResponse() {
+    IOEvent* new_event = NULL;
+
     if (req_.GetMethod() == "GET") {
-        ReadFile* read_file = new ReadFile(stream_, req_);
+        // Uriのパスや拡張子によって ReadFile or ReadCGI
+        if (CGI::IsCGI(req_.GetRequestTarget())) {
+            CGI cgi(req_);
+            cgi.Run();
+            new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
+        } else {
+            new_event = new ReadFile(stream_, req_);
+        }
 
         EventRegister::Instance().DelReadEvent(this);
-        EventRegister::Instance().AddReadEvent(read_file);
-        return read_file;
+        EventRegister::Instance().AddReadEvent(new_event);
+        return new_event;
     }
     return NULL;
 }
