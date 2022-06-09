@@ -15,23 +15,19 @@ public:
     const std::string&                        GetVersion() const;
     int                                       GetStatus() const;
     const std::map<std::string, std::string>& GetHeaders() const;
-    const std::string GetHeaderValue(std::string key) const;
+    const std::string  GetHeaderValue(std::string key) const;
+    const std::string& GetBody() const;
 
     void SetRequestTarget(const std::string uri);
     void SetMethod(const std::string method);
     void SetHTTPVersion(const std::string version);
     void SetStatus(const int status);
     void SetHeader(const std::string key, const std::string value);
+    void SetBody(const std::string);
 
     // 改行コード
     static const std::string            crlf;
     static const std::string::size_type crlf_size;
-
-    // ステータスコード
-    static const int status_ok                    = 200;
-    static const int status_bad_request           = 400;
-    static const int status_method_not_allowed    = 405;
-    static const int status_version_not_supported = 505;
 
 private:
     std::string                        method_;

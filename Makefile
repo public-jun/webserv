@@ -30,6 +30,7 @@ TESTSRCS  := CGI.cpp \
 			ListeningSocket.cpp \
 			SysError.cpp \
 			HTTPParser.cpp \
+			parse.cpp \
 			HTTPRequest.cpp \
 			HTTPResponse.cpp \
 			Config.cpp \

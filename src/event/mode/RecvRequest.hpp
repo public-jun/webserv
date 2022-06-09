@@ -16,6 +16,8 @@ public:
     virtual void     Run();
     virtual IOEvent* RegisterNext();
 
+    static const std::size_t buf_size;
+
 private:
     RecvRequest();
     IOEvent* prepareResponse();
@@ -26,10 +28,7 @@ private:
     HTTPRequest req_;
 
     // RecvRequestに必要な入力
-    HTTPParser parser_;
-
-    // RecvRequestによってできる出力
-    std::string all_buf_;
+    HTTPParser::State state_;
 };
 
 #endif
