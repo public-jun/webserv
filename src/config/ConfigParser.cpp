@@ -68,13 +68,14 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
   if (!ifs)
     throw (std::runtime_error(ERR_MSG_IVLD_FILE));
   tokens = tokenize(ifs);
+  ifs.close();
   try {
     ConfigValidator::validateConfigFile(tokens);
     setupConfig(tokens);
+    Config::printConfigs();
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
-  ifs.close();
 }
 
 void ConfigParser::setupConfig(std::vector<std::string> tokens) {
