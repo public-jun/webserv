@@ -14,6 +14,8 @@ public:
     virtual ~RecvRequest();
 
     virtual void     Run();
+    virtual void     Register();
+    virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
     static const std::size_t buf_size;

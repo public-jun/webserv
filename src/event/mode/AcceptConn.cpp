@@ -34,9 +34,13 @@ void AcceptConn::Run() {
     stream_sock_.SetAddress(peer_sin);
 }
 
+void AcceptConn::Register() { EventRegister::Instance().AddAcceptEvent(this); }
+
+void AcceptConn::Unregister() { EventRegister::Instance().DelReadEvent(this); }
+
 IOEvent* AcceptConn::RegisterNext() {
     IOEvent* recv_request = new RecvRequest(stream_sock_);
 
-    EventRegister::Instance().AddReadEvent(recv_request);
+    recv_request->Register();
     return recv_request;
 }

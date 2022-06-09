@@ -20,7 +20,7 @@ int main(void) {
 
         // イベントの追加
         IOEvent* event = new AcceptConn(ls);
-        EventRegister::Instance().AddAcceptEvent(event);
+        event->Register();
 
         while (true) {
             executor.ProcessEvent();
