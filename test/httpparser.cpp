@@ -37,6 +37,18 @@ TEST(HTTPParser, EmptyVersion) {
     EXPECT_EQ(Parser::DONE, state.Phase());
 }
 
+TEST(HTTPParser, ParseBody) {
+    string      message("POST / HTTP/1.1\r\nHost: localhost\r\nContent-Length: "
+                             "4\r\n\r\nhoge");
+    HTTPRequest req;
+    Parser::State state(req);
+    Parser::parse(state, message);
+
+    EXPECT_EQ(200, req.GetStatus());
+    EXPECT_EQ("POST", req.GetMethod());
+    EXPECT_EQ("hoge", req.GetBody());
+}
+
 TEST(HTTPParser, ParsePart1) {
     vector<string> m;
     m.push_back("GE");
