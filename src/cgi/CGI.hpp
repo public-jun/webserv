@@ -16,6 +16,7 @@ public:
     void        Run();
 
     int FdForReadFromCGI();
+    int FdForWriteToCGI();
 
 private:
     CGI();
@@ -35,11 +36,13 @@ private:
 
     std::string              extension_;
     std::string              local_path_;
+    std::string              method_;
     std::string              exec_binary_;
     std::vector<std::string> args_;
     std::vector<std::string> envs_;
 
     int pipe_for_cgi_write_[2];
+    int pipe_for_cgi_read_[2];
 
     static const std::map<std::string, std::string> binaries;
     static const std::map<std::string, std::string> commands;

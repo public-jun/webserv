@@ -119,7 +119,7 @@ void HTTPParser::validateVersionNotSuppoted() {
 }
 
 void HTTPParser::validateMethodNotAllowed() {
-    if (req_.GetMethod() != "GET") {
+    if (req_.GetMethod() != "POST") {
         throwErrorMethodNotAllowed();
     }
 }

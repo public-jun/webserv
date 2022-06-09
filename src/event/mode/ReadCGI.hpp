@@ -11,7 +11,7 @@
 class ReadCGI : public IOEvent {
 public:
     ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req);
-    ~ReadCGI();
+    virtual ~ReadCGI();
 
     virtual void     Run();
     virtual IOEvent* RegisterNext();
