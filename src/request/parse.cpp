@@ -255,6 +255,7 @@ void update_state(State& state, const std::string new_buf) {
                     parse_header_line(req, line);
                 }
                 break;
+
             case BODY:
                 if (!needs_parse_body(req.GetMethod())) {
                     phase = DONE;
@@ -263,7 +264,7 @@ void update_state(State& state, const std::string new_buf) {
                 might_set_body(
                     state, buf,
                     str_to_ulong(req.GetHeaderValue("Content-length")));
-                break;
+                return;
 
             case DONE:
                 return;
