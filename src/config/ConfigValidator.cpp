@@ -53,11 +53,15 @@ bool ConfigValidator::isValidBraceNum(const std::vector<std::string> tokens) {
 
 bool ConfigValidator::isValidBracePlace(const std::vector<std::string> tokens, std::string target) {
   int pad = target == Config::DERECTIVE_NAMES.at(SRVR) ? 1 : 2;
+  int cnt = -1;
   str_vec_itr it = tokens.begin();
   while ((it = std::find(it, tokens.end(), target)) != tokens.end()) {
-    it += pad;
+    while (++cnt < pad)
+      if (++it == tokens.end())
+        return (false);
     if (*it != "{")
       return (false);
+    cnt = -1;
   }
   return (true);
 }
