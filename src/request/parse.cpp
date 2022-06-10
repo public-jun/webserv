@@ -207,7 +207,7 @@ unsigned long str_to_ulong(const std::string& str) {
 void might_set_body(HTTPParser::State& state, const std::string& buf,
                     unsigned long content_length) {
     if (buf.size() >= content_length) {
-        state.Request().SetBody(buf);
+        state.Request().SetBody(std::string(buf, 0, content_length));
         state.Phase() = HTTPParser::DONE;
     }
 }
