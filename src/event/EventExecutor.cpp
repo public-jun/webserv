@@ -68,7 +68,6 @@ void EventExecutor::onEvent(std::vector<struct kevent> event_vec,
         try {
             // イベント実行
             doEvent(event);
-            // 次のイベントを決定する
             next_event = event;
         } catch (std::pair<StreamSocket, status::code>& err) {
             next_event = new SendError(err.first, err.second);

@@ -37,11 +37,9 @@ void RecvRequest::Run() {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
         std::cout << "catch code" << std::endl;
+        // TODO: pairを投げる関数作る
         throw std::make_pair(stream_, code);
     }
-    /* } catch (HTTPResponse& resp) { */
-    /*     throw std::make_pair(stream_, resp); */
-    /* } */
 }
 
 void RecvRequest::Register() { EventRegister::Instance().AddReadEvent(this); }

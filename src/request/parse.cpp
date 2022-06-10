@@ -7,20 +7,20 @@
 
 namespace {
 void throw_error_badrequest(const std::string err_message = "bad request") {
-    std::cout << err_message << std::endl;
+    std::cerr << err_message << std::endl;
     throw status::bad_request;
 }
 
 void throw_error_method_not_allowed(
     const std::string err_message = "method not allowed") {
-    std::cout << err_message << std::endl;
+    std::cerr << err_message << std::endl;
     throw status::method_not_allowed;
 }
 
 void throw_error_version_not_supported(
     const std::string err_message = "version not supported") {
-    std::cout << err_message << std::endl;
-    throw status::validate_version_not_suppoted;
+    std::cerr << err_message << std::endl;
+    throw status::version_not_suppoted;
 }
 
 // token  = 1*tchar

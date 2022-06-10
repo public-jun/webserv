@@ -16,7 +16,7 @@ public:
     virtual IOEvent* RegisterNext();
 
 private:
-    StreamSocket stream_;
-    status::code status_code_;
+    StreamSocket& stream_;
+    status::code  status_code_;
 };
 #endif // SEND_ERROR_HPP
