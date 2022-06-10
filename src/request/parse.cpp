@@ -1,11 +1,16 @@
+#include "DefaultErrorPage.hpp"
 #include "HTTPParser.hpp"
+#include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include <iostream>
 #include <sstream>
 
 namespace {
 void throw_error_badrequest(const std::string err_message = "bad request") {
-    /* req.SetStatus(HTTPRequest::status_bad_request); */
-    throw std::runtime_error(err_message);
+    std::cout << err_message << std::endl;
+    HTTPResponse resp;
+    resp.SetStatusCode(status::bad_request);
+    throw resp;
 }
 
 void throw_error_method_not_allowed(

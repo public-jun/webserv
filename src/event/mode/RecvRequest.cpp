@@ -6,6 +6,7 @@
 
 #include "CGI.hpp"
 #include "EventRegister.hpp"
+#include "HTTPResponse.hpp"
 #include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
@@ -13,6 +14,7 @@
 #include "WriteCGI.hpp"
 
 #include <iostream>
+#include <utility>
 
 const size_t RecvRequest::buf_size = 2048;
 
@@ -30,7 +32,14 @@ void RecvRequest::Run() {
     char buf[buf_size];
     int  recv_size = recv(stream_.GetSocketFd(), buf, buf_size, 0);
 
-    HTTPParser::update_state(state_, std::string(buf, recv_size));
+    try {
+        HTTPParser::update_state(state_, std::string(buf, recv_size));
+    } catch (HTTPResponse& resp) {
+        std::cout << "catch response" << std::endl;
+        std::pair<StreamSocket, HTTPResponse> pair =
+            std::make_pair(stream_, resp);
+        throw pair;
+    }
 }
 
 void RecvRequest::Register() { EventRegister::Instance().AddReadEvent(this); }

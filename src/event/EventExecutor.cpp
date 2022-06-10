@@ -5,9 +5,13 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <utility>
 
 #include "EventRegister.hpp"
+#include "HTTPResponse.hpp"
 #include "IOEvent.hpp"
+#include "SendError.hpp"
+#include "StreamSocket.hpp"
 #include "SysError.hpp"
 
 EventExecutor::EventExecutor()
@@ -37,7 +41,7 @@ void EventExecutor::ShutDown() {
 }
 
 void EventExecutor::ProcessEvent() {
-    int event_size   = 0;
+    int event_size = 0;
 
     event_size = kevent(kqueue_fd_, registered_list_.data(),
                         (int)registered_list_.size(), active_list_.data(),
@@ -59,12 +63,18 @@ void EventExecutor::onEvent(std::vector<struct kevent> event_vec,
             continue;
         }
 
+        IOEvent* next_event;
         try {
             // イベント実行
             doEvent(event);
             // 次のイベントを決定する
-            nextEvent(event);
+            next_event = event;
+        } catch (std::pair<StreamSocket, HTTPResponse>& err) {
+            next_event = new SendError(err.first, err.second);
+            event->Unregister();
+            delete event;
         } catch (const std::exception& e) { std::cerr << e.what() << '\n'; }
+        nextEvent(next_event);
     }
 }
 
