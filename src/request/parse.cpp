@@ -15,14 +15,18 @@ void throw_error_badrequest(const std::string err_message = "bad request") {
 
 void throw_error_method_not_allowed(
     const std::string err_message = "method not allowed") {
-    /* req.SetStatus(HTTPRequest::status_method_not_allowed); */
-    throw std::runtime_error(err_message);
+    std::cout << err_message << std::endl;
+    HTTPResponse resp;
+    resp.SetStatusCode(status::method_not_allowed);
+    throw resp;
 }
 
 void throw_error_version_not_supported(
     const std::string err_message = "version not supported") {
-    /* req.SetStatus(HTTPRequest::status_version_not_supported); */
-    throw std::runtime_error(err_message);
+    std::cout << err_message << std::endl;
+    HTTPResponse resp;
+    resp.SetStatusCode(status::validate_version_not_suppoted);
+    throw resp;
 }
 
 // token  = 1*tchar

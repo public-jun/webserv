@@ -35,10 +35,7 @@ void RecvRequest::Run() {
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (HTTPResponse& resp) {
-        std::cout << "catch response" << std::endl;
-        std::pair<StreamSocket, HTTPResponse> pair =
-            std::make_pair(stream_, resp);
-        throw pair;
+        throw std::make_pair(stream_, resp);
     }
 }
 
