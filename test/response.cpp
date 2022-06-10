@@ -14,7 +14,6 @@ TEST(HTTPResponse, SetVersion) {
 
 TEST(HTTPResponse, SetBody) {
     HTTPResponse resp;
-    resp.SetVersion("HTTP/1.1");
     resp.SetBody("hoge");
 
     string expect = "HTTP/1.1 200 OK\r\n\r\nhoge";
@@ -24,7 +23,6 @@ TEST(HTTPResponse, SetBody) {
 
 TEST(HTTPResponse, AppendHeader) {
     HTTPResponse resp;
-    resp.SetVersion("HTTP/1.1");
     resp.SetBody("hoge");
     resp.AppendHeader("Content-Length", "4");
 
@@ -35,7 +33,6 @@ TEST(HTTPResponse, AppendHeader) {
 
 TEST(HTTPResponse, BadRequest) {
     HTTPResponse resp;
-    resp.SetVersion("HTTP/1.1");
     resp.SetStatusCode(400);
 
     string expect = "HTTP/1.1 400 Bad Request\r\n\r\n";
