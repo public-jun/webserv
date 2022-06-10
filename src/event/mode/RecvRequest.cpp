@@ -36,9 +36,10 @@ void RecvRequest::Run() {
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
-        std::cout << "catch code" << std::endl;
+        // parseエラーが起きた場合
         // TODO: pairを投げる関数作る
         throw std::make_pair(stream_, code);
+        // EventExecutor::onEventでcatch
     }
 }
 
