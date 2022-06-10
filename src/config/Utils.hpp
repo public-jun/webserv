@@ -11,7 +11,7 @@ enum e_drctv_cd {
     SRVR_NM,
     MX_CLNT_BDY_SZ,
     ALLWD_MTHD,
-    ROOT,
+    ALIAS,
     AUTO_INDX,
     INDX,
     RTRN,

@@ -42,7 +42,7 @@ private:
                             LocationConfig& location_config);
     static void setupAllowedMethod(str_vec_itr     it[2],
                                    LocationConfig& location_config);
-    static void setupRoot(str_vec_itr it[2], LocationConfig& location_config);
+    static void setupAlias(str_vec_itr it[2], LocationConfig& location_config);
     static void setupAutoIndex(str_vec_itr     it[2],
                                LocationConfig& location_config);
     static void setupIndex(str_vec_itr it[2], LocationConfig& location_config);

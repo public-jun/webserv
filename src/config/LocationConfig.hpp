@@ -18,7 +18,7 @@ public:
 
     void setTarget(std::string target);
     void setAllowedMethods(std::string allowed_method);
-    void setRoot(std::string root);
+    void setAlias(std::string alias);
     void setAutoIndex(std::string auto_index);
     void setIndex(std::string index);
     void setCgiExtensions(std::string cgi_extension);
@@ -26,7 +26,7 @@ public:
 
     std::string                 getTarget() const;
     std::vector<std::string>    getAllowedMethods() const;
-    std::string                 getRoot() const;
+    std::string                 getAlias() const;
     e_auto_index_type           getAutoIndex() const;
     std::string                 getIndex() const;
     std::vector<std::string>    getCgiExtensions() const;
@@ -35,7 +35,7 @@ public:
 private:
     std::string                 target_;
     std::vector<std::string>    allowed_methods_;
-    std::string                 root_;
+    std::string                 alias_;
     e_auto_index_type           auto_index_;
     std::string                 index_;
     std::vector<std::string>    cgi_extensions_;

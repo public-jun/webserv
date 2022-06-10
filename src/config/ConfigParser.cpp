@@ -113,7 +113,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
         LocationConfig location_config = LocationConfig();
         setupTarget(target, location_config);
         setupAllowedMethod(it, location_config);
-        setupRoot(it, location_config);
+        setupAlias(it, location_config);
         setupAutoIndex(it, location_config);
         setupIndex(it, location_config);
         setupCgiExtensions(it, location_config);
@@ -174,12 +174,12 @@ void ConfigParser::setupAllowedMethod(str_vec_itr     it[2],
             location_config.setAllowedMethods(*allowed_method);
 }
 
-void ConfigParser::setupRoot(str_vec_itr     it[2],
+void ConfigParser::setupAlias(str_vec_itr     it[2],
                              LocationConfig& location_config) {
-    str_vec_itr root =
-        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ROOT));
-    if (root != it[END])
-        location_config.setRoot(*++root);
+    str_vec_itr alias =
+        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALIAS));
+    if (alias != it[END])
+        location_config.setAlias(*++alias);
 }
 
 void ConfigParser::setupAutoIndex(str_vec_itr     it[2],

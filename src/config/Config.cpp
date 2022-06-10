@@ -39,7 +39,7 @@ const std::map<const e_drctv_cd, std::string> Config::createDerectiveNames() {
     directive_names[SRVR_NM]        = "server_name";
     directive_names[MX_CLNT_BDY_SZ] = "max_client_body_size";
     directive_names[ALLWD_MTHD]     = "allowed_method";
-    directive_names[ROOT]           = "root";
+    directive_names[ALIAS]          = "alias";
     directive_names[AUTO_INDX]      = "auto_index";
     directive_names[INDX]           = "index";
     directive_names[RTRN]           = "return";
@@ -62,7 +62,7 @@ Config::createDerectiveMap() {
     server_dirs.push_back(DERECTIVE_NAMES.at(MX_CLNT_BDY_SZ));
     server_dirs.push_back(DERECTIVE_NAMES.at(ERR_PG));
     location_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
-    location_dirs.push_back(DERECTIVE_NAMES.at(ROOT));
+    location_dirs.push_back(DERECTIVE_NAMES.at(ALIAS));
     location_dirs.push_back(DERECTIVE_NAMES.at(AUTO_INDX));
     location_dirs.push_back(DERECTIVE_NAMES.at(INDX));
     location_dirs.push_back(DERECTIVE_NAMES.at(RTRN));
@@ -120,7 +120,7 @@ void Config::printConfigs() {
             while (++k < allowed_methods.size())
                 std::cout << " " << allowed_methods[k];
             std::cout << std::endl;
-            std::cout << "\troot\t\t:" << location_config.getRoot()
+            std::cout << "\talias\t\t:" << location_config.getAlias()
                       << std::endl;
             std::cout << "\tauto index\t:"
                       << (location_config.getAutoIndex() == ON ? "on" : "off")

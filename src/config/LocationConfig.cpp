@@ -13,7 +13,7 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& src) {
     if (this != &src) {
         this->target_          = src.target_;
         this->allowed_methods_ = src.allowed_methods_;
-        this->root_            = src.root_;
+        this->alias_            = src.alias_;
         this->auto_index_      = src.auto_index_;
         this->index_           = src.index_;
         this->cgi_extensions_  = src.cgi_extensions_;
@@ -28,7 +28,7 @@ void LocationConfig::setAllowedMethods(std::string allowed_method) {
     this->allowed_methods_.push_back(allowed_method);
 }
 
-void LocationConfig::setRoot(std::string root) { this->root_ = root; }
+void LocationConfig::setAlias(std::string alias) { this->alias_ = alias; }
 
 void LocationConfig::setAutoIndex(std::string auto_index) {
     this->auto_index_ = auto_index == "on" ? ON : OFF;
@@ -50,7 +50,7 @@ std::vector<std::string> LocationConfig::getAllowedMethods() const {
     return (this->allowed_methods_);
 }
 
-std::string LocationConfig::getRoot() const { return (this->root_); }
+std::string LocationConfig::getAlias() const { return (this->alias_); }
 
 e_auto_index_type LocationConfig::getAutoIndex() const {
     return (this->auto_index_);
