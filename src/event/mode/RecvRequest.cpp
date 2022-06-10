@@ -66,13 +66,11 @@ IOEvent* RecvRequest::prepareResponse() {
         return new_event;
     } else if (req_.GetMethod() == "POST") {
         if (CGI::IsCGI(req_.GetRequestTarget())) {
-            std::cout << "CGI POST" << std::endl;
             CGI cgi(req_);
             cgi.Run();
-            std::cout << "CGI POST" << std::endl;
             new_event = new WriteCGI(cgi, stream_, req_);
-            EventRegister::Instance().DelReadEvent(this);
-            EventRegister::Instance().AddWriteEvent(new_event);
+            this->Unregister();
+            new_event->Register();
             return new_event;
         }
     }

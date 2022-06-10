@@ -27,27 +27,23 @@ WriteCGI::~WriteCGI() {
 }
 
 void WriteCGI::Run() {
-    std::cout << "Write CGI Run" << std::endl;
-    int         fd_write_to_cgi = polled_fd_;
-    std::string content         = "12345";
-    int write_size = write(fd_write_to_cgi, content.c_str(), content.size());
-    if (write_size < 0 || static_cast<size_t>(write_size) != content.size()) {
+    int fd_write_to_cgi = polled_fd_;
+    int write_size =
+        write(fd_write_to_cgi, req_.GetBody().c_str(), req_.GetBody().size());
+    if (write_size < 0 ||
+        static_cast<size_t>(write_size) != req_.GetBody().size()) {
         throw SysError("write", errno);
     }
 }
 
-void WriteCGI::Register() {
-    EventRegister::Instance().AddWriteEvent(this);
-}
+void WriteCGI::Register() { EventRegister::Instance().AddWriteEvent(this); }
 
-void WriteCGI::Unregister() {
-    EventRegister::Instance().DelWriteEvent(this);
-}
+void WriteCGI::Unregister() { EventRegister::Instance().DelWriteEvent(this); }
 
 IOEvent* WriteCGI::RegisterNext() {
     Unregister();
 
     IOEvent* read_cgi = new ReadCGI(cgi_.FdForReadFromCGI(), stream_, req_);
-    EventRegister::Instance().AddReadEvent(read_cgi);
+    read_cgi->Register();
     return read_cgi;
 }

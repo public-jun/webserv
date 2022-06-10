@@ -14,6 +14,7 @@ public:
 
     static bool IsCGI(const std::string& target);
     void        Run();
+    void        ShutDown();
 
     int FdForReadFromCGI();
     int FdForWriteToCGI();

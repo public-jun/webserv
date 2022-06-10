@@ -12,6 +12,8 @@
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
 
+const std::size_t ReadCGI::buf_size = 2048;
+
 ReadCGI::ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req)
     : IOEvent(fd_read_from_cgi, READ_CGI), stream_(stream), req_(req),
       is_finish_(false), resp_(HTTPResponse()) {}
@@ -25,17 +27,15 @@ ReadCGI::~ReadCGI() {
 }
 
 void ReadCGI::Run() {
-    std::cout << "Read From CGI Start" << std::endl;
-    char buf[2048];
+    char buf[buf_size];
     int  fd_from_cgi = polled_fd_;
 
-    int read_size = read(fd_from_cgi, buf, 2048 - 1);
+    int read_size = read(fd_from_cgi, buf, buf_size);
     if (read_size < 0) {
         throw SysError("read", errno);
     } else if (read_size == 0) {
         is_finish_ = true;
     } else {
-        buf[read_size] = '\0';
         cgi_output_.append(buf, read_size);
     }
 }
