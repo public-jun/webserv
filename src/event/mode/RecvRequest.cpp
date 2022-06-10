@@ -7,6 +7,7 @@
 #include "CGI.hpp"
 #include "EventRegister.hpp"
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
@@ -34,9 +35,13 @@ void RecvRequest::Run() {
 
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
-    } catch (HTTPResponse& resp) {
-        throw std::make_pair(stream_, resp);
+    } catch (status::code code) {
+        std::cout << "catch code" << std::endl;
+        throw std::make_pair(stream_, code);
     }
+    /* } catch (HTTPResponse& resp) { */
+    /*     throw std::make_pair(stream_, resp); */
+    /* } */
 }
 
 void RecvRequest::Register() { EventRegister::Instance().AddReadEvent(this); }

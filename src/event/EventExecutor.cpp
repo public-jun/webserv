@@ -9,6 +9,7 @@
 
 #include "EventRegister.hpp"
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include "IOEvent.hpp"
 #include "SendError.hpp"
 #include "StreamSocket.hpp"
@@ -69,7 +70,7 @@ void EventExecutor::onEvent(std::vector<struct kevent> event_vec,
             doEvent(event);
             // 次のイベントを決定する
             next_event = event;
-        } catch (std::pair<StreamSocket, HTTPResponse>& err) {
+        } catch (std::pair<StreamSocket, status::code>& err) {
             next_event = new SendError(err.first, err.second);
             event->Unregister();
             delete event;

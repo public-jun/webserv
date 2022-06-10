@@ -8,25 +8,19 @@
 namespace {
 void throw_error_badrequest(const std::string err_message = "bad request") {
     std::cout << err_message << std::endl;
-    HTTPResponse resp;
-    resp.SetStatusCode(status::bad_request);
-    throw resp;
+    throw status::bad_request;
 }
 
 void throw_error_method_not_allowed(
     const std::string err_message = "method not allowed") {
     std::cout << err_message << std::endl;
-    HTTPResponse resp;
-    resp.SetStatusCode(status::method_not_allowed);
-    throw resp;
+    throw status::method_not_allowed;
 }
 
 void throw_error_version_not_supported(
     const std::string err_message = "version not supported") {
     std::cout << err_message << std::endl;
-    HTTPResponse resp;
-    resp.SetStatusCode(status::validate_version_not_suppoted);
-    throw resp;
+    throw status::validate_version_not_suppoted;
 }
 
 // token  = 1*tchar
