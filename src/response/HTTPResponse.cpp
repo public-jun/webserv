@@ -1,17 +1,21 @@
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include <sstream>
+
+const std::string HTTPResponse::default_version = "HTTP/1.1";
 
 std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
-    status_text[200] = "OK";
-    status_text[400] = "Bad Request";
-    status_text[404] = "Not Found";
+    status_text[status::ok]          = "OK";
+    status_text[status::bad_request] = "Bad Request";
+    status_text[status::not_found]   = "Not Found";
     return status_text;
 }
 
 std::map<int, std::string> HTTPResponse::status_text = make_status_text();
 
-HTTPResponse::HTTPResponse() : status_code_(200) {}
+HTTPResponse::HTTPResponse()
+    : HTTPVersion_(default_version), status_code_(status::ok) {}
 
 HTTPResponse::~HTTPResponse() {}
 
