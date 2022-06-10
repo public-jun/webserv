@@ -4,6 +4,7 @@
 namespace status {
 const int ok                            = 200;
 const int bad_request                   = 400;
+const int not_found                     = 404;
 const int method_not_allowed            = 405;
 const int validate_version_not_suppoted = 505;
 } // namespace status
