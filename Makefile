@@ -25,6 +25,7 @@ TESTSRCS  := CGI.cpp \
 			ReadFile.cpp \
 			RecvRequest.cpp \
 			SendResponse.cpp \
+			WriteCGI.cpp \
 			EventExecutor.cpp \
 			EventRegister.cpp \
 			ListeningSocket.cpp \

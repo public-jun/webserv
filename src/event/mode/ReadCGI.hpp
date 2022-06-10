@@ -11,12 +11,14 @@
 class ReadCGI : public IOEvent {
 public:
     ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req);
-    ~ReadCGI();
+    virtual ~ReadCGI();
 
     virtual void     Run();
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
+
+    static const std::size_t buf_size;
 
 private:
     ReadCGI();

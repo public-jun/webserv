@@ -10,6 +10,7 @@
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
+#include "WriteCGI.hpp"
 
 #include <iostream>
 
@@ -63,6 +64,15 @@ IOEvent* RecvRequest::prepareResponse() {
         this->Unregister();
         new_event->Register();
         return new_event;
+    } else if (req_.GetMethod() == "POST") {
+        if (CGI::IsCGI(req_.GetRequestTarget())) {
+            CGI cgi(req_);
+            cgi.Run();
+            new_event = new WriteCGI(cgi, stream_, req_);
+            this->Unregister();
+            new_event->Register();
+            return new_event;
+        }
     }
     return NULL;
 }
