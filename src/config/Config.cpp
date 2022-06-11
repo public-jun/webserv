@@ -1,15 +1,15 @@
 #include "Config.hpp"
 
-Config*                                       Config::instance_    = 0;
-const int                                     Config::MAX_PORT_NUM = 65535;
-const std::string                             Config::DELIMITERS   = " {};";
-const std::map<const e_drctv_cd, std::string> Config::DERECTIVE_NAMES =
+Config*                                         Config::instance_    = 0;
+const int                                       Config::MAX_PORT_NUM = 65535;
+const std::string                               Config::DELIMITERS   = " {};";
+std::map<int, std::vector<const ServerConfig> > Config::server_configs_;
+const std::map<const e_drctv_cd, std::string>   Config::DERECTIVE_NAMES =
     Config::createDerectiveNames();
 const std::map<const e_drctv_cd, std::vector<std::string> >
     Config::DERECTIVE_MAP = Config::createDerectiveMap();
 const std::vector<std::string> Config::ALLOWED_METHODS =
     Config::createAllowedMethodsVec();
-std::map<int, const ServerConfig> Config::server_configs_;
 
 Config* Config::instance() {
     if (instance_ == 0)
@@ -84,60 +84,77 @@ const std::vector<std::string> Config::createAllowedMethodsVec() {
 
 void Config::addServerConfig(const ServerConfig& server_config) {
     int port = server_config.getListen();
-    server_configs_.insert(std::make_pair(port, server_config));
+    std::map<int, std::vector<const ServerConfig> >::iterator target =
+        server_configs_.find(port);
+    (void)target;
+    if (target == server_configs_.end()) {
+        std::vector<const ServerConfig> new_servers(1, server_config);
+        server_configs_.insert(std::make_pair(port, new_servers));
+    } else
+        target->second.push_back(server_config);
 }
 
 void Config::printConfigs() {
-    std::map<int, const ServerConfig>::iterator itr = server_configs_.begin();
-    while (itr != server_configs_.end()) {
-        std::cout << "--------- server config ------------" << std::endl;
-        ServerConfig server_config = itr->second;
-        std::cout << "listen\t\t\t:" << server_config.getListen() << std::endl;
-        std::cout << "server name\t\t:" << server_config.getServerName()
-                  << std::endl;
-        std::cout << "max client body size\t:"
-                  << server_config.getMaxClientBodySize() << std::endl;
-        std::map<int, std::string> error_page   = server_config.getErrorPage();
-        std::map<int, std::string>::iterator it = error_page.begin();
-        while (it != error_page.end()) {
-            std::cout << "error page\t\t:" << it->first << " > " << it->second
+    std::map<int, std::vector<const ServerConfig> >::iterator map_itr =
+        server_configs_.begin();
+    while (map_itr != server_configs_.end()) {
+        std::vector<const ServerConfig>::iterator sc_itr =
+            map_itr->second.begin();
+        std::cout << "-------------------------------------------" << std::endl;
+        while (sc_itr != map_itr->second.end()) {
+            std::cout << "--------- server config ------------" << std::endl;
+            ServerConfig server_config = *sc_itr;
+            std::cout << "listen\t\t\t:" << server_config.getListen()
                       << std::endl;
-            it++;
-        }
+            std::cout << "server name\t\t:" << server_config.getServerName()
+                      << std::endl;
+            std::cout << "max client body size\t:"
+                      << server_config.getMaxClientBodySize() << std::endl;
+            std::map<int, std::string> error_page =
+                server_config.getErrorPage();
+            std::map<int, std::string>::iterator it = error_page.begin();
+            while (it != error_page.end()) {
+                std::cout << "error page\t\t:" << it->first << " > "
+                          << it->second << std::endl;
+                it++;
+            }
 
-        size_t                      j = -1;
-        std::vector<LocationConfig> location_configs =
-            server_config.getLocationConfigs();
-        while (++j < location_configs.size()) {
-            std::cout << "\t--------- location config" << std::endl;
-            LocationConfig location_config = location_configs[j];
-            std::cout << "\ttarget\t\t:" << location_config.getTarget()
-                      << std::endl;
-            std::cout << "\tallowed method\t:";
-            std::vector<std::string> allowed_methods =
-                location_config.getAllowedMethods();
-            size_t k = -1;
-            while (++k < allowed_methods.size())
-                std::cout << " " << allowed_methods[k];
-            std::cout << std::endl;
-            std::cout << "\talias\t\t:" << location_config.getAlias()
-                      << std::endl;
-            std::cout << "\tauto index\t:"
-                      << (location_config.getAutoIndex() == ON ? "on" : "off")
-                      << std::endl;
-            std::cout << "\tindex\t\t:" << location_config.getIndex()
-                      << std::endl;
-            std::cout << "\treturn\t\t:";
-            std::pair<int, std::string> rtrn = location_config.getReturn();
-            std::cout << rtrn.first << " > " << rtrn.second << std::endl;
-            std::cout << "\tcgi extension\t:";
-            std::vector<std::string> cgi_extensions =
-                location_config.getCgiExtensions();
-            size_t l = -1;
-            while (++l < cgi_extensions.size())
-                std::cout << " " << cgi_extensions[l];
-            std::cout << std::endl;
+            size_t                      j = -1;
+            std::vector<LocationConfig> location_configs =
+                server_config.getLocationConfigs();
+            while (++j < location_configs.size()) {
+                std::cout << "\t--------- location config" << std::endl;
+                LocationConfig location_config = location_configs[j];
+                std::cout << "\ttarget\t\t:" << location_config.getTarget()
+                          << std::endl;
+                std::cout << "\tallowed method\t:";
+                std::vector<std::string> allowed_methods =
+                    location_config.getAllowedMethods();
+                size_t k = -1;
+                while (++k < allowed_methods.size())
+                    std::cout << " " << allowed_methods[k];
+                std::cout << std::endl;
+                std::cout << "\talias\t\t:" << location_config.getAlias()
+                          << std::endl;
+                std::cout << "\tauto index\t:"
+                          << (location_config.getAutoIndex() == ON ? "on"
+                                                                   : "off")
+                          << std::endl;
+                std::cout << "\tindex\t\t:" << location_config.getIndex()
+                          << std::endl;
+                std::cout << "\treturn\t\t:";
+                std::pair<int, std::string> rtrn = location_config.getReturn();
+                std::cout << rtrn.first << " > " << rtrn.second << std::endl;
+                std::cout << "\tcgi extension\t:";
+                std::vector<std::string> cgi_extensions =
+                    location_config.getCgiExtensions();
+                size_t l = -1;
+                while (++l < cgi_extensions.size())
+                    std::cout << " " << cgi_extensions[l];
+                std::cout << std::endl;
+            }
+            sc_itr++;
         }
-        itr++;
+        map_itr++;
     }
 }

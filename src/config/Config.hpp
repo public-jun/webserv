@@ -28,8 +28,8 @@ protected:
     Config& operator=(const Config& src);
 
 private:
-    static Config*                                       instance_;
-    static std::map<int, const ServerConfig>             server_configs_;
+    static Config*                                         instance_;
+    static std::map<int, std::vector<const ServerConfig> > server_configs_;
     static const std::map<const e_drctv_cd, std::string> createDerectiveNames();
     static const std::map<const e_drctv_cd, std::vector<std::string> >
                                           createDerectiveMap();
