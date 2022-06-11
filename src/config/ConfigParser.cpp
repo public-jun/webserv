@@ -70,7 +70,7 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
         ConfigValidator::validateConfigFile(tokens);
         setupConfig(tokens);
         Config::printConfigs();
-    } catch (std::exception& e) { std::cerr << e.what() << std::endl; }
+    } catch (...) { throw }
 }
 
 void ConfigParser::setupConfig(std::vector<std::string> tokens) {
@@ -175,7 +175,7 @@ void ConfigParser::setupAllowedMethod(str_vec_itr     it[2],
 }
 
 void ConfigParser::setupAlias(str_vec_itr     it[2],
-                             LocationConfig& location_config) {
+                              LocationConfig& location_config) {
     str_vec_itr alias =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALIAS));
     if (alias != it[END])
