@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Setup compile_commands.json
+        run: |
+          pip install compiledb && compiledb make
       - uses: cpp-linter/cpp-linter-action@v1
         id: linter
         env:
