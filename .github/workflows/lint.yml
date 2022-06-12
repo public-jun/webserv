@@ -13,15 +13,11 @@ jobs:
         run: |
           pip install compiledb && compiledb make -n
 
-      - name: Install clang
-        run: sudo apt install clang-13 --install-suggests
-
       - uses: cpp-linter/cpp-linter-action@v1
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: '13'
           style: file
           tidy-checks: ''
           files-changed-only: false
