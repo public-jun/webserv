@@ -1,0 +1,11 @@
+name: google_test
+
+on: [pull_request]
+
+jobs:
+  google_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        run: make gtest
+
