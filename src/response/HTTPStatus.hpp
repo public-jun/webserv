@@ -2,11 +2,14 @@
 #define HTTPSTATUS_HPP
 
 namespace status {
-const int ok                            = 200;
-const int bad_request                   = 400;
-const int not_found                     = 404;
-const int method_not_allowed            = 405;
-const int validate_version_not_suppoted = 505;
+
+typedef int code;
+
+const code ok                   = 200;
+const code bad_request          = 400;
+const code not_found            = 404;
+const code method_not_allowed   = 405;
+const code version_not_suppoted = 505;
 } // namespace status
 
 #endif // HTTPSTATUS_HPP

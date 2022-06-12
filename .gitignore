@@ -39,3 +39,4 @@ tester
 #others
 compile_commands.json
 *.dSYM
+.cache/*

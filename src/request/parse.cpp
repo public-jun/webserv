@@ -1,23 +1,26 @@
+#include "DefaultErrorPage.hpp"
 #include "HTTPParser.hpp"
+#include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include <iostream>
 #include <sstream>
 
 namespace {
-void throw_error_badrequest(const std::string err_message = "bad request") {
-    /* req.SetStatus(HTTPRequest::status_bad_request); */
-    throw std::runtime_error(err_message);
+void throw_code_badrequest(const std::string err_message = "bad request") {
+    std::cerr << err_message << std::endl;
+    throw status::bad_request;
 }
 
-void throw_error_method_not_allowed(
+void throw_code_method_not_allowed(
     const std::string err_message = "method not allowed") {
-    /* req.SetStatus(HTTPRequest::status_method_not_allowed); */
-    throw std::runtime_error(err_message);
+    std::cerr << err_message << std::endl;
+    throw status::method_not_allowed;
 }
 
-void throw_error_version_not_supported(
+void throw_code_version_not_supported(
     const std::string err_message = "version not supported") {
-    /* req.SetStatus(HTTPRequest::status_version_not_supported); */
-    throw std::runtime_error(err_message);
+    std::cerr << err_message << std::endl;
+    throw status::version_not_suppoted;
 }
 
 // token  = 1*tchar
@@ -26,13 +29,13 @@ void throw_error_version_not_supported(
 //       / DIGIT / ALPHA
 void validate_token(const std::string& token) {
     if (token.empty()) {
-        throw_error_badrequest("empty token");
+        throw_code_badrequest("empty token");
     }
     const std::string special = "!#$%&'*+-.^_`|~";
     for (std::string::const_iterator it = token.begin(); it != token.end();
          it++) {
         if (!std::isalnum(*it) && special.find(*it) == special.npos) {
-            throw_error_badrequest("error token");
+            throw_code_badrequest("error token");
         }
     }
 }
@@ -43,7 +46,7 @@ void validate_method(const std::string& method) {
     for (std::string::const_iterator it = method.begin(); it != method.end();
          it++) {
         if (!std::isupper(*it) && *it != '_' && *it != '-') {
-            throw_error_badrequest("error method");
+            throw_code_badrequest("error method");
         }
     }
 }
@@ -51,7 +54,7 @@ void validate_method(const std::string& method) {
 void validate_request_target(const std::string& request_target) {
     // TODO: バリデート
     if (request_target.empty()) {
-        throw_error_badrequest("error request target");
+        throw_code_badrequest("error request target");
     }
 }
 
@@ -66,17 +69,17 @@ bool isdigit(const std::string& str) {
 
 void validate_version(const std::string& version) {
     if (version.empty()) {
-        throw_error_badrequest("error HTTP version");
+        throw_code_badrequest("error HTTP version");
     }
 
     std::string::size_type pos = version.find("/");
     if (pos == version.npos) {
-        throw_error_badrequest("error not exist slash");
+        throw_code_badrequest("error not exist slash");
     }
 
     std::string name = version.substr(0, pos);
     if (name != "HTTP") {
-        throw_error_badrequest("error protocol name");
+        throw_code_badrequest("error protocol name");
     }
 
     std::string            digit   = version.substr(pos + 1);
@@ -85,7 +88,7 @@ void validate_version(const std::string& version) {
     // dotがあるか
     // dotが複数ないか
     if (dot_pos == digit.npos || dot_pos != digit.find_last_of('.')) {
-        throw_error_badrequest("error version");
+        throw_code_badrequest("error version");
     }
 
     std::string before_dot = digit.substr(0, dot_pos);
@@ -94,27 +97,27 @@ void validate_version(const std::string& version) {
     // dotの前後が数字か
     if (before_dot.empty() || after_dot.empty() || !isdigit(before_dot) ||
         !isdigit(after_dot)) {
-        throw_error_badrequest("error version");
+        throw_code_badrequest("error version");
     }
 }
 
 void validate_host(const HTTPRequest& req) {
     // TODO: find使って調べる
     if (req.GetHeaderValue("Host").empty()) {
-        throw_error_badrequest("empty host");
+        throw_code_badrequest("empty host");
     }
 }
 
 void validate_version_not_suppoted(const std::string& version) {
     if (version != "HTTP/1.1") {
-        throw_error_version_not_supported();
+        throw_code_version_not_supported();
     }
 }
 
 void validate_method_not_allowed(const HTTPRequest& req) {
     if (req.GetMethod() != "GET" && req.GetMethod() != "POST" &&
         req.GetMethod() != "DELETE") {
-        throw_error_method_not_allowed();
+        throw_code_method_not_allowed();
     }
 }
 
@@ -149,7 +152,7 @@ void parse_header_line(HTTPRequest& req, const std::string& line) {
 
     value = trim_space(value);
     if (value.find_first_of(HTTPRequest::crlf) != value.npos) {
-        throw_error_badrequest("error value");
+        throw_code_badrequest("error value");
     }
 
     req.SetHeader(key, value);
