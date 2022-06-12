@@ -17,18 +17,25 @@ jobs:
       - name: Install clang-tools
         uses: KyleMayes/install-llvm-action@v1
         with:
-          version: "13"
+          version: '13'
+          directory: ${{ runner.temp }}/llvm
+
+      - name: Symlink libclang.so (Linux)
+        if: contains(matrix.os, 'ubuntu')
+        run: sudo ln -s libclang-11.so.1 /lib/x86_64-linux-gnu/libclang.so
+        working-directory: ${{ env.LLVM_PATH }}/lib
 
       - uses: cpp-linter/cpp-linter-action@v1
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: "13"
+          version: '13'
           style: file
+          extensions: 'cpp,hpp'
           tidy-checks: ''
           files-changed-only: false
-          ignore: test
+          ignore: "test|llvm"
           thread-comments: true
 
       - name: Fail fast?!
