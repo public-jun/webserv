@@ -1,0 +1,21 @@
+name: clang-tidy-review
+
+# You can be more specific, but it currently only works on pull requests
+on: [pull_request]
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Optionally generate compile_commands.json
+    - name: Generate compile_commands.json
+      run: pip install compiledb && compiledb make
+
+    - uses: ZedThree/clang-tidy-review@v0.7.0
+      id: review
+    # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
