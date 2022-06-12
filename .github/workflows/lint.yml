@@ -1,45 +1,22 @@
-# Workflow syntax:
-# https://help.github.com/en/articles/workflow-syntax-for-github-actions
-name: cpp-linter
+name: clang-tidy-review
 
+# You can be more specific, but it currently only works on pull requests
 on: [pull_request]
 
 jobs:
-  cpp-linter:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
-      - name: Setup compile_commands.json
-        run: |
-          pip install compiledb && compiledb make -n
-
-      - name: Install clang-tools
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: '13'
-          directory: ${{ runner.temp }}/llvm
-
-      - name: Symlink libclang.so (Linux)
-        run: sudo ln -s libclang-11.so.1 /lib/x86_64-linux-gnu/libclang.so
-        working-directory: ${{ env.LLVM_PATH }}/lib
-
-      - uses: cpp-linter/cpp-linter-action@v1
-        id: linter
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          version: '13'
-          style: file
-          extensions: 'cpp,hpp'
-          tidy-checks: ''
-          files-changed-only: false
-          ignore: "test|llvm"
-          thread-comments: true
-
-      - name: Fail fast?!
-        if: steps.linter.outputs.checks-failed > 0
-        run: |
-          echo "Some files failed the linting checks!"
-        # for actual deployment
-        # run: exit 1
+    - uses: ZedThree/clang-tidy-review@v0.7.0
+      id: review
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        exclude: ./test
+        config_file: '.clang-tidy'
+        cmake_command: pip install compiledb && compiledb make -n
+    # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
