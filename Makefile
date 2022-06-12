@@ -41,7 +41,7 @@ TESTSRCS  := CGI.cpp \
 			LocationConfig.cpp \
 			ServerConfig.cpp \
 			Utils.cpp \
-# Delete.cpp
+			Delete.cpp
 
 SRCS := main.cpp \
 			$(TESTSRCS)
