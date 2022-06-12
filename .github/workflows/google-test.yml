@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   google_test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: google_test
