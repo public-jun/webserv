@@ -113,7 +113,7 @@ gtest: $(gtest)
 
 gtestlist:
 	@./tester --gtest_list_tests
-	@echo "\nRUN ./tester --gtest_fileter=(TESTCASE).(TESTNAME)"
+	@echo "\nRUN ./tester --gtest_filter=(TESTCASE).(TESTNAME)"
 
 .PHONY: cleangtest
 cleangtest:
