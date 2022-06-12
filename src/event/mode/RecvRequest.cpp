@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <unistd.h>
 
+#include "Delete.hpp"
 #include "EventRegister.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
@@ -43,6 +44,12 @@ IOEvent* RecvRequest::prepareResponse() {
         EventRegister::Instance().DelReadEvent(this);
         EventRegister::Instance().AddReadEvent(read_file);
         return read_file;
+    }
+    if (req_.GetMethod() == "DELETE") {
+        Delete dlt(stream_, req_);
+
+        dlt.Run();
+        return dlt.RegisterNext();
     }
     return NULL;
 }
