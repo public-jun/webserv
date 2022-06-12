@@ -18,6 +18,7 @@ jobs:
           tidy-checks: ''
           files-changed-only: false
           ignore: test
+          thread-comments: true
 
       - name: Fail fast?!
         if: steps.linter.outputs.checks-failed > 0
