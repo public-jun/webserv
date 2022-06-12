@@ -30,6 +30,11 @@ Config& Config::operator=(const Config& src) {
     return (*this);
 }
 
+const std::map<int, std::vector<const ServerConfig> >
+Config::getServerConfigs() {
+    return (server_configs_);
+}
+
 const std::map<const e_drctv_cd, std::string> Config::createDerectiveNames() {
     std::map<const e_drctv_cd, std::string> directive_names;
 
