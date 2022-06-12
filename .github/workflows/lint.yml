@@ -13,6 +13,7 @@ jobs:
         id: linter
         with:
           style: file
+          files-changed-only: false
 
       - name: Fail fast?!
         if: steps.linter.outputs.checks-failed > 0
