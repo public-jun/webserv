@@ -9,15 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup compile_commands.json
         run: |
           pip install compiledb && compiledb make -n
+
+      - name: Install clang-tools
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "13"
 
       - uses: cpp-linter/cpp-linter-action@v1
         id: linter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          version: "13"
           style: file
           tidy-checks: ''
           files-changed-only: false
