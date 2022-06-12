@@ -94,6 +94,10 @@ void Config::addServerConfig(const ServerConfig& server_config) {
         target->second.push_back(server_config);
 }
 
+std::map<int, std::vector<const ServerConfig> > Config::GetServerConfigs() {
+    return server_configs_;
+}
+
 void Config::printConfigs() {
     std::map<int, std::vector<const ServerConfig> >::iterator map_itr =
         server_configs_.begin();

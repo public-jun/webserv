@@ -64,7 +64,7 @@ IOEvent* RecvRequest::prepareResponse() {
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
         if (CGI::IsCGI(req_.GetRequestTarget())) {
-            CGI cgi(req_);
+            class CGI cgi(req_);
             cgi.Run();
             new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
         } else {
@@ -76,7 +76,7 @@ IOEvent* RecvRequest::prepareResponse() {
         return new_event;
     } else if (req_.GetMethod() == "POST") {
         if (CGI::IsCGI(req_.GetRequestTarget())) {
-            CGI cgi(req_);
+            class CGI cgi(req_);
             cgi.Run();
             new_event = new WriteCGI(cgi, stream_, req_);
             this->Unregister();

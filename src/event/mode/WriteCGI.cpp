@@ -14,7 +14,7 @@
 
 #include <iostream>
 
-WriteCGI::WriteCGI(CGI cgi, StreamSocket stream, HTTPRequest req)
+WriteCGI::WriteCGI(class CGI cgi, StreamSocket stream, HTTPRequest req)
     : IOEvent(cgi.FdForWriteToCGI(), WRITE_CGI), cgi_(cgi), stream_(stream),
       req_(req) {}
 
