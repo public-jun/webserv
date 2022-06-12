@@ -32,8 +32,14 @@ void SendResponse::Run() {
     }
 }
 
-IOEvent* SendResponse::RegisterNext() {
+void SendResponse::Register() { EventRegister::Instance().AddWriteEvent(this); }
+
+void SendResponse::Unregister() {
     EventRegister::Instance().DelWriteEvent(this);
+}
+
+IOEvent* SendResponse::RegisterNext() {
+    this->Unregister();
 
     // To Do Keep alive
 

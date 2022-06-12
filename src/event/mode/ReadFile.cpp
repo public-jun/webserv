@@ -44,6 +44,10 @@ void ReadFile::Run() {
     std::cout << "Read File end" << std::endl;
 }
 
+void ReadFile::Register() { EventRegister::Instance().AddReadEvent(this); }
+
+void ReadFile::Unregister() { EventRegister::Instance().DelReadEvent(this); }
+
 IOEvent* ReadFile::RegisterNext() {
     // response 作成
     std::stringstream ss;
@@ -55,8 +59,8 @@ IOEvent* ReadFile::RegisterNext() {
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
-    EventRegister::Instance().DelReadEvent(this);
-    EventRegister::Instance().AddWriteEvent(send_response);
+    this->Unregister();
+    send_response->Register();
 
     return send_response;
 }

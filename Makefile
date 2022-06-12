@@ -6,9 +6,10 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 OBJDIR    :=    ./objs
 DPSDIR    :=    ./dps
 
-INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c -I ./src/config
+INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c -I ./src/config -I ./src/cgi
 
 VPATH     := src: \
+			src/cgi \
 			src/event \
 			src/event/mode \
 			src/exception \
@@ -18,15 +19,20 @@ VPATH     := src: \
 			src/socket \
 			src/config
 
-TESTSRCS  := AcceptConn.cpp \
+TESTSRCS  := CGI.cpp \
+			AcceptConn.cpp \
+			ReadCGI.cpp \
 			ReadFile.cpp \
 			RecvRequest.cpp \
 			SendResponse.cpp \
+			SendError.cpp \
+			WriteCGI.cpp \
 			EventExecutor.cpp \
 			EventRegister.cpp \
 			ListeningSocket.cpp \
 			SysError.cpp \
 			HTTPParser.cpp \
+			parse.cpp \
 			HTTPRequest.cpp \
 			HTTPResponse.cpp \
 			Config.cpp \
@@ -35,7 +41,7 @@ TESTSRCS  := AcceptConn.cpp \
 			LocationConfig.cpp \
 			ServerConfig.cpp \
 			Utils.cpp \
-			Delete.cpp 
+# Delete.cpp
 
 SRCS := main.cpp \
 			$(TESTSRCS)

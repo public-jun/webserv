@@ -20,6 +20,8 @@ public:
     virtual ~IOEvent() {}
 
     virtual void     Run()          = 0;
+    virtual void     Register()     = 0;
+    virtual void     Unregister()   = 0;
     virtual IOEvent* RegisterNext() = 0;
 
     void SetPolledFd(int fd) { polled_fd_ = fd; }

@@ -69,6 +69,7 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
     try {
         ConfigValidator::validateConfigFile(tokens);
         setupConfig(tokens);
+        Config::printConfigs();
     } catch (...) { throw; }
 }
 
