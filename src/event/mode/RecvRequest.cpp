@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "CGI.hpp"
+#include "Delete.hpp"
 #include "EventRegister.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
