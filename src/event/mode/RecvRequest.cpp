@@ -14,6 +14,7 @@
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
 #include "WriteCGI.hpp"
+#include "URI.hpp"
 
 #include <iostream>
 #include <utility>
@@ -63,10 +64,7 @@ IOEvent* RecvRequest::prepareResponse() {
     IOEvent* new_event = NULL;
 
     // URI クラス作成
-    const ServerConfig& conf = searchServerConfig();
-    std::cout << "server name: " << conf.getServerName() << std::endl;
-
-
+    URI uri(searchServerConfig(), req_.GetRequestTarget());
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
