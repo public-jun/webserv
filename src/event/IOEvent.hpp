@@ -8,6 +8,7 @@ public:
         RECV_REQUEST,
         SEND_RESPONSE,
         READ_FILE,
+        DELETE,
         READ_CGI,
         WRITE_CGI,
     };
@@ -32,6 +33,7 @@ public:
 protected:
     int         polled_fd_;
     IOEventMode mode_;
+    int         status_;
 };
 
 #endif

@@ -1,44 +1,45 @@
 #ifndef LOCATION_CONFIG_HPP
-# define LOCATION_CONFIG_HPP
+#define LOCATION_CONFIG_HPP
 
-#include <string>
-#include <vector>
+#include "Utils.hpp"
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <string>
 #include <utility>
-#include "Utils.hpp"
+#include <vector>
 
 class LocationConfig {
 public:
-  LocationConfig();
-  LocationConfig(const LocationConfig &src);
-  ~LocationConfig();
-  LocationConfig &operator=(const LocationConfig &src);
+    LocationConfig();
+    LocationConfig(const LocationConfig& src);
+    ~LocationConfig();
+    LocationConfig& operator=(const LocationConfig& src);
 
-  void setTarget(std::string target);
-  void setAllowedMethods(std::string allowed_method);
-  void setRoot(std::string root);
-  void setAutoIndex(std::string auto_index);
-  void setIndex(std::string index);
-  void setCgiExtensions(std::string cgi_extension);
-  void setReturn(int status_code, std::string url);
+    void setTarget(std::string target);
+    void setAllowedMethods(std::string allowed_method);
+    void setAlias(std::string alias);
+    void setAutoIndex(std::string auto_index);
+    void setIndex(std::string index);
+    void setCgiExtensions(std::string cgi_extension);
+    void setReturn(int status_code, std::string url);
 
-  std::string getTarget() const;
-  std::vector<std::string> getAllowedMethods() const;
-  std::string getRoot() const;
-  e_auto_index_type getAutoIndex() const;
-  std::string getIndex() const;
-  std::vector<std::string> getCgiExtensions() const;
-  std::pair<int, std::string> getReturn() const;
+    std::string                 getTarget() const;
+    std::vector<std::string>    getAllowedMethods() const;
+    std::string                 getAlias() const;
+    e_auto_index_type           getAutoIndex() const;
+    std::string                 getIndex() const;
+    std::vector<std::string>    getCgiExtensions() const;
+    std::pair<int, std::string> getReturn() const;
+
 private:
-  std::string target_;
-  std::vector<std::string> allowed_methods_;
-  std::string root_;
-  e_auto_index_type auto_index_;
-  std::string index_;
-  std::vector<std::string> cgi_extensions_;
-  std::pair<int, std::string> return_;
+    std::string                 target_;
+    std::vector<std::string>    allowed_methods_;
+    std::string                 alias_;
+    e_auto_index_type           auto_index_;
+    std::string                 index_;
+    std::vector<std::string>    cgi_extensions_;
+    std::pair<int, std::string> return_;
 };
 
 #endif
