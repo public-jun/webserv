@@ -14,6 +14,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          version: '13'
           style: file
           tidy-checks: ''
           files-changed-only: false
