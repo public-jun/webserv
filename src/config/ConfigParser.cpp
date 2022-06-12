@@ -70,7 +70,7 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
         ConfigValidator::validateConfigFile(tokens);
         setupConfig(tokens);
         Config::printConfigs();
-    } catch (...) { throw }
+    } catch (...) { throw; }
 }
 
 void ConfigParser::setupConfig(std::vector<std::string> tokens) {
