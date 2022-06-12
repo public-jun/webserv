@@ -11,6 +11,7 @@
 #include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
+#include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
 #include "WriteCGI.hpp"
 
@@ -61,6 +62,12 @@ IOEvent* RecvRequest::RegisterNext() {
 IOEvent* RecvRequest::prepareResponse() {
     IOEvent* new_event = NULL;
 
+    // URI クラス作成
+    const ServerConfig& conf = searchServerConfig();
+    std::cout << "server name: " << conf.getServerName() << std::endl;
+
+
+
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
         if (CGI::IsCGI(req_.GetRequestTarget())) {
@@ -85,4 +92,23 @@ IOEvent* RecvRequest::prepareResponse() {
         }
     }
     return NULL;
+}
+
+ServerConfig RecvRequest::searchServerConfig() {
+    typedef std::vector<const ServerConfig>::const_iterator const_iterator;
+
+    const std::vector<const ServerConfig> config_list =
+        stream_.GetServerConfig();
+
+    ServerConfig config = *config_list.begin();
+
+    const_iterator       it     = config_list.begin();
+    const const_iterator it_end = config_list.end();
+
+    for (; it != it_end; it++) {
+        if (it->getServerName() == req_.GetHeaderValue("Host")) {
+            config = *it;
+        }
+    }
+    return config;
 }
