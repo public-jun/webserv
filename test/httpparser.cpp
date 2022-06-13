@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "HTTPParser.hpp"
+#include "HTTPStatus.hpp"
 #include <string>
 #include <vector>
 
@@ -133,154 +134,208 @@ TEST(HTTPParser, EmptyMethod) {
     string            message("/ HTTP/1.1\r\nHost:localhost\r\n\r\n");
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, LowercaseMethod) {
     string            message("get / HTTP/1.1\r\nHost: localhost\r\n\r\n");
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionNotExistName) {
     string            message = "GET / /1.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionLowerCase) {
     string            message = "GET / http/1.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionMultipleDot) {
     string            message = "GET / HTTP/1.1.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionEndWithDot) {
     string            message = "GET / HTTP/1.\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionStartWithDot) {
     string            message = "GET / HTTP/.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionOnlyName) {
     string            message = "GET / HTTP/\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionNotExistSlash) {
     string            message = "GET / HTTP1.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, VersionNotExistdot) {
     string            message = "GET / HTTP/1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, NoHost) {
     string            message = "GET / HTTP/1.1\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, ValueContainCR) {
     string            message = "GET / HTTP/1.1\r\nHost: local\rhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, ValueContainLF) {
     string            message = "GET / HTTP/1.1\r\nHost: local\nhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, KeyIncludeSpace) {
     string            message = "GET / HTTP/1.1\r\nHost : localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 TEST(HTTPParser, EmptyKey) {
     string      message = "GET / HTTP/1.1\r\nHost: localhost\r\n:hoge\r\n\r\n";
     HTTPRequest req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(400, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::bad_request, code);
+    }
 }
 
 // =======================
 // == OTHER STATUS CASE ==
 
-TEST(HTTPParser, UnsupportedMethod) {
-    string            message = "HOGE / HTTP/1.1\r\nHost: localhost\r\n\r\n";
-    HTTPRequest       req;
-    HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
-
-    EXPECT_EQ(405, req.GetStatus());
-}
-
 TEST(HTTPParser, VersionNotSupported) {
     string            message = "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
-
-    EXPECT_EQ(505, req.GetStatus());
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::version_not_suppoted, code);
+    }
 }
