@@ -4,6 +4,7 @@
 #include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include "IOEvent.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
@@ -16,6 +17,8 @@ public:
     virtual ~Delete();
 
     virtual void     Run();
+    virtual void     Register();
+    virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
 private:
