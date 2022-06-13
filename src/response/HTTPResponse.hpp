@@ -16,6 +16,8 @@ public:
 
     std::string ConvertToStr() const;
 
+    static const std::string default_version;
+
 private:
     static std::map<int, std::string> status_text;
 

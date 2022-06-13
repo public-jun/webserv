@@ -5,17 +5,26 @@
 
 class ExecveArray {
 public:
+    ExecveArray() {}
     template <typename T>
     explicit ExecveArray(T const& strs) {
         initExecveArray(strs.begin(), strs.end());
+    }
+
+    ExecveArray(const ExecveArray& other) { *this = other; }
+
+    ExecveArray& operator=(const ExecveArray& other) {
+        if (this != &other) {
+            str_  = other.str_;
+            ptrs_ = other.ptrs_;
+        }
+        return *this;
     }
 
     char* const* Get() const { return ptrs_.data(); }
     size_t       GetSize() { return str_.size(); }
 
 private:
-    ExecveArray() {}
-
     template <typename InputIt>
     void initExecveArray(InputIt first, InputIt last) {
         std::vector<size_t> offsets;

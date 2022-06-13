@@ -4,8 +4,11 @@
 #include "ListeningSocket.hpp"
 
 #include "AcceptConn.hpp"
+#include "Config.hpp"
+#include "ConfigParser.hpp"
 #include "IOEvent.hpp"
 #include <unistd.h>
+#include <vector>
 
 #include <iostream>
 
@@ -14,20 +17,39 @@ int main(void) {
         EventExecutor executor;
         executor.Init();
 
-        ListeningSocket ls;
-        ls.Bind("127.0.0.1", 5000);
-        ls.Listen();
+        ConfigParser::parseConfigFile();
+        std::map<int, std::vector<const ServerConfig> > server_configs =
+            Config::instance()->GetServerConfigs();
 
-        // イベントの追加
-        IOEvent* event = new AcceptConn(ls);
-        EventRegister::Instance().AddAcceptEvent(event);
+        std::map<int, std::vector<const ServerConfig> >::const_iterator it_end =
+            server_configs.end();
+
+        std::vector<ListeningSocket> listeners;
+        for (std::map<int, std::vector<const ServerConfig> >::const_iterator
+                 it = server_configs.begin();
+             it != it_end; it++) {
+
+            int                             port    = it->first;
+            std::vector<const ServerConfig> configs = it->second;
+
+            ListeningSocket ls(configs);
+            ls.Bind("127.0.0.1", port);
+            ls.Listen();
+            listeners.push_back(ls);
+
+            IOEvent* event = new AcceptConn(ls);
+            event->Register();
+        }
 
         while (true) {
             executor.ProcessEvent();
         }
 
-        ls.Close();
-        // 全てのsocketをclose
+        // 全てのListeningSocketをclose
+        for (std::vector<ListeningSocket>::iterator it = listeners.begin();
+             it != listeners.end(); it++) {
+            it->Close();
+        }
         executor.ShutDown();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
