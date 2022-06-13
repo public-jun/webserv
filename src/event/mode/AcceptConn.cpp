@@ -15,7 +15,7 @@ AcceptConn::AcceptConn()
 
 AcceptConn::AcceptConn(ListeningSocket listener)
     : IOEvent(listener.GetSocketFd(), ACCEPT_CONNECTION), listener_(listener),
-      stream_sock_(StreamSocket()) {}
+      stream_sock_(StreamSocket(listener.GetServerConfig())) {}
 
 AcceptConn::~AcceptConn() {}
 

@@ -6,10 +6,16 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h> // close()
+#include <vector>
 
+#include "ServerConfig.hpp"
+#include "Socket.hpp"
 #include "SysError.hpp"
 
-ListeningSocket::ListeningSocket() { type_ = LISTENING; }
+ListeningSocket::ListeningSocket() : Socket(LISTENING) {}
+
+ListeningSocket::ListeningSocket(std::vector<const ServerConfig> config)
+    : Socket(LISTENING), config_(config) {}
 
 ListeningSocket::~ListeningSocket() {}
 
