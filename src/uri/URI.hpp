@@ -2,6 +2,7 @@
 #define URI_HPP
 
 #include <string>
+#include <utility>
 
 #include "ServerConfig.hpp"
 
@@ -11,6 +12,8 @@ public:
 
     ~URI();
 
+    void Init();
+
     const ServerConfig& GetServerConfig() const { return server_config_; }
     const std::string   GetRawTarget() const { return raw_target_; }
     const std::string   GetRawPath() const { return raw_path_; }
@@ -18,7 +21,11 @@ public:
 
 private:
     URI();
-    void splitTarget();
+    void divideRawTarget();
+    std::pair<std::string, std::string>
+    divideByTheFirstDelimiterFound(std::string str, std::string delimiter);
+
+    // void parseQuery();
 
 private:
     const ServerConfig& server_config_;

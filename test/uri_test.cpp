@@ -31,6 +31,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/");
+        uri.Init();
 
         EXPECT_EQ("/", uri.GetRawTarget());
         EXPECT_EQ("/", uri.GetRawPath());
@@ -39,6 +40,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/docs");
+        uri.Init();
 
         EXPECT_EQ("/docs", uri.GetRawTarget());
         EXPECT_EQ("/docs", uri.GetRawPath());
@@ -47,6 +49,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/docs/");
+        uri.Init();
 
         EXPECT_EQ("/docs/", uri.GetRawTarget());
         EXPECT_EQ("/docs/", uri.GetRawPath());
@@ -55,6 +58,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/docs/hoge");
+        uri.Init();
 
         EXPECT_EQ("/docs/hoge", uri.GetRawTarget());
         EXPECT_EQ("/docs/hoge", uri.GetRawPath());
@@ -63,6 +67,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/docs/hoge/");
+        uri.Init();
 
         EXPECT_EQ("/docs/hoge/", uri.GetRawTarget());
         EXPECT_EQ("/docs/hoge/", uri.GetRawPath());
@@ -71,6 +76,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/?");
+        uri.Init();
 
         EXPECT_EQ("/?", uri.GetRawTarget());
         EXPECT_EQ("/", uri.GetRawPath());
@@ -79,6 +85,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/?arg1");
+        uri.Init();
 
         EXPECT_EQ("/?arg1", uri.GetRawTarget());
         EXPECT_EQ("/", uri.GetRawPath());
@@ -87,6 +94,7 @@ TEST_F(URITest, splitURI) {
 
     {
         URI uri(config, "/?arg1+arg2");
+        uri.Init();
 
         EXPECT_EQ("/?arg1+arg2", uri.GetRawTarget());
         EXPECT_EQ("/", uri.GetRawPath());
