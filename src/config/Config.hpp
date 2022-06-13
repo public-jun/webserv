@@ -19,7 +19,8 @@ public:
                                           DERECTIVE_MAP;
     static const std::vector<std::string> ALLOWED_METHODS;
     static void addServerConfig(const ServerConfig& server_config);
-    static void printConfigs();
+    static std::map<int, std::vector<const ServerConfig> > GetServerConfigs();
+    static void                                            printConfigs();
 
 protected:
     Config();
