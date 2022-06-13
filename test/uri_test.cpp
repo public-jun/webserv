@@ -101,3 +101,46 @@ TEST_F(URITest, splitURI) {
         EXPECT_EQ("arg1+arg2", uri.GetQuery());
     }
 }
+
+TEST_F(URITest, storeArgsFromQuery) {
+    {
+        URI uri(config, "/docs?a+b+c+d");
+        uri.Init();
+
+        std::vector<std::string> args = uri.GetArgs();
+        std::vector<std::string> ans;
+        ans.push_back("a");
+        ans.push_back("b");
+        ans.push_back("c");
+        ans.push_back("d");
+        EXPECT_TRUE(args == ans);
+    }
+
+    {
+        URI uri(config, "/docs?a");
+        uri.Init();
+
+        std::vector<std::string> args = uri.GetArgs();
+        std::vector<std::string> ans;
+        ans.push_back("a");
+        EXPECT_TRUE(args == ans);
+    }
+
+    {
+        URI uri(config, "/docs?a=");
+        uri.Init();
+
+        std::vector<std::string> args = uri.GetArgs();
+        std::vector<std::string> ans;
+        EXPECT_TRUE(args == ans);
+    }
+
+    {
+        URI uri(config, "/docs?a=b+c=d");
+        uri.Init();
+
+        std::vector<std::string> args = uri.GetArgs();
+        std::vector<std::string> ans;
+        EXPECT_TRUE(args == ans);
+    }
+}

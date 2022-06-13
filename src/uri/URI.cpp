@@ -11,8 +11,10 @@ URI::URI(const ServerConfig& server_config, const std::string target)
 URI::~URI() {}
 
 void URI::Init() {
-    // ? で divideする
+    // raw_targetを'?'で分割する
     divideRawTarget();
+    // query_からargsを作成する
+    storeArgsFromQuery();
 }
 
 // raw_target を <raw_path_> '?' <query_> に分割する
@@ -25,7 +27,7 @@ void URI::divideRawTarget() {
     query_    = p.second;
 }
 
-// str を <first> '?' <last> に分割する
+// str を <first> 'sep' <last> に分割する
 std::pair<std::string, std::string>
 URI::divideByTheFirstDelimiterFound(std::string str, std::string delimiter) {
     std::string first, last;
@@ -43,8 +45,43 @@ URI::divideByTheFirstDelimiterFound(std::string str, std::string delimiter) {
     return std::make_pair(first, last);
 }
 
-// void parseQuery() {
-//     // argsを作るか判定
-//     // queryに=が含まれていればargsは作らない
+void URI::storeArgsFromQuery() {
+    if (query_.empty()) {
+        return;
+    }
 
-// }
+    // argsを作るか判定
+    std::string::size_type pos = query_.find("=");
+    // queryに=が含まれていればargsは作らない
+    if (pos != std::string::npos) {
+        return;
+    }
+
+    // queryを+でsplitする
+    args_ = split(query_, "+");
+}
+
+std::vector<std::string> URI::split(std::string str, std::string sep) {
+    typedef std::string::size_type size_type;
+    std::vector<std::string>       list;
+
+    size_type sep_len = sep.length();
+
+    if (sep_len == 0) {
+        return list;
+    } else {
+        size_type offset = size_type(0);
+        while (true) {
+            size_type pos = str.find(sep, offset);
+            if (pos == std::string::npos) {
+                list.push_back(str.substr(offset));
+                break;
+            }
+
+            list.push_back(str.substr(offset, pos - offset));
+            offset = pos + sep_len;
+        }
+    }
+
+    return list;
+}
