@@ -13,8 +13,8 @@
 #include "SendResponse.hpp"
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
-#include "WriteCGI.hpp"
 #include "URI.hpp"
+#include "WriteCGI.hpp"
 
 #include <iostream>
 #include <utility>
@@ -92,21 +92,19 @@ IOEvent* RecvRequest::prepareResponse() {
     return NULL;
 }
 
-ServerConfig RecvRequest::searchServerConfig() {
+const ServerConfig& RecvRequest::searchServerConfig() {
     typedef std::vector<const ServerConfig>::const_iterator const_iterator;
 
     const std::vector<const ServerConfig> config_list =
         stream_.GetServerConfig();
-
-    ServerConfig config = *config_list.begin();
 
     const_iterator       it     = config_list.begin();
     const const_iterator it_end = config_list.end();
 
     for (; it != it_end; it++) {
         if (it->getServerName() == req_.GetHeaderValue("Host")) {
-            config = *it;
+            return *it;
         }
     }
-    return config;
+    return *config_list.begin();
 }
