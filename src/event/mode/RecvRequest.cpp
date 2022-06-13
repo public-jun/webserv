@@ -92,7 +92,7 @@ IOEvent* RecvRequest::prepareResponse() {
     return NULL;
 }
 
-const ServerConfig& RecvRequest::searchServerConfig() {
+const ServerConfig RecvRequest::searchServerConfig() {
     typedef std::vector<const ServerConfig>::const_iterator const_iterator;
 
     const std::vector<const ServerConfig> config_list =

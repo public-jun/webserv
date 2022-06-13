@@ -22,7 +22,7 @@ public:
     static const std::size_t buf_size;
 
 private:
-    const ServerConfig& searchServerConfig();
+    const ServerConfig searchServerConfig();
 
 private:
     RecvRequest();
