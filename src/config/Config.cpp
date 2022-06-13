@@ -30,11 +30,6 @@ Config& Config::operator=(const Config& src) {
     return (*this);
 }
 
-const std::map<int, std::vector<const ServerConfig> >
-Config::getServerConfigs() {
-    return (server_configs_);
-}
-
 const std::map<const e_drctv_cd, std::string> Config::createDerectiveNames() {
     std::map<const e_drctv_cd, std::string> directive_names;
 
@@ -91,7 +86,7 @@ void Config::addServerConfig(const ServerConfig& server_config) {
     int port = server_config.getListen();
     std::map<int, std::vector<const ServerConfig> >::iterator target =
         server_configs_.find(port);
-    (void)target;
+
     if (target == server_configs_.end()) {
         std::vector<const ServerConfig> new_servers(1, server_config);
         server_configs_.insert(std::make_pair(port, new_servers));
@@ -128,12 +123,13 @@ void Config::printConfigs() {
                 it++;
             }
 
-            size_t                      j = -1;
-            std::vector<LocationConfig> location_configs =
+            std::map<const std::string, const LocationConfig> location_configs =
                 server_config.getLocationConfigs();
-            while (++j < location_configs.size()) {
+            std::map<const std::string, const LocationConfig>::iterator
+                location_it = location_configs.begin();
+            while (location_it != location_configs.end()) {
                 std::cout << "\t--------- location config" << std::endl;
-                LocationConfig location_config = location_configs[j];
+                LocationConfig location_config = location_it->second;
                 std::cout << "\ttarget\t\t:" << location_config.getTarget()
                           << std::endl;
                 std::cout << "\tallowed method\t:";
@@ -161,6 +157,7 @@ void Config::printConfigs() {
                 while (++l < cgi_extensions.size())
                     std::cout << " " << cgi_extensions[l];
                 std::cout << std::endl;
+                location_it++;
             }
             sc_itr++;
         }

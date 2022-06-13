@@ -15,7 +15,7 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& src) {
         this->server_name_          = src.server_name_;
         this->max_client_body_size_ = src.max_client_body_size_;
         this->error_page_           = src.error_page_;
-        this->location_configs      = src.location_configs;
+        this->location_configs_     = src.location_configs_;
     }
     return (*this);
 }
@@ -35,7 +35,8 @@ void ServerConfig::setErrorPage(int status_code, std::string location) {
 }
 
 void ServerConfig::setLocationConfigs(LocationConfig& location_config) {
-    this->location_configs.push_back(location_config);
+    this->location_configs_.insert(
+        std::make_pair(location_config.getTarget(), location_config));
 }
 
 int ServerConfig::getListen() const { return (this->listen_); }
@@ -50,6 +51,7 @@ std::map<int, std::string> ServerConfig::getErrorPage() const {
     return (this->error_page_);
 }
 
-std::vector<LocationConfig> ServerConfig::getLocationConfigs() const {
-    return (this->location_configs);
+std::map<const std::string, const LocationConfig>
+ServerConfig::getLocationConfigs() const {
+    return (this->location_configs_);
 }
