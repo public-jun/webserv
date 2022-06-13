@@ -105,7 +105,7 @@ $(gtest):
 
 test_compile = clang++ -std=c++11 \
 	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc $(TESTOBJS) \
-	-g -fsanitize=address -fsanitize=undefined -fsanitize=leak \
+	-g -fsanitize=address -fsanitize=undefined \
 	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
 
 .PHONY: gtest
@@ -115,7 +115,7 @@ gtest: $(gtest)
 
 gtestlist:
 	@./tester --gtest_list_tests
-	@echo "\nRUN ./tester --gtest_fileter=(TESTCASE).(TESTNAME)"
+	@echo "\nRUN ./tester --gtest_filter=(TESTCASE).(TESTNAME)"
 
 .PHONY: cleangtest
 cleangtest:
