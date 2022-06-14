@@ -7,35 +7,15 @@ SRCSDIR   := ./src
 OBJDIR    := ./obj
 DPSDIR    := ./dps
 TESTDIR   := ./test
+INCDIR    := $(shell find src -maxdepth 2 -type d)
 
-INCLUDE := -I ./src/event \
-					 -I ./src/event/mode \
-					 -I ./src/exception \
-					 -I ./src/socket \
-					 -I ./src/request \
-					 -I ./src/response \
-					 -I ./src/extended_c \
-					 -I ./src/config \
-					 -I ./src/cgi \
-					 -I ./src/uri
-
-VPATH  := src: \
-			src/cgi \
-			src/event \
-			src/event/mode \
-			src/exception \
-			src/extended_c \
-			src/request \
-			src/response \
-			src/socket \
-			src/config \
-			src/uri
+INCLUDE := $(addprefix -I, $(INCDIR))
+VPATH := $(INCDIR)
 
 SRCS := $(shell find $(SRCSDIR) -type f -name '*.cpp')
-
 OBJS := $(patsubst $(SRCSDIR)%,$(OBJDIR)%,$(SRCS:.cpp=.o))
 
-RM        := rm -rf
+RM := rm -rf
 
 .PHONY: all
 all: $(NAME) ## Build
@@ -52,7 +32,7 @@ $(OBJDIR)/%.o: %.cpp
 
 .PHONY: clean
 clean: ## Remove object file
-	rm -rf $(OBJDIR) $(DPSDIR)
+	$(RM) $(OBJDIR) $(DPSDIR)
 
 .PHONY: fclean
 fclean: clean ## Remove object file, executable file
@@ -63,11 +43,11 @@ re: fclean all ## Rebuild
 
 .PHONY: tidy
 tidy: ## Run clang-tidy
-	clang-tidy `find src -type f` -- $(INCLUDE)
+	clang-tidy $(SRCS) -- $(INCLUDE)
 
 .PHONY: tidy-fix
 tidy-fix: ## Run clang-tidy --fix
-	clang-tidy `find src include -type f` --fix -- $(INCLUDE)
+	clang-tidy $(SRCS) --fix -- $(INCLUDE)
 
 ################# google test ####################
 
@@ -78,7 +58,7 @@ gtest: $(OBJS) ## Create tester
 gtestclean: ## Clean google test object file
 	@$(MAKE) -C $(TESTDIR) clean
 
-BLUE := \033[34m
+BLUE  := \033[34m
 RESET := \033[39m
 
 .PHONY: gtestlist
