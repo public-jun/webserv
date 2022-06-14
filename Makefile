@@ -43,7 +43,8 @@ TESTSRCS  := CGI.cpp \
 			ServerConfig.cpp \
 			Utils.cpp \
 			URI.cpp \
-			Delete.cpp
+			Delete.cpp \
+			Post.cpp
 
 SRCS := main.cpp \
 			$(TESTSRCS)
