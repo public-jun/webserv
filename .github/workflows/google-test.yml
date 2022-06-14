@@ -8,5 +8,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: google_test
-        run: make && make gtest && ./tester
+        run: make gtest && ./tester
 
