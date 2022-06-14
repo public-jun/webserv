@@ -8,8 +8,6 @@ OBJDIR    := ./objs
 DPSDIR    := ./dps
 TESTDIR   := ./test
 
-# INCLUDE := -I ./src
-
 INCLUDE   := -I ./src/event \
 						 -I ./src/event/mode \
 						 -I ./src/exception \
@@ -33,53 +31,17 @@ VPATH     := src: \
 			src/config \
 			src/uri
 
-CGI       := CGI.cpp \
-			ReadCGI.cpp \
-			WriteCGI.cpp
-
-CONFIG    := Config.cpp \
-			ConfigParser.cpp \
-			ConfigValidator.cpp \
-			LocationConfig.cpp \
-			ServerConfig.cpp \
-			Utils.cpp \
-
-EVENT     := ReadFile.cpp \
-			RecvRequest.cpp \
-			SendResponse.cpp \
-			SendError.cpp \
-			AcceptConn.cpp \
-			EventExecutor.cpp \
-			EventRegister.cpp \
-
-REQUEST   := parse.cpp \
-			HTTPRequest.cpp \
-			HTTPParser.cpp \
-
-EXCEPTION := SysError.cpp
-SOCKET    := ListeningSocket.cpp
-RESPONSE  := HTTPResponse.cpp
-URI       := URI.cpp
-
-TESTSRCS  := $(CGI) \
-			$(CONFIG) \
-			$(EVENT) \
-			$(SOCKET) \
-			$(REQUEST) \
-			$(RESPONSE) \
-			$(EXCEPTION) \
-			$(URI)
-# Delete.cpp
-
 SRCS := $(shell find $(SRCSDIR) -type f -name '*.cpp')
 
 # SRCS := main.cpp \
 # 			$(TESTSRCS)
 
+# DPS    := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
 # OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
-OBJS = $(patsubst $(SRCSDIR)%,$(OBJDIR)%,$(SRCS:.cpp=.o))
+#
+OBJS := $(patsubst $(SRCSDIR)%,$(OBJDIR)%,$(SRCS:.cpp=.o))
+DPS   := $(patsubst $(SRCSDIR)%,$(DPSDIR)%,$(SRCS:.cpp=.d))
 
-DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
 
 RM        := rm -rf
 
@@ -137,4 +99,4 @@ gtestclean:
 .PHONY: gtestlist
 gtestlist:
 	@./tester --gtest_list_tests
-	@echo -e '\nRUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"'
+	@echo '\nRUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"'
