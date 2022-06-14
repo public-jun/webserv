@@ -15,6 +15,8 @@ void URI::Init() {
     divideRawTarget();
     // query_からargsを作成する
     storeArgsFromQuery();
+    // location_configを決定し、local_pathを作成する
+    // findLocalPath();
 }
 
 // raw_target を <raw_path_> '?' <query_> に分割する

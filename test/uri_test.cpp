@@ -14,7 +14,7 @@ protected:
     virtual void SetUp() {
         typedef std::map<int, std::vector<const ServerConfig> > configs_map;
 
-        ConfigParser::parseConfigFile("./config/duplicated_port.conf");
+        ConfigParser::parseConfigFile("./config/multi_location.conf");
         configs_map servers_map = Config::instance()->GetServerConfigs();
 
         configs_map::const_iterator it = servers_map.begin();
@@ -142,5 +142,63 @@ TEST_F(URITest, storeArgsFromQuery) {
         std::vector<std::string> args = uri.GetArgs();
         std::vector<std::string> ans;
         EXPECT_TRUE(args == ans);
+    }
+}
+
+TEST_F(URITest, findLocalPath) {
+    {
+        URI uri(config, "/txt");
+        uri.Init();
+
+        EXPECT_EQ("./txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/b/txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/b/txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/b/c/txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/b/c/txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/d/txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/d/txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/b/d/txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/b/d/txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/b/c/d/txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/b/c/d/txt", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(config, "/a/../txt");
+        uri.Init();
+
+        EXPECT_EQ("./a/../txt", uri.GetLocalPath());
     }
 }
