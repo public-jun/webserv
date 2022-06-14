@@ -116,11 +116,6 @@ $(gtest):
 	python googletest-release-1.11.0/googletest/scripts/fuse_gtest_files.py $(gtestdir)
 	mv googletest-release-1.11.0 $(gtestdir)
 
-test_compile = clang++ -std=c++11 \
-	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc $(TESTOBJS) \
-	-g -fsanitize=address -fsanitize=undefined \
-	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
-
 .PHONY: gtest_compile
 gtest_compile:
 	clang++ -std=c++11 \
@@ -129,8 +124,7 @@ gtest_compile:
 	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
 
 .PHONY: gtest
-gtest: $(gtest)
-	$(test_compile)
+gtest: $(gtest) gtest_compile
 	./tester
 
 gtestlist:
