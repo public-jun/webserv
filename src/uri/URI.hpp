@@ -15,19 +15,23 @@ public:
 
     void Init();
 
-    const ServerConfig&      GetServerConfig() const { return server_config_; }
-    const std::string        GetRawTarget() const { return raw_target_; }
-    const std::string        GetRawPath() const { return raw_path_; }
-    const std::string        GetQuery() const { return query_; }
-    std::vector<std::string> GetArgs() { return args_; }
+    const ServerConfig& GetServerConfig() const { return server_config_; }
+    const std::string&  GetRawTarget() const { return raw_target_; }
+    const std::string&  GetRawPath() const { return raw_path_; }
+    const std::string&  GetQuery() const { return query_; }
+    const std::vector<std::string>& GetArgs() const { return args_; }
+    const std::string&              GetLocalPath() const { return local_path_; }
 
 private:
     URI();
+
     void divideRawTarget();
+    void storeArgsFromQuery();
+    void findLocationConfig();
+    void storeLocalPath();
+
     std::pair<std::string, std::string>
     divideByTheFirstDelimiterFound(std::string str, std::string delimiter);
-
-    void                     storeArgsFromQuery();
     std::vector<std::string> split(std::string str, std::string sep);
 
 private:

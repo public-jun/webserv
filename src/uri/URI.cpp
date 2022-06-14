@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 
+#include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
 
 URI::URI(const ServerConfig& server_config, const std::string target)
@@ -15,6 +16,10 @@ void URI::Init() {
     divideRawTarget();
     // query_からargsを作成する
     storeArgsFromQuery();
+    // location_configを探す
+    findLocationConfig();
+    // location_configのtargetからlocal_pathを作成する
+    storeLocalPath();
 }
 
 // raw_target を <raw_path_> '?' <query_> に分割する
@@ -84,4 +89,43 @@ std::vector<std::string> URI::split(std::string str, std::string sep) {
     }
 
     return list;
+}
+
+void URI::findLocationConfig() {
+    typedef std::map<const std::string, const LocationConfig> location_map;
+    typedef std::map<const std::string,
+                     const LocationConfig>::const_reverse_iterator
+        const_reverse_iterator;
+
+    const location_map& locations = server_config_.getLocationConfigs();
+
+    // location configを決定する
+    std::string            location_target_dir;
+    const_reverse_iterator it_end = locations.rend();
+    for (const_reverse_iterator it = locations.rbegin(); it != it_end; it++) {
+        location_target_dir = it->first;
+        if (*location_target_dir.rbegin() != '/') {
+            location_target_dir += "/";
+        }
+
+        // location の target と
+        // raw_path_のディレクトリのパス部分が最大長で一致するもの
+        if (location_target_dir.length() <= raw_path_.length() &&
+            raw_path_.substr(0, location_target_dir.length()) ==
+                location_target_dir) {
+            location_config_ = it->second;
+            break;
+        }
+    }
+}
+
+void URI::storeLocalPath() {
+    std::string location_target_dir = location_config_.getTarget();
+    if (*location_target_dir.rbegin() != '/') {
+        location_target_dir += "/";
+    }
+
+    // local_path_を設定する
+    local_path_ = location_config_.getAlias() +
+                  raw_path_.substr(location_target_dir.length());
 }
