@@ -33,46 +33,33 @@ VPATH     := src: \
 
 SRCS := $(shell find $(SRCSDIR) -type f -name '*.cpp')
 
-# DPS    := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
-# OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
-#
 OBJS := $(patsubst $(SRCSDIR)%,$(OBJDIR)%,$(SRCS:.cpp=.o))
-DPS   := $(patsubst $(SRCSDIR)%,$(DPSDIR)%,$(SRCS:.cpp=.d))
-
 
 RM        := rm -rf
 
 .PHONY: all
-all: makedir $(NAME)
-
-debug:
-	@echo $(OBJS)
+all: $(NAME) ## Build
 
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 $(OBJDIR)/%.o: %.cpp
-	@echo $(@D)
+	@mkdir -p $(DPSDIR)
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
 
 -include $(DPS)
 
-.PHONY: makedir
-makedir :
-	@mkdir -p $(OBJDIR)
-	@mkdir -p $(DPSDIR)
-
 .PHONY: clean
-clean:
+clean: ## Remove object file
 	rm -rf $(OBJDIR) $(DPSDIR)
 
 .PHONY: fclean
-fclean: clean
+fclean: clean ## Remove object file, executable file
 	$(RM) $(NAME) *.dSYM tester
 
 .PHONY: re
-re: fclean all
+re: fclean all ## Rebuild
 
 .PHONY: tidy
 tidy: ## Run clang-tidy
@@ -84,18 +71,21 @@ tidy-fix: ## Run clang-tidy --fix
 
 ################# google test ####################
 
-gtest: ## Create tester
+gtest: $(OBJS) ## Create tester
 	@$(MAKE) -C $(TESTDIR) gtest
 	@mv $(TESTDIR)/tester ./
 
-gtestclean:
+gtestclean: ## Clean google test object file
 	@$(MAKE) -C $(TESTDIR) clean
 
+BLUE := \033[34m
+RESET := \033[39m
+
 .PHONY: gtestlist
-gtestlist: gtest ## Show Google Test List
+gtestlist: gtest ## Show google test list
 	@./tester --gtest_list_tests
-	@printf '\nRUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"\n'
+	@printf '\n$(BLUE)RUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"$(RESET)\n'
 
 PHONY: help
 help: ## Display this help screen
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' "Makefile" | awk -F ': ##' '{printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' "Makefile" | awk -F ' ##' '{printf "$(BLUE)%-20s$(RESET) %s\n", $$1, $$2}'
