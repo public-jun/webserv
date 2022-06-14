@@ -3,8 +3,8 @@ NAME      := webserv
 CXX       := clang++
 CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 
-OBJDIR    :=    ./objs
-DPSDIR    :=    ./dps
+OBJDIR    := ./objs
+DPSDIR    := ./dps
 
 INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c -I ./src/config -I ./src/cgi
 
@@ -19,28 +19,42 @@ VPATH     := src: \
 			src/socket \
 			src/config
 
-TESTSRCS  := CGI.cpp \
-			AcceptConn.cpp \
+CGI       := CGI.cpp \
 			ReadCGI.cpp \
-			ReadFile.cpp \
-			RecvRequest.cpp \
-			SendResponse.cpp \
-			SendError.cpp \
-			WriteCGI.cpp \
-			EventExecutor.cpp \
-			EventRegister.cpp \
-			ListeningSocket.cpp \
-			SysError.cpp \
-			HTTPParser.cpp \
-			parse.cpp \
-			HTTPRequest.cpp \
-			HTTPResponse.cpp \
-			Config.cpp \
+			WriteCGI.cpp
+
+CONFIG    := Config.cpp \
 			ConfigParser.cpp \
 			ConfigValidator.cpp \
 			LocationConfig.cpp \
 			ServerConfig.cpp \
 			Utils.cpp \
+
+EVENT     := ReadFile.cpp \
+			RecvRequest.cpp \
+			SendResponse.cpp \
+			SendError.cpp \
+			AcceptConn.cpp \
+			EventExecutor.cpp \
+			EventRegister.cpp \
+
+SOCKET    := ListeningSocket.cpp \
+
+RESPONSE  := HTTPResponse.cpp \
+
+REQUEST   := parse.cpp \
+			HTTPRequest.cpp \
+			HTTPParser.cpp \
+
+EXCEPTION := SysError.cpp \
+
+TESTSRCS  := $(CGI) \
+			$(CONFIG) \
+			$(EVENT) \
+			$(SOCKET) \
+			$(REQUEST) \
+			$(RESPONSE) \
+			$(EXCEPTION) \
 # Delete.cpp
 
 SRCS := main.cpp \
@@ -65,8 +79,8 @@ $(OBJDIR)/%.o: %.cpp
 
 .PHONY: makedir
 makedir :
-	mkdir -p $(OBJDIR)
-	mkdir -p $(DPSDIR)
+	@mkdir -p $(OBJDIR)
+	@mkdir -p $(DPSDIR)
 
 .PHONY: clean
 clean:
@@ -102,6 +116,13 @@ $(gtest):
 	mv googletest-release-1.11.0 $(gtestdir)
 
 test_compile = clang++ -std=c++11 \
+	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc $(TESTOBJS) \
+	-g -fsanitize=address -fsanitize=undefined \
+	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
+
+.PHONY: gtest_compile
+gtest_compile:
+	clang++ -std=c++11 \
 	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc $(TESTOBJS) \
 	-g -fsanitize=address -fsanitize=undefined \
 	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
