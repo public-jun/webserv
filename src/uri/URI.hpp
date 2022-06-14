@@ -27,7 +27,8 @@ private:
 
     void divideRawTarget();
     void storeArgsFromQuery();
-    // void findLocalPath();
+    void findLocationConfig();
+    void storeLocalPath();
 
     std::pair<std::string, std::string>
     divideByTheFirstDelimiterFound(std::string str, std::string delimiter);
