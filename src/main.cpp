@@ -17,7 +17,7 @@ int main(void) {
         EventExecutor executor;
         executor.Init();
 
-        ConfigParser::parseConfigFile();
+        ConfigParser::parseConfigFile("./config/duplicated_port.conf");
         std::map<int, std::vector<const ServerConfig> > server_configs =
             Config::instance()->GetServerConfigs();
 

@@ -6,6 +6,7 @@
 #include "HTTPParser.hpp"
 #include "HTTPRequest.hpp"
 #include "IOEvent.hpp"
+#include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
 
 class RecvRequest : public IOEvent {
@@ -19,6 +20,9 @@ public:
     virtual IOEvent* RegisterNext();
 
     static const std::size_t buf_size;
+
+private:
+    const ServerConfig searchServerConfig();
 
 private:
     RecvRequest();

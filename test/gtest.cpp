@@ -10,3 +10,4 @@
 #include "execve_array_test.cpp"
 #include "httpparser.cpp"
 #include "response.cpp"
+#include "uri_test.cpp"
