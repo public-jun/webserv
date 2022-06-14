@@ -33,9 +33,6 @@ VPATH     := src: \
 
 SRCS := $(shell find $(SRCSDIR) -type f -name '*.cpp')
 
-# SRCS := main.cpp \
-# 			$(TESTSRCS)
-
 # DPS    := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
 # OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
 #
@@ -78,18 +75,16 @@ fclean: clean
 re: fclean all
 
 .PHONY: tidy
-tidy: # Run clang-tidy
+tidy: ## Run clang-tidy
 	clang-tidy `find src -type f` -- $(INCLUDE)
 
 .PHONY: tidy-fix
-tidy-fix: # Run clang-tidy --fix
+tidy-fix: ## Run clang-tidy --fix
 	clang-tidy `find src include -type f` --fix -- $(INCLUDE)
-
 
 ################# google test ####################
 
-
-gtest: # Create tester
+gtest: ## Create tester
 	@$(MAKE) -C $(TESTDIR) gtest
 	@mv $(TESTDIR)/tester ./
 
@@ -97,6 +92,10 @@ gtestclean:
 	@$(MAKE) -C $(TESTDIR) clean
 
 .PHONY: gtestlist
-gtestlist:
+gtestlist: gtest ## Show Google Test List
 	@./tester --gtest_list_tests
-	@echo '\nRUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"'
+	@printf '\nRUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"\n'
+
+PHONY: help
+help: ## Display this help screen
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' "Makefile" | awk -F ': ##' '{printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
