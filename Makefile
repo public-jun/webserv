@@ -3,23 +3,23 @@ NAME      := webserv
 CXX       := clang++
 CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 
-SRCSDIR  := ./src
-OBJDIR    := ./objs
+SRCSDIR   := ./src
+OBJDIR    := ./obj
 DPSDIR    := ./dps
 TESTDIR   := ./test
 
-INCLUDE   := -I ./src/event \
-						 -I ./src/event/mode \
-						 -I ./src/exception \
-						 -I ./src/socket \
-						 -I ./src/request \
-						 -I ./src/response \
-						 -I ./src/extended_c \
-						 -I ./src/config \
-						 -I ./src/cgi \
-						 -I ./src/uri
+INCLUDE := -I ./src/event \
+					 -I ./src/event/mode \
+					 -I ./src/exception \
+					 -I ./src/socket \
+					 -I ./src/request \
+					 -I ./src/response \
+					 -I ./src/extended_c \
+					 -I ./src/config \
+					 -I ./src/cgi \
+					 -I ./src/uri
 
-VPATH     := src: \
+VPATH  := src: \
 			src/cgi \
 			src/event \
 			src/event/mode \

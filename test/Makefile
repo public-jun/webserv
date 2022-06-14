@@ -42,18 +42,13 @@ $(gtest):
 	mv googletest-release-1.11.0 $(gtestdir)
 
 .PHONY: gtest
-gtest: $(G_OBJ)
+gtest: $(gtest) $(G_OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(G_OBJ) -o $(NAME)
 
 .PHONY: clean
 clean:
 	$(RM) $(G_OBJ)
 
-gtestlist:
-	@./tester --gtest_list_tests
-	@echo '\nRUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"'
-
 .PHONY: cleangtest
 cleangtest:
-	$(RM) $(gtestdir)
-
+	rm -rf $(gtestdir)
