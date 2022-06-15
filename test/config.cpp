@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Config.hpp"
 #include "ConfigParser.hpp"
-#include <exception>
 
 const std::string CONF_PATH = "./config/error";
 
