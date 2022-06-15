@@ -3,118 +3,69 @@ NAME      := webserv
 CXX       := clang++
 CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 
-OBJDIR    :=    ./objs
-DPSDIR    :=    ./dps
+SRCSDIR   := ./src
+OBJDIR    := ./obj
+DPSDIR    := ./dps
+TESTDIR   := ./test
+INCDIR    := $(shell find src -maxdepth 2 -type d)
 
-INCLUDE   := -I ./src/event -I ./src/exception -I ./src/socket -I ./src/event/mode -I ./src/request -I ./src/response -I ./src/extended_c -I ./src/config -I ./src/cgi
+INCLUDE := $(addprefix -I, $(INCDIR))
+VPATH := $(INCDIR)
 
-VPATH     := src: \
-			src/cgi \
-			src/event \
-			src/event/mode \
-			src/exception \
-			src/extended_c \
-			src/request \
-			src/response \
-			src/socket \
-			src/config
+SRCS := $(shell find $(SRCSDIR) -type f -name '*.cpp')
+OBJS := $(patsubst $(SRCSDIR)%,$(OBJDIR)%,$(SRCS:.cpp=.o))
 
-TESTSRCS  := CGI.cpp \
-			AcceptConn.cpp \
-			ReadCGI.cpp \
-			ReadFile.cpp \
-			RecvRequest.cpp \
-			SendResponse.cpp \
-			SendError.cpp \
-			WriteCGI.cpp \
-			EventExecutor.cpp \
-			EventRegister.cpp \
-			ListeningSocket.cpp \
-			SysError.cpp \
-			HTTPParser.cpp \
-			parse.cpp \
-			HTTPRequest.cpp \
-			HTTPResponse.cpp \
-			Config.cpp \
-			ConfigParser.cpp \
-			ConfigValidator.cpp \
-			LocationConfig.cpp \
-			ServerConfig.cpp \
-			Utils.cpp \
-# Delete.cpp
-
-SRCS := main.cpp \
-			$(TESTSRCS)
-
-OBJS      := $(addprefix $(OBJDIR)/, $(notdir $(SRCS:.cpp=.o)))
-TESTOBJS  := $(addprefix $(OBJDIR)/, $(notdir $(TESTSRCS:.cpp=.o)))
-DPS       := $(addprefix $(DPSDIR)/, $(notdir $(SRCS:.o=.d)))
-
-RM        := rm -rf
+RM := rm -rf
 
 .PHONY: all
-all: makedir $(NAME)
+all: $(NAME) ## Build
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 
 $(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(DPSDIR)
+	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -MMD -MP -MF $(DPSDIR)/$(notdir $(<:.cpp=.d)) -c $< -o $@
 
 -include $(DPS)
 
-.PHONY: makedir
-makedir :
-	mkdir -p $(OBJDIR)
-	mkdir -p $(DPSDIR)
-
 .PHONY: clean
-clean:
-	rm -rf $(OBJDIR) $(DPSDIR)
+clean: ## Remove object file
+	$(RM) $(OBJDIR) $(DPSDIR)
 
 .PHONY: fclean
-fclean: clean
+fclean: clean ## Remove object file, executable file
 	$(RM) $(NAME) *.dSYM tester
 
 .PHONY: re
-re: fclean all
+re: fclean all ## Rebuild
 
 .PHONY: tidy
-tidy:
-	clang-tidy `find src -type f` -- $(INCLUDE)
+tidy: ## Run clang-tidy
+	clang-tidy $(SRCS) -- $(INCLUDE)
 
 .PHONY: tidy-fix
-tidy-fix:
-	clang-tidy `find src include -type f` --fix -- $(INCLUDE)
+tidy-fix: ## Run clang-tidy --fix
+	clang-tidy $(SRCS) --fix -- $(INCLUDE)
 
 ################# google test ####################
 
-gtestdir =    ./google_test
-gtest    =    $(gtestdir)/gtest $(gtestdir)/googletest-release-1.11.0
-testdir  = ./test
+gtest: $(OBJS) ## Create tester
+	@$(MAKE) -C $(TESTDIR) gtest
+	@mv $(TESTDIR)/tester ./
 
-$(gtest):
-	mkdir -p $(dir ../google_test)
-	curl -OL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.tar.gz
-	tar -xvzf release-1.11.0.tar.gz googletest-release-1.11.0
-	$(RM) -rf release-1.11.0.tar.gz
-	python googletest-release-1.11.0/googletest/scripts/fuse_gtest_files.py $(gtestdir)
-	mv googletest-release-1.11.0 $(gtestdir)
+gtestclean: ## Clean google test object file
+	@$(MAKE) -C $(TESTDIR) clean
 
-test_compile = clang++ -std=c++11 \
-	$(testdir)/gtest.cpp $(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc $(gtestdir)/gtest/gtest-all.cc $(TESTOBJS) \
-	-g -fsanitize=address -fsanitize=undefined \
-	-I$(gtestdir) $(INCLUDE) -lpthread -o tester
+BLUE  := \033[34m
+RESET := \033[39m
 
-.PHONY: gtest
-gtest: $(gtest)
-	$(test_compile)
-	./tester
-
-gtestlist:
+.PHONY: gtestlist
+gtestlist: gtest ## Show google test list
 	@./tester --gtest_list_tests
-	@echo "\nRUN ./tester --gtest_filter=(TESTCASE).(TESTNAME)"
+	@printf '\n$(BLUE)RUN ./tester --gtest_filter="(TESTCASE).(TESTNAME)"$(RESET)\n'
 
-.PHONY: cleangtest
-cleangtest:
-	$(RM) $(gtestdir)
+PHONY: help
+help: ## Display this help screen
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' "Makefile" | awk -F ' ##' '{printf "$(BLUE)%-20s$(RESET) %s\n", $$1, $$2}'
