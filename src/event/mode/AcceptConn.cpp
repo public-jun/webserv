@@ -10,9 +10,6 @@
 
 #include <iostream>
 
-AcceptConn::AcceptConn()
-    : IOEvent(), listener_(ListeningSocket()), stream_sock_(StreamSocket()) {}
-
 AcceptConn::AcceptConn(ListeningSocket listener)
     : IOEvent(listener.GetSocketFd(), ACCEPT_CONNECTION), listener_(listener),
       stream_sock_(StreamSocket(listener.GetServerConfig())) {}
