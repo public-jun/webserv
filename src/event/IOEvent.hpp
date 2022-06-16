@@ -9,6 +9,7 @@ public:
         SEND_RESPONSE,
         READ_FILE,
         DELETE,
+        POST,
         READ_CGI,
         WRITE_CGI,
     };

@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "CGI.hpp"
+#include "Delete.hpp"
 #include "EventRegister.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
@@ -88,6 +89,12 @@ IOEvent* RecvRequest::prepareResponse() {
             new_event->Register();
             return new_event;
         }
+    }
+    if (req_.GetMethod() == "DELETE") {
+        Delete dlt(stream_, req_);
+
+        dlt.Run();
+        return dlt.RegisterNext();
     }
     return NULL;
 }
