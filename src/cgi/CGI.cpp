@@ -104,25 +104,30 @@ std::vector<std::string> CGI::makeEnvs() {
     std::ostringstream                 oss;
 
     // 環境変数を順に決定
-    env_map["AUTH_TYPE"] = "";
+    env_map["AUTH_TYPE"] = req_.GetHeaderValue("Authorization");
     oss << req_.GetBody().size() << std::flush;
     env_map["CONTENT_LENGTH"] = oss.str();
     oss.str("");
-    env_map["CONTENT_TYPE"]      = "";
-    env_map["GATEWAY_INTERFACE"] = "";
-    env_map["PATH_INFO"]         = "";
-    env_map["PATH_TRANSLATED"]   = "";
-    env_map["QUERY_STRING"]      = "";
-    env_map["REMOTE_ADDR"]       = "";
-    env_map["REMOTE_HOST"]       = "";
-    env_map["REMOTE_IDENT"]      = "";
-    env_map["REMOTE_USER"]       = "";
-    env_map["REQUEST_METHOD"]    = "";
-    env_map["SCRIPT_NAME"]       = "";
-    env_map["SERVER_NAME"]       = "";
-    env_map["SERVER_PORT"]       = "";
-    env_map["SERVER_PROTOCOL"]   = "";
-    env_map["SERVER_SOFTWARE"]   = "";
+    env_map["CONTENT_TYPE"]      = req_.GetHeaderValue("Content-Type");
+    env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
+    env_map["PATH_INFO"]         = uri_.GetRawPath();
+    env_map["PATH_TRANSLATED"]   = uri_.GetLocalPath();
+    env_map["QUERY_STRING"]      = uri_.GetQuery();
+
+    env_map["REMOTE_ADDR"] = ""; // ipアドレス
+    env_map["REMOTE_HOST"] = ""; // ipアドレスから逆引きしたホスト名
+    env_map["REMOTE_IDENT"] = "";
+    env_map["REMOTE_USER"]  = "";
+
+    env_map["REQUEST_METHOD"] = req_.GetMethod();
+    env_map["SCRIPT_NAME"]    = uri_.GetRawPath();
+    env_map["SERVER_NAME"]    = uri_.GetServerConfig().getServerName();
+
+    oss << uri_.GetServerConfig().getListen() << std::flush;
+    env_map["SERVER_PORT"] = oss.str();
+    oss.str("");
+    env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
+    env_map["SERVER_SOFTWARE"] = "webserv/1.0.0";
 
     std::vector<std::string> envs;
 
