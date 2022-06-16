@@ -228,10 +228,10 @@ TEST_F(URITest, statLocalPath) {
     }
 
     {
-        URI uri(stat_test_conf, "/a/gtest.cpp");
+        URI uri(stat_test_conf, "/a/gtest.cc");
         uri.Init();
 
-        EXPECT_EQ("./test/gtest.cpp", uri.GetLocalPath());
+        EXPECT_EQ("./test/gtest.cc", uri.GetLocalPath());
         EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
     }
 
