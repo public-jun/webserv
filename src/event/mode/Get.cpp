@@ -5,6 +5,7 @@
 #include "SendResponse.hpp"
 #include "URI.hpp"
 
+#include "HTTPStatus.hpp"
 #include <cstdio>
 #include <dirent.h>
 #include <fcntl.h>
@@ -18,9 +19,14 @@ Get::Get(StreamSocket stream, URI& uri) : stream_(stream), uri_(uri) {}
 Get::~Get() {}
 
 void Get::autoIndex(std::string path) {
+    errno    = 0;
     DIR* dir = opendir(path.c_str());
     if (dir == NULL) {
-        return;
+        perror("opendir");
+        if (errno == EACCES) {
+            throw status::forbidden;
+        }
+        throw status::server_error;
     }
 
     std::stringstream ss;
@@ -42,6 +48,10 @@ void Get::autoIndex(std::string path) {
        << "<hr>\r\n"
        << "</body>\r\n"
        << "</html>\r\n";
+    if (errno == EBADF) {
+        perror("readdir");
+        throw status::server_error;
+    }
 
     HTTPResponse      resp;
     std::string       content = ss.str();
@@ -56,21 +66,17 @@ void Get::prepareReadFile(std::string path) {
     int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
     if (fd == -1) {
         perror("open");
-        // internal server error;
-        std::cout << "error" << std::endl;
+        if (errno == EACCES) {
+            throw status::forbidden;
+        }
+        throw status::server_error;
     }
     next_event_ = new ReadFile(stream_, fd);
 }
 
 void Get::Run() {
-    std::string path = uri_.GetLocalPath();
-    struct stat s    = uri_.GetStat();
-
-    // 403の処理
-    if (!((s.st_mode & S_IRUSR) == S_IRUSR)) {
-        std::cout << "permission denied " << std::endl;
-        throw status::forbidden;
-    }
+    const std::string& path = uri_.GetLocalPath();
+    const struct stat& s    = uri_.GetStat();
 
     if (S_ISDIR(s.st_mode)) {
         autoIndex(path);
