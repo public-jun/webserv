@@ -29,7 +29,7 @@ int main(void) {
                  it = server_configs.begin();
              it != it_end; it++) {
 
-            int                             port    = it->first;
+            int                                    port    = it->first;
             const std::vector<const ServerConfig>& configs = it->second;
 
             ListeningSocket ls(configs);
