@@ -7,6 +7,7 @@
 
 /* Include all tests files */
 
+#include "config.cpp"
 #include "execve_array_test.cpp"
 #include "httpparser.cpp"
 #include "response.cpp"

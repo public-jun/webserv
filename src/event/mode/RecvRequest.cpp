@@ -20,7 +20,7 @@
 #include <iostream>
 #include <utility>
 
-const size_t RecvRequest::buf_size = 2048;
+const size_t RecvRequest::BUF_SIZE = 2048;
 
 RecvRequest::RecvRequest()
     : IOEvent(RECV_REQUEST), stream_(StreamSocket()), req_(HTTPRequest()),
@@ -33,8 +33,8 @@ RecvRequest::RecvRequest(StreamSocket stream)
 RecvRequest::~RecvRequest() {}
 
 void RecvRequest::Run() {
-    char buf[buf_size];
-    int  recv_size = recv(stream_.GetSocketFd(), buf, buf_size, 0);
+    char buf[BUF_SIZE];
+    int  recv_size = recv(stream_.GetSocketFd(), buf, BUF_SIZE, 0);
 
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
@@ -66,11 +66,12 @@ IOEvent* RecvRequest::prepareResponse() {
 
     // URI クラス作成
     URI uri(searchServerConfig(), req_.GetRequestTarget());
+    uri.Init();
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
-        if (CGI::IsCGI(req_.GetRequestTarget())) {
-            class CGI cgi(req_);
+        if (CGI::IsCGI(uri, "GET")) {
+            class CGI cgi(uri, req_);
             cgi.Run();
             new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
         } else {
@@ -81,8 +82,8 @@ IOEvent* RecvRequest::prepareResponse() {
         new_event->Register();
         return new_event;
     } else if (req_.GetMethod() == "POST") {
-        if (CGI::IsCGI(req_.GetRequestTarget())) {
-            class CGI cgi(req_);
+        if (CGI::IsCGI(uri, "POST")) {
+            class CGI cgi(uri, req_);
             cgi.Run();
             new_event = new WriteCGI(cgi, stream_, req_);
             this->Unregister();
@@ -109,7 +110,7 @@ const ServerConfig RecvRequest::searchServerConfig() {
     const const_iterator it_end = config_list.end();
 
     for (; it != it_end; it++) {
-        if (it->getServerName() == req_.GetHeaderValue("Host")) {
+        if (it->GetServerName() == req_.GetHeaderValue("Host")) {
             return *it;
         }
     }

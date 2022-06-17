@@ -1,15 +1,32 @@
 #include "URI.hpp"
 
+#include <cerrno>
 #include <string>
+#include <sys/stat.h>
 #include <utility>
 
+#include "Config.hpp"
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
+#include "SysError.hpp"
 
-URI::URI(const ServerConfig& server_config, const std::string target)
+URI::URI(const ServerConfig server_config, const std::string target)
     : server_config_(server_config), raw_target_(target) {}
 
 URI::~URI() {}
+
+const ServerConfig& URI::GetServerConfig() const { return server_config_; }
+const std::string&  URI::GetRawTarget() const { return raw_target_; }
+const std::string&  URI::GetExtension() const { return extension_; }
+const std::string&  URI::GetRawPath() const { return raw_path_; }
+const std::string&  URI::GetQuery() const { return query_; }
+
+const std::vector<std::string>& URI::GetArgs() const { return args_; }
+const LocationConfig&           URI::GetLocationConfig() const {
+    return location_config_;
+}
+const std::string& URI::GetLocalPath() const { return local_path_; }
+const struct stat& URI::GetStat() const { return stat_buf_; }
 
 void URI::Init() {
     // raw_targetを'?'で分割する
@@ -20,6 +37,8 @@ void URI::Init() {
     findLocationConfig();
     // location_configのtargetからlocal_pathを作成する
     storeLocalPath();
+    // local_path_のstat取得
+    statLocalPath();
 }
 
 // raw_target を <raw_path_> '?' <query_> に分割する
@@ -29,7 +48,11 @@ void URI::divideRawTarget() {
 
     p         = divideByTheFirstDelimiterFound(raw_target, "?");
     raw_path_ = p.first;
-    query_    = p.second;
+    std::string::size_type dot_pos = raw_path_.rfind(".");
+    if (dot_pos != std::string::npos) {
+        extension_ = raw_path_.substr(dot_pos);
+    }
+    query_ = p.second;
 }
 
 // str を <first> 'sep' <last> に分割する
@@ -97,7 +120,7 @@ void URI::findLocationConfig() {
                      const LocationConfig>::const_reverse_iterator
         const_reverse_iterator;
 
-    const location_map& locations = server_config_.getLocationConfigs();
+    location_map locations = server_config_.GetLocationConfigs();
 
     // location configを決定する
     std::string            location_target_dir;
@@ -120,12 +143,22 @@ void URI::findLocationConfig() {
 }
 
 void URI::storeLocalPath() {
-    std::string location_target_dir = location_config_.getTarget();
+    std::string location_target_dir = location_config_.GetTarget();
     if (*location_target_dir.rbegin() != '/') {
         location_target_dir += "/";
     }
 
     // local_path_を設定する
-    local_path_ = location_config_.getAlias() +
-                  raw_path_.substr(location_target_dir.length());
+    std::string alias = location_config_.GetAlias();
+    if (*alias.rbegin() != '/') {
+        alias += "/";
+    }
+    local_path_ = alias + raw_path_.substr(location_target_dir.length());
+}
+
+void URI::statLocalPath() {
+    stat(local_path_.c_str(), &stat_buf_);
+    // if (stat(local_path_.c_str(), &stat_buf_) < 0) {
+    //     throw SysError("stat", errno);
+    // }
 }

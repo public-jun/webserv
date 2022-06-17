@@ -9,9 +9,9 @@ Delete::Delete(StreamSocket stream, HTTPRequest req)
 
 Delete::~Delete() {}
 
-void Delete::Register() { EventRegister::Instance().AddWriteEvent(this); }
+void Delete::Register() {}
 
-void Delete::Unregister() { EventRegister::Instance().DelWriteEvent(this); }
+void Delete::Unregister() {}
 
 void Delete::Run() {
     std::string target_path = req_.GetRequestTarget();
@@ -37,7 +37,7 @@ IOEvent* Delete::RegisterNext() {
     std::cout << resp_.ConvertToStr() << std::endl;
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
-    EventRegister::Instance().AddWriteEvent(send_response);
+    send_response->Register();
 
     return send_response;
 }

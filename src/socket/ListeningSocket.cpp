@@ -12,9 +12,7 @@
 #include "Socket.hpp"
 #include "SysError.hpp"
 
-ListeningSocket::ListeningSocket() : Socket(LISTENING) {}
-
-ListeningSocket::ListeningSocket(std::vector<const ServerConfig> config)
+ListeningSocket::ListeningSocket(const std::vector<const ServerConfig> config)
     : Socket(LISTENING), config_(config) {}
 
 ListeningSocket::~ListeningSocket() {}

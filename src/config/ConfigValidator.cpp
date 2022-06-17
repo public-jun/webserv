@@ -2,7 +2,7 @@
 
 ConfigValidator* ConfigValidator::instance_ = 0;
 
-ConfigValidator* ConfigValidator::instance() {
+ConfigValidator* ConfigValidator::Instance() {
     if (instance_ == 0)
         instance_ = new ConfigValidator;
     return instance_;
@@ -21,7 +21,7 @@ ConfigValidator& ConfigValidator::operator=(const ConfigValidator& src) {
     return (*this);
 }
 
-void ConfigValidator::validateConfigFile(
+void ConfigValidator::ValidateConfigFile(
     const std::vector<std::string> tokens) {
     if (tokens.size() == 0)
         return;
@@ -74,7 +74,7 @@ void ConfigValidator::checkDerective(const std::vector<std::string> tokens,
     while (it[BEGIN] != tokens.end()) {
         it[BEGIN] = std::find(it[BEGIN], tokens.end(), "{");
         it[END]   = it[BEGIN];
-        Utils::findEndBrace(++it[END]);
+        Utils::FindEndBrace(++it[END]);
         try {
             scanDerective(it, target);
         } catch (...) { throw; }
@@ -86,7 +86,7 @@ void ConfigValidator::scanDerective(str_vec_itr       it[2],
                                     const std::string target) {
     while (++it[BEGIN] != it[END]) {
         if (*it[BEGIN] == "{")
-            Utils::findEndBrace(++it[BEGIN]);
+            Utils::FindEndBrace(++it[BEGIN]);
         if (!isValidDirectiveName(it[BEGIN], target))
             throw(std::runtime_error(ERR_MSG_INVLD_DRCTV));
         if (isDerectiveDuplicated(it[BEGIN], it[END]))
@@ -128,10 +128,10 @@ bool ConfigValidator::isDirective(str_vec_itr it) {
             Config::DELIMITERS.find(*it) == std::string::npos);
 }
 
-e_drctv_cd ConfigValidator::getDirectiveCode(std::string target) {
-    std::map<const e_drctv_cd, std::string> directive_names =
+EDrctvCd ConfigValidator::getDirectiveCode(std::string target) {
+    std::map<const EDrctvCd, std::string> directive_names =
         Config::DERECTIVE_NAMES;
-    std::map<const e_drctv_cd, std::string>::iterator it =
+    std::map<const EDrctvCd, std::string>::iterator it =
         directive_names.begin();
     while (it != Config::DERECTIVE_NAMES.end() && it->second != target)
         it++;
@@ -153,7 +153,7 @@ void ConfigValidator::checkMainDirectives(
     it[END]   = tokens.end();
     while (it[BEGIN] != it[END]) {
         if (*it[BEGIN] == "{")
-            Utils::findEndBrace(++it[BEGIN]);
+            Utils::FindEndBrace(++it[BEGIN]);
         if (*it[BEGIN] != "}" && *it[BEGIN] != Config::DERECTIVE_NAMES.at(SRVR))
             throw(std::runtime_error(ERR_MSG_INVLD_DRCTV));
         it[BEGIN]++;

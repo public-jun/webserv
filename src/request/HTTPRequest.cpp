@@ -12,9 +12,9 @@
 #include <sstream>
 #include <stdexcept>
 
-const std::string HTTPRequest::crlf = "\r\n";
+const std::string HTTPRequest::CRLF = "\r\n";
 
-const std::string::size_type HTTPRequest::crlf_size = crlf.size();
+const std::string::size_type HTTPRequest::CRLF_SIZE = CRLF.size();
 
 HTTPRequest::HTTPRequest() : status_(status::ok) {}
 

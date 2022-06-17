@@ -12,7 +12,7 @@
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
 
-const std::size_t ReadCGI::buf_size = 2048;
+const std::size_t ReadCGI::BUF_SIZE = 2048;
 
 ReadCGI::ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req)
     : IOEvent(fd_read_from_cgi, READ_CGI), stream_(stream), req_(req),
@@ -27,10 +27,10 @@ ReadCGI::~ReadCGI() {
 }
 
 void ReadCGI::Run() {
-    char buf[buf_size];
+    char buf[BUF_SIZE];
     int  fd_from_cgi = polled_fd_;
 
-    int read_size = read(fd_from_cgi, buf, buf_size);
+    int read_size = read(fd_from_cgi, buf, BUF_SIZE);
     if (read_size < 0) {
         throw SysError("read", errno);
     } else if (read_size == 0) {
