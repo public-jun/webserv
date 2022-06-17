@@ -10,7 +10,6 @@
 
 class ReadFile : public IOEvent {
 public:
-    ReadFile(StreamSocket stream, HTTPRequest req);
     ReadFile(StreamSocket stream, int fd);
     virtual ~ReadFile();
 

@@ -18,13 +18,10 @@
 const std::size_t ReadFile::buf_size = 2048;
 
 ReadFile::ReadFile(StreamSocket stream, int fd)
-    : IOEvent(fd), stream_(stream) {}
+    : IOEvent(fd, READ_FILE), stream_(stream) {}
 
 ReadFile::ReadFile()
     : IOEvent(READ_FILE), stream_(StreamSocket()), resp_(HTTPResponse()) {}
-
-ReadFile::ReadFile(StreamSocket stream, HTTPRequest req)
-    : IOEvent(READ_FILE), stream_(stream), req_(req), resp_(HTTPResponse()) {}
 
 ReadFile::~ReadFile() {
     int fd = polled_fd_;
@@ -39,6 +36,7 @@ void ReadFile::Run() {
     int  fd = polled_fd_;
 
     int read_size = read(fd, buf, buf_size);
+    // TODO: エラー処理
     file_content_.append(buf, read_size);
 }
 
