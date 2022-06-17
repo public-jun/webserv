@@ -2,7 +2,7 @@
 
 ConfigParser* ConfigParser::instance_ = 0;
 
-ConfigParser* ConfigParser::instance() {
+ConfigParser* ConfigParser::Instance() {
     if (instance_ == 0)
         instance_ = new ConfigParser;
     return instance_;
@@ -58,8 +58,8 @@ std::vector<std::string> ConfigParser::tokenize(std::ifstream& ifs) {
     return (tokens);
 }
 
-void ConfigParser::parseConfigFile(const std::string confPath) {
-    std::ifstream            ifs(confPath);
+void ConfigParser::ParseConfigFile(const std::string conf_path) {
+    std::ifstream            ifs(conf_path);
     std::vector<std::string> tokens;
 
     if (!ifs)
@@ -67,7 +67,7 @@ void ConfigParser::parseConfigFile(const std::string confPath) {
     tokens = tokenize(ifs);
     ifs.close();
     try {
-        ConfigValidator::validateConfigFile(tokens);
+        ConfigValidator::ValidateConfigFile(tokens);
         setupConfig(tokens);
     } catch (...) { throw; }
 }
@@ -84,7 +84,7 @@ void ConfigParser::setupServerConfig(const std::vector<std::string> tokens) {
     while (it[BEGIN] != tokens.end()) {
         it[BEGIN] = std::find(it[BEGIN], tokens.end(), "{");
         it[END]   = it[BEGIN];
-        Utils::findEndBrace(++it[END]);
+        Utils::FindEndBrace(++it[END]);
 
         ServerConfig server_config = ServerConfig();
 
@@ -93,7 +93,7 @@ void ConfigParser::setupServerConfig(const std::vector<std::string> tokens) {
         setupMaxClientBodySize(it, server_config);
         setupErrorPage(it, server_config);
         setupLocationConfig(it[BEGIN], it[END], server_config);
-        Config::addServerConfig(server_config);
+        Config::AddServerConfig(server_config);
         it[BEGIN] = std::find(it[BEGIN], tokens.end(),
                               Config::DERECTIVE_NAMES.at(SRVR));
     }
@@ -107,7 +107,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
         std::string target = *++it[BEGIN];
         it[BEGIN]          = std::find(it[BEGIN], end, "{");
         it[END]            = it[BEGIN];
-        Utils::findEndBrace(++it[END]);
+        Utils::FindEndBrace(++it[END]);
 
         LocationConfig location_config = LocationConfig();
         setupTarget(target, location_config);
@@ -118,7 +118,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
         setupCgiExtensions(it, location_config);
         setupReturn(it, location_config);
 
-        server_config.setLocationConfigs(location_config);
+        server_config.SetLocationConfigs(location_config);
         it[BEGIN] = std::find(it[BEGIN], end, Config::DERECTIVE_NAMES.at(LCTN));
     }
 }
@@ -127,7 +127,7 @@ void ConfigParser::setupListen(str_vec_itr it[2], ServerConfig& server_config) {
     str_vec_itr listen =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(LSTN));
     if (listen != it[END])
-        server_config.setListen(std::strtol((*++listen).c_str(), NULL, 10));
+        server_config.SetListen(std::strtol((*++listen).c_str(), NULL, 10));
 }
 
 void ConfigParser::setupServerName(str_vec_itr   it[2],
@@ -135,7 +135,7 @@ void ConfigParser::setupServerName(str_vec_itr   it[2],
     str_vec_itr server_name =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(SRVR_NM));
     if (server_name != it[END])
-        server_config.setServerName(*++server_name);
+        server_config.SetServerName(*++server_name);
 }
 
 void ConfigParser::setupMaxClientBodySize(str_vec_itr   it[2],
@@ -143,7 +143,7 @@ void ConfigParser::setupMaxClientBodySize(str_vec_itr   it[2],
     str_vec_itr max_client_body_size = std::find(
         it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(MX_CLNT_BDY_SZ));
     if (max_client_body_size != it[END])
-        server_config.setMaxClientBodySize(*++max_client_body_size);
+        server_config.SetMaxClientBodySize(*++max_client_body_size);
 }
 
 void ConfigParser::setupErrorPage(str_vec_itr   it[2],
@@ -154,14 +154,14 @@ void ConfigParser::setupErrorPage(str_vec_itr   it[2],
         error_page =
             std::find(error_page, it[END], Config::DERECTIVE_NAMES.at(ERR_PG));
         if (error_page != it[END])
-            server_config.setErrorPage(
+            server_config.SetErrorPage(
                 std::strtol((*++error_page).c_str(), NULL, 10), *++error_page);
     }
 }
 
 void ConfigParser::setupTarget(std::string     target,
                                LocationConfig& location_config) {
-    location_config.setTarget(target);
+    location_config.SetTarget(target);
 }
 
 void ConfigParser::setupAllowedMethod(str_vec_itr     it[2],
@@ -170,7 +170,7 @@ void ConfigParser::setupAllowedMethod(str_vec_itr     it[2],
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALLWD_MTHD));
     if (allowed_method != it[END])
         while (*++allowed_method != ";")
-            location_config.setAllowedMethods(*allowed_method);
+            location_config.SetAllowedMethods(*allowed_method);
 }
 
 void ConfigParser::setupAlias(str_vec_itr     it[2],
@@ -178,7 +178,7 @@ void ConfigParser::setupAlias(str_vec_itr     it[2],
     str_vec_itr alias =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALIAS));
     if (alias != it[END])
-        location_config.setAlias(*++alias);
+        location_config.SetAlias(*++alias);
 }
 
 void ConfigParser::setupAutoIndex(str_vec_itr     it[2],
@@ -186,7 +186,7 @@ void ConfigParser::setupAutoIndex(str_vec_itr     it[2],
     str_vec_itr auto_index =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(AUTO_INDX));
     if (auto_index != it[END])
-        location_config.setAutoIndex(*++auto_index);
+        location_config.SetAutoIndex(*++auto_index);
 }
 
 void ConfigParser::setupIndex(str_vec_itr     it[2],
@@ -194,7 +194,7 @@ void ConfigParser::setupIndex(str_vec_itr     it[2],
     str_vec_itr index =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(INDX));
     if (index != it[END])
-        location_config.setIndex(*++index);
+        location_config.SetIndex(*++index);
 }
 
 void ConfigParser::setupCgiExtensions(str_vec_itr     it[2],
@@ -203,7 +203,7 @@ void ConfigParser::setupCgiExtensions(str_vec_itr     it[2],
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(CGI));
     if (cgi_extensions != it[END])
         while (*++cgi_extensions != ";")
-            location_config.setCgiExtensions(*cgi_extensions);
+            location_config.SetCgiExtensions(*cgi_extensions);
 }
 
 void ConfigParser::setupReturn(str_vec_itr     it[2],
@@ -211,5 +211,5 @@ void ConfigParser::setupReturn(str_vec_itr     it[2],
     str_vec_itr rtrn =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(RTRN));
     if (rtrn != it[END])
-        location_config.setReturn(strtol((*++rtrn).c_str(), NULL, 10), *++rtrn);
+        location_config.SetReturn(strtol((*++rtrn).c_str(), NULL, 10), *++rtrn);
 }

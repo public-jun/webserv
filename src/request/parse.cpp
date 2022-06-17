@@ -151,7 +151,7 @@ void parse_header_line(HTTPRequest& req, const std::string& line) {
     }
 
     value = trim_space(value);
-    if (value.find_first_of(HTTPRequest::crlf) != value.npos) {
+    if (value.find_first_of(HTTPRequest::CRLF) != value.npos) {
         throw_code_badrequest("error value");
     }
 
@@ -180,13 +180,13 @@ void parse_firstline(HTTPRequest& req, const std::string& line) {
 }
 
 bool split_to_line(std::string& buf, std::string& line) {
-    std::string::size_type line_end_pos = buf.find(HTTPRequest::crlf);
+    std::string::size_type line_end_pos = buf.find(HTTPRequest::CRLF);
     if (line_end_pos == buf.npos) {
         return false;
     }
 
     line = buf.substr(0, line_end_pos);
-    buf  = buf.substr(line_end_pos + HTTPRequest::crlf_size);
+    buf  = buf.substr(line_end_pos + HTTPRequest::CRLF_SIZE);
     return true;
 }
 

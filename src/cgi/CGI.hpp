@@ -44,8 +44,8 @@ private:
     int pipe_for_cgi_write_[2];
     int pipe_for_cgi_read_[2];
 
-    static const std::map<std::string, std::string> binaries;
-    static const std::map<std::string, std::string> commands;
+    static const std::map<std::string, std::string> BINARIES;
+    static const std::map<std::string, std::string> COMMANDS;
     static std::map<std::string, std::string>       setBinaries();
     static std::map<std::string, std::string>       setCommands();
 };

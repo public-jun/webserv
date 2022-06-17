@@ -13,10 +13,10 @@ Utils& Utils::operator=(const Utils& src) {
     return (*this);
 }
 
-void Utils::findEndBrace(str_vec_itr& it) {
+void Utils::FindEndBrace(str_vec_itr& it) {
     while (*it != "}") {
         if (*it == "{")
-            findEndBrace(++it);
+            FindEndBrace(++it);
         it++;
     }
 }
