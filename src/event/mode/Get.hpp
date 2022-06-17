@@ -15,6 +15,7 @@ public:
 
 private:
     void autoIndex(std::string path);
+    void prepareReadFile(std::string path);
 
     StreamSocket stream_;
     IOEvent*     next_event_;

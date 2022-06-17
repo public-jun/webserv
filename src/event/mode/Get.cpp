@@ -17,23 +17,6 @@ Get::Get(StreamSocket stream, URI& uri) : stream_(stream), uri_(uri) {}
 
 Get::~Get() {}
 
-/*
-<head>
-<title>Index of /dir/</title>
-</head>
-<body>
-<h1>Index of /dir/</h1>
-<hr>
-<pre>
-<a href="../">../</a>
-<a href="hoge.html">hoge.html«/a>
-17-Jun-2022 03:14 5
-</pre>
-<hr>
-</body>
-</html>
-*/
-
 void Get::autoIndex(std::string path) {
     DIR* dir = opendir(path.c_str());
     if (dir == NULL) {
@@ -53,7 +36,7 @@ void Get::autoIndex(std::string path) {
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
         std::string file_name = ent->d_name;
-        ss << "<a href=\"" << file_name << ">" << file_name << "</a>\r\n";
+        ss << "<a href=\"" << file_name << "\">" << file_name << "</a>\r\n";
     }
     ss << "</pre>\r\n"
        << "<hr>\r\n"
@@ -66,45 +49,33 @@ void Get::autoIndex(std::string path) {
     size << content.size();
     resp.AppendHeader("Content-Length", size.str());
     resp.SetBody(content);
-    std::cout << resp.ConvertToStr() << std::endl;
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
+void Get::prepareReadFile(std::string path) {
+    int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
+    if (fd == -1) {
+        perror("open");
+        // internal server error;
+        std::cout << "error" << std::endl;
+    }
+    next_event_ = new ReadFile(stream_, fd);
+}
+
 void Get::Run() {
-    (void)uri_;
-    /* autoIndex(); */
-    /* exit(0); */
+    std::string path = uri_.GetLocalPath();
+    struct stat s    = uri_.GetStat();
 
-    std::string path;
-    /* path = "index.html"; */
-    path = "./src";
-    /* path = "no_auth.txt"; */
-    /* path = "no_such_file"; */
-
-    struct stat ss;
-    stat(path.c_str(), &ss);
-
-    // 404, 403の処理
-
-    if (!((ss.st_mode & S_IRUSR) == S_IRUSR)) {
+    // 403の処理
+    if (!((s.st_mode & S_IRUSR) == S_IRUSR)) {
         std::cout << "permission denied " << std::endl;
         throw status::forbidden;
     }
 
-    // ディレクトリか
-    if (S_ISDIR(ss.st_mode)) {
-        std::cout << "is dir" << std::endl;
+    if (S_ISDIR(s.st_mode)) {
         autoIndex(path);
-        return;
     } else {
-        int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
-        std::cout << "fd: " << fd << std::endl;
-        if (fd == -1) {
-            // internal server error;
-            std::cout << "error" << std::endl;
-        }
-        // ReadFileを登録
-        next_event_ = new ReadFile(stream_, fd);
+        prepareReadFile(path);
     }
 }
 
