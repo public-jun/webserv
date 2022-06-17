@@ -11,16 +11,16 @@
 
 class Config {
 public:
-    static Config*                                       instance();
-    static const std::string                             DELIMITERS;
-    static const int                                     MAX_PORT_NUM;
-    static const std::map<const e_drctv_cd, std::string> DERECTIVE_NAMES;
-    static const std::map<const e_drctv_cd, std::vector<std::string> >
+    static Config*                                     Instance();
+    static const std::string                           DELIMITERS;
+    static const int                                   MAX_PORT_NUM;
+    static const std::map<const EDrctvCd, std::string> DERECTIVE_NAMES;
+    static const std::map<const EDrctvCd, std::vector<std::string> >
                                           DERECTIVE_MAP;
     static const std::vector<std::string> ALLOWED_METHODS;
-    static void addServerConfig(const ServerConfig& server_config);
+    static void AddServerConfig(const ServerConfig& server_config);
     static std::map<int, std::vector<const ServerConfig> > GetServerConfigs();
-    static void                                            printConfigs();
+    static void                                            PrintConfigs();
 
 protected:
     Config();
@@ -31,8 +31,8 @@ protected:
 private:
     static Config*                                         instance_;
     static std::map<int, std::vector<const ServerConfig> > server_configs_;
-    static const std::map<const e_drctv_cd, std::string> createDerectiveNames();
-    static const std::map<const e_drctv_cd, std::vector<std::string> >
+    static const std::map<const EDrctvCd, std::string> createDerectiveNames();
+    static const std::map<const EDrctvCd, std::vector<std::string> >
                                           createDerectiveMap();
     static const std::vector<std::string> createAllowedMethodsVec();
     static void                           setupConfig();

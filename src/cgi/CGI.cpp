@@ -17,9 +17,9 @@
 
 #include <iostream>
 
-const std::map<std::string, std::string> CGI::binaries = CGI::setBinaries();
+const std::map<std::string, std::string> CGI::BINARIES = CGI::setBinaries();
 
-const std::map<std::string, std::string> CGI::commands = CGI::setCommands();
+const std::map<std::string, std::string> CGI::COMMANDS = CGI::setCommands();
 
 CGI::CGI(const URI& uri, const HTTPRequest& req) : uri_(uri), req_(req) {
     // pipeの初期化
@@ -34,7 +34,7 @@ bool CGI::IsCGI(const URI& uri, const std::string& method) {
     const LocationConfig& location_config = uri.GetLocationConfig();
 
     const std::vector<std::string> allowed_methods =
-        location_config.getAllowedMethods();
+        location_config.GetAllowedMethods();
 
     // methodが許可されているか
     if (std::find(allowed_methods.begin(), allowed_methods.end(), method) ==
@@ -49,7 +49,7 @@ bool CGI::IsCGI(const URI& uri, const std::string& method) {
     }
 
     const std::vector<std::string> cgi_extensions =
-        location_config.getCgiExtensions();
+        location_config.GetCgiExtensions();
     // 拡張子がcgi_extentionに含まれているか
     if (std::find(cgi_extensions.begin(), cgi_extensions.end(), extension) ==
         cgi_extensions.end()) {
@@ -83,14 +83,14 @@ void CGI::cgiParseRequest() {}
 
 std::string CGI::makeExecutableBinary() {
     // 拡張子によって実行ファイルのパスを決定する
-    return binaries.find(uri_.GetExtension())->second;
+    return BINARIES.find(uri_.GetExtension())->second;
 }
 
 std::vector<std::string> CGI::makeArgs() {
     std::vector<std::string> args;
 
     // command設定
-    args.push_back(commands.find(uri_.GetExtension())->second);
+    args.push_back(COMMANDS.find(uri_.GetExtension())->second);
     // 実行するスクリプトファイルのパス設定
     args.push_back(uri_.GetLocalPath());
     // 残りの引数設定
@@ -121,9 +121,9 @@ std::vector<std::string> CGI::makeEnvs() {
 
     env_map["REQUEST_METHOD"] = req_.GetMethod();
     env_map["SCRIPT_NAME"]    = uri_.GetRawPath();
-    env_map["SERVER_NAME"]    = uri_.GetServerConfig().getServerName();
+    env_map["SERVER_NAME"]    = uri_.GetServerConfig().GetServerName();
 
-    oss << uri_.GetServerConfig().getListen() << std::flush;
+    oss << uri_.GetServerConfig().GetListen() << std::flush;
     env_map["SERVER_PORT"] = oss.str();
     oss.str("");
     env_map["SERVER_PROTOCOL"] = req_.GetVersion();

@@ -24,8 +24,8 @@
 
 class ConfigValidator {
 public:
-    static ConfigValidator* instance();
-    static void validateConfigFile(const std::vector<std::string> tokens);
+    static ConfigValidator* Instance();
+    static void ValidateConfigFile(const std::vector<std::string> tokens);
 
 protected:
     ConfigValidator();
@@ -35,27 +35,27 @@ protected:
 
 private:
     static ConfigValidator*           instance_;
-    static std::map<int, std::string> listen_server_name_map;
-    static bool isValidBraceNum(const std::vector<std::string> tokens);
-    static bool isValidBracePlace(const std::vector<std::string> tokens,
-                                  const std::string              target);
-    static bool isServerExist(const std::vector<std::string> tokens);
-    static void checkDerective(const std::vector<std::string> tokens,
-                               const std::string              target);
-    static void scanDerective(str_vec_itr it[2], const std::string target);
-    static bool isDerectiveDuplicated(str_vec_itr begin, str_vec_itr end);
-    static bool isDirective(str_vec_itr it);
-    static e_drctv_cd getDirectiveCode(std::string target);
-    static bool       isValidDirectiveName(str_vec_itr it, std::string target);
-    static void checkMainDirectives(const std::vector<std::string> tokens);
-    static bool isValidValueNum(str_vec_itr it);
-    static bool isLocationDuplicated(str_vec_itr begin, str_vec_itr end);
-    static bool isValidErrorPage(str_vec_itr begin);
-    static bool isValidAllowedMethod(str_vec_itr begin);
-    static bool isValidAutoIndex(str_vec_itr begin);
-    static bool isValidReturn(str_vec_itr begin);
-    static bool isValidListen(str_vec_itr begin);
-    static bool isDigit(const std::string& str);
+    static std::map<int, std::string> listen_server_name_map_;
+    static bool     isValidBraceNum(const std::vector<std::string> tokens);
+    static bool     isValidBracePlace(const std::vector<std::string> tokens,
+                                      const std::string              target);
+    static bool     isServerExist(const std::vector<std::string> tokens);
+    static void     checkDerective(const std::vector<std::string> tokens,
+                                   const std::string              target);
+    static void     scanDerective(str_vec_itr it[2], const std::string target);
+    static bool     isDerectiveDuplicated(str_vec_itr begin, str_vec_itr end);
+    static bool     isDirective(str_vec_itr it);
+    static EDrctvCd getDirectiveCode(std::string target);
+    static bool     isValidDirectiveName(str_vec_itr it, std::string target);
+    static void     checkMainDirectives(const std::vector<std::string> tokens);
+    static bool     isValidValueNum(str_vec_itr it);
+    static bool     isLocationDuplicated(str_vec_itr begin, str_vec_itr end);
+    static bool     isValidErrorPage(str_vec_itr begin);
+    static bool     isValidAllowedMethod(str_vec_itr begin);
+    static bool     isValidAutoIndex(str_vec_itr begin);
+    static bool     isValidReturn(str_vec_itr begin);
+    static bool     isValidListen(str_vec_itr begin);
+    static bool     isDigit(const std::string& str);
 };
 
 #endif

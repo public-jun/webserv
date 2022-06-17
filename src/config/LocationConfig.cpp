@@ -13,7 +13,7 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& src) {
     if (this != &src) {
         this->target_          = src.target_;
         this->allowed_methods_ = src.allowed_methods_;
-        this->alias_            = src.alias_;
+        this->alias_           = src.alias_;
         this->auto_index_      = src.auto_index_;
         this->index_           = src.index_;
         this->cgi_extensions_  = src.cgi_extensions_;
@@ -22,46 +22,46 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& src) {
     return (*this);
 }
 
-void LocationConfig::setTarget(std::string target) { this->target_ = target; }
+void LocationConfig::SetTarget(std::string target) { this->target_ = target; }
 
-void LocationConfig::setAllowedMethods(std::string allowed_method) {
+void LocationConfig::SetAllowedMethods(std::string allowed_method) {
     this->allowed_methods_.push_back(allowed_method);
 }
 
-void LocationConfig::setAlias(std::string alias) { this->alias_ = alias; }
+void LocationConfig::SetAlias(std::string alias) { this->alias_ = alias; }
 
-void LocationConfig::setAutoIndex(std::string auto_index) {
+void LocationConfig::SetAutoIndex(std::string auto_index) {
     this->auto_index_ = auto_index == "on" ? ON : OFF;
 }
 
-void LocationConfig::setIndex(std::string index) { this->index_ = index; }
+void LocationConfig::SetIndex(std::string index) { this->index_ = index; }
 
-void LocationConfig::setCgiExtensions(std::string cgi_extension) {
+void LocationConfig::SetCgiExtensions(std::string cgi_extension) {
     this->cgi_extensions_.push_back(cgi_extension);
 }
 
-void LocationConfig::setReturn(int status_code, std::string url) {
+void LocationConfig::SetReturn(int status_code, std::string url) {
     this->return_ = std::make_pair(status_code, url);
 }
 
-std::string LocationConfig::getTarget() const { return (this->target_); }
+std::string LocationConfig::GetTarget() const { return (this->target_); }
 
-std::vector<std::string> LocationConfig::getAllowedMethods() const {
+std::vector<std::string> LocationConfig::GetAllowedMethods() const {
     return (this->allowed_methods_);
 }
 
-std::string LocationConfig::getAlias() const { return (this->alias_); }
+std::string LocationConfig::GetAlias() const { return (this->alias_); }
 
-e_auto_index_type LocationConfig::getAutoIndex() const {
+EAutoIndexType LocationConfig::GetAutoIndex() const {
     return (this->auto_index_);
 }
 
-std::string LocationConfig::getIndex() const { return (this->index_); }
+std::string LocationConfig::GetIndex() const { return (this->index_); }
 
-std::vector<std::string> LocationConfig::getCgiExtensions() const {
+std::vector<std::string> LocationConfig::GetCgiExtensions() const {
     return (this->cgi_extensions_);
 }
 
-std::pair<int, std::string> LocationConfig::getReturn() const {
+std::pair<int, std::string> LocationConfig::GetReturn() const {
     return (this->return_);
 }

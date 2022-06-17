@@ -5,11 +5,11 @@
 const std::string CONF_PATH = "./config/error";
 
 void testParseConfigError(std::string file_path, std::string expect) {
-    EXPECT_ANY_THROW(ConfigParser::parseConfigFile(file_path));
+    EXPECT_ANY_THROW(ConfigParser::ParseConfigFile(file_path));
 
     testing::internal::CaptureStderr();
     try {
-        ConfigParser::parseConfigFile(file_path);
+        ConfigParser::ParseConfigFile(file_path);
     } catch (const std::exception& e) { std::cerr << e.what(); }
 
     std::string actual = testing::internal::GetCapturedStderr();

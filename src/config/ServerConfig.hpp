@@ -15,18 +15,18 @@ public:
     ~ServerConfig();
     ServerConfig& operator=(const ServerConfig& src);
 
-    void setListen(int listen);
-    void setServerName(std::string serverName);
-    void setMaxClientBodySize(std::string clientMaxBodySize);
-    void setErrorPage(int status_code, std::string location);
-    void setLocationConfigs(LocationConfig& location_config);
+    void SetListen(int listen);
+    void SetServerName(std::string server_name);
+    void SetMaxClientBodySize(std::string client_max_body_size);
+    void SetErrorPage(int status_code, std::string location);
+    void SetLocationConfigs(LocationConfig& location_config);
 
-    int                        getListen() const;
-    std::string                getServerName() const;
-    std::string                getMaxClientBodySize() const;
-    std::map<int, std::string> getErrorPage() const;
+    int                        GetListen() const;
+    std::string                GetServerName() const;
+    std::string                GetMaxClientBodySize() const;
+    std::map<int, std::string> GetErrorPage() const;
     std::map<const std::string, const LocationConfig>
-    getLocationConfigs() const;
+    GetLocationConfigs() const;
 
 private:
     int                                               listen_;

@@ -16,10 +16,10 @@ public:
 
     std::string ConvertToStr() const;
 
-    static const std::string default_version;
+    static const std::string DEFAULT_VERSION;
 
 private:
-    static std::map<int, std::string> status_text;
+    static std::map<int, std::string> status_text_;
 
     std::string                        HTTPVersion_;
     int                                status_code_;

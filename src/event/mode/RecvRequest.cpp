@@ -20,7 +20,7 @@
 #include <iostream>
 #include <utility>
 
-const size_t RecvRequest::buf_size = 2048;
+const size_t RecvRequest::BUF_SIZE = 2048;
 
 RecvRequest::RecvRequest()
     : IOEvent(RECV_REQUEST), stream_(StreamSocket()), req_(HTTPRequest()),
@@ -33,8 +33,8 @@ RecvRequest::RecvRequest(StreamSocket stream)
 RecvRequest::~RecvRequest() {}
 
 void RecvRequest::Run() {
-    char buf[buf_size];
-    int  recv_size = recv(stream_.GetSocketFd(), buf, buf_size, 0);
+    char buf[BUF_SIZE];
+    int  recv_size = recv(stream_.GetSocketFd(), buf, BUF_SIZE, 0);
 
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
@@ -110,7 +110,7 @@ const ServerConfig RecvRequest::searchServerConfig() {
     const const_iterator it_end = config_list.end();
 
     for (; it != it_end; it++) {
-        if (it->getServerName() == req_.GetHeaderValue("Host")) {
+        if (it->GetServerName() == req_.GetHeaderValue("Host")) {
             return *it;
         }
     }

@@ -18,7 +18,7 @@ public:
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
-    static const std::size_t buf_size;
+    static const std::size_t BUF_SIZE;
 
 private:
     ReadCGI();
