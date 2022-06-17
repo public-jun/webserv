@@ -7,6 +7,7 @@
 #include "CGI.hpp"
 #include "Delete.hpp"
 #include "EventRegister.hpp"
+#include "Get.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
 #include "ReadCGI.hpp"
@@ -66,6 +67,8 @@ IOEvent* RecvRequest::prepareResponse() {
 
     // URI クラス作成
     URI uri(searchServerConfig(), req_.GetRequestTarget());
+    uri.Init();
+    std::cout << "init end" << std::endl;
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
@@ -74,7 +77,9 @@ IOEvent* RecvRequest::prepareResponse() {
             cgi.Run();
             new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
         } else {
-            new_event = new ReadFile(stream_, req_);
+            Get get(stream_, uri);
+            get.Run();
+            new_event = get.NextEvent();
         }
 
         this->Unregister();
