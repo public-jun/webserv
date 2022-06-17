@@ -8,8 +8,7 @@
 #include "Socket.hpp"
 class ListeningSocket : public Socket {
 public:
-    ListeningSocket();
-    ListeningSocket(std::vector<const ServerConfig> config);
+    ListeningSocket(const std::vector<const ServerConfig> config);
     virtual ~ListeningSocket();
 
     const std::vector<const ServerConfig> GetServerConfig() const {
@@ -21,6 +20,7 @@ public:
     void Close();
 
 private:
+    ListeningSocket();
     const std::vector<const ServerConfig> config_;
 };
 

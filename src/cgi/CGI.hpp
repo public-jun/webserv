@@ -7,12 +7,13 @@
 
 #include "ExecveArray.hpp"
 #include "HTTPRequest.hpp"
+#include "URI.hpp"
 class CGI {
 public:
-    CGI(const HTTPRequest req);
+    CGI(const URI& uri, const HTTPRequest& req);
     ~CGI();
 
-    static bool IsCGI(const std::string& target);
+    static bool IsCGI(const URI& uri, const std::string& method);
     void        Run();
     void        ShutDown();
 
@@ -33,11 +34,9 @@ private:
 
 private:
     // To do request から必要な情報を受け取る
-    HTTPRequest req_;
+    const URI&         uri_;
+    const HTTPRequest& req_;
 
-    std::string              extension_;
-    std::string              local_path_;
-    std::string              method_;
     std::string              exec_binary_;
     std::vector<std::string> args_;
     std::vector<std::string> envs_;

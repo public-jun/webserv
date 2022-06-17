@@ -68,12 +68,11 @@ IOEvent* RecvRequest::prepareResponse() {
     // URI クラス作成
     URI uri(searchServerConfig(), req_.GetRequestTarget());
     uri.Init();
-    std::cout << "init end" << std::endl;
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
-        if (CGI::IsCGI(req_.GetRequestTarget())) {
-            class CGI cgi(req_);
+        if (CGI::IsCGI(uri, "GET")) {
+            class CGI cgi(uri, req_);
             cgi.Run();
             new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
         } else {
@@ -86,8 +85,8 @@ IOEvent* RecvRequest::prepareResponse() {
         new_event->Register();
         return new_event;
     } else if (req_.GetMethod() == "POST") {
-        if (CGI::IsCGI(req_.GetRequestTarget())) {
-            class CGI cgi(req_);
+        if (CGI::IsCGI(uri, "POST")) {
+            class CGI cgi(uri, req_);
             cgi.Run();
             new_event = new WriteCGI(cgi, stream_, req_);
             this->Unregister();

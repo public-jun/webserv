@@ -13,6 +13,7 @@
 #include "ExecveArray.hpp"
 #include "HTTPRequest.hpp"
 #include "SysError.hpp"
+#include "URI.hpp"
 
 #include <iostream>
 
@@ -20,8 +21,7 @@ const std::map<std::string, std::string> CGI::binaries = CGI::setBinaries();
 
 const std::map<std::string, std::string> CGI::commands = CGI::setCommands();
 
-CGI::CGI(const HTTPRequest req)
-    : req_(req), extension_(std::string()), local_path_(std::string()) {
+CGI::CGI(const URI& uri, const HTTPRequest& req) : uri_(uri), req_(req) {
     // pipeの初期化
     std::fill_n(pipe_for_cgi_write_, 2, -1);
     std::fill_n(pipe_for_cgi_read_, 2, -1);
@@ -29,17 +29,34 @@ CGI::CGI(const HTTPRequest req)
 
 CGI::~CGI() {}
 
-bool CGI::IsCGI(const std::string& target) {
-    if (target.length() >= 3 && target.substr(target.length() - 3) == ".pl") {
-        return true;
-    } else if (target.length() >= 4 &&
-               target.substr(target.length() - 4) == ".php") {
-        return true;
-    } else if (target.length() >= 3 &&
-               target.substr(target.length() - 3) == ".py") {
-        return true;
+bool CGI::IsCGI(const URI& uri, const std::string& method) {
+
+    const LocationConfig& location_config = uri.GetLocationConfig();
+
+    const std::vector<std::string> allowed_methods =
+        location_config.getAllowedMethods();
+
+    // methodが許可されているか
+    if (std::find(allowed_methods.begin(), allowed_methods.end(), method) ==
+        allowed_methods.end()) {
+        return false;
     }
-    return false;
+
+    // 拡張子を取得
+    std::string extension = uri.GetExtension();
+    if (extension == "") {
+        return false;
+    }
+
+    const std::vector<std::string> cgi_extensions =
+        location_config.getCgiExtensions();
+    // 拡張子がcgi_extentionに含まれているか
+    if (std::find(cgi_extensions.begin(), cgi_extensions.end(), extension) ==
+        cgi_extensions.end()) {
+        return false;
+    }
+
+    return true;
 }
 
 void CGI::Run() {
@@ -62,38 +79,22 @@ int CGI::FdForReadFromCGI() { return pipe_for_cgi_write_[0]; }
 
 int CGI::FdForWriteToCGI() { return pipe_for_cgi_read_[1]; }
 
-void CGI::cgiParseRequest() {
-    std::string target = req_.GetRequestTarget();
-
-    if (target.length() >= 3 && target.substr(target.length() - 3) == ".pl") {
-        extension_ = ".pl";
-    } else if (target.length() >= 4 &&
-               target.substr(target.length() - 4) == ".php") {
-        extension_ = ".php";
-    } else if (target.length() >= 3 &&
-               target.substr(target.length() - 3) == ".py") {
-        extension_ = ".py";
-    }
-
-    local_path_ = target;
-    method_     = req_.GetMethod();
-}
+void CGI::cgiParseRequest() {}
 
 std::string CGI::makeExecutableBinary() {
     // 拡張子によって実行ファイルのパスを決定する
-    return binaries.find(extension_)->second;
+    return binaries.find(uri_.GetExtension())->second;
 }
 
 std::vector<std::string> CGI::makeArgs() {
     std::vector<std::string> args;
 
     // command設定
-    args.push_back(commands.find(extension_)->second);
+    args.push_back(commands.find(uri_.GetExtension())->second);
     // 実行するスクリプトファイルのパス設定
-    args.push_back("." + local_path_);
+    args.push_back(uri_.GetLocalPath());
     // 残りの引数設定
-    // args.push_back("arg0");
-    // args.push_back("arg1");
+    args.insert(args.end(), uri_.GetArgs().begin(), uri_.GetArgs().end());
 
     return args;
 }
@@ -103,25 +104,30 @@ std::vector<std::string> CGI::makeEnvs() {
     std::ostringstream                 oss;
 
     // 環境変数を順に決定
-    env_map["AUTH_TYPE"] = "";
+    env_map["AUTH_TYPE"] = req_.GetHeaderValue("Authorization");
     oss << req_.GetBody().size() << std::flush;
     env_map["CONTENT_LENGTH"] = oss.str();
     oss.str("");
-    env_map["CONTENT_TYPE"]      = "";
-    env_map["GATEWAY_INTERFACE"] = "";
-    env_map["PATH_INFO"]         = "";
-    env_map["PATH_TRANSLATED"]   = "";
-    env_map["QUERY_STRING"]      = "";
-    env_map["REMOTE_ADDR"]       = "";
-    env_map["REMOTE_HOST"]       = "";
-    env_map["REMOTE_IDENT"]      = "";
-    env_map["REMOTE_USER"]       = "";
-    env_map["REQUEST_METHOD"]    = "";
-    env_map["SCRIPT_NAME"]       = "";
-    env_map["SERVER_NAME"]       = "";
-    env_map["SERVER_PORT"]       = "";
-    env_map["SERVER_PROTOCOL"]   = "";
-    env_map["SERVER_SOFTWARE"]   = "";
+    env_map["CONTENT_TYPE"]      = req_.GetHeaderValue("Content-Type");
+    env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
+    env_map["PATH_INFO"]         = uri_.GetRawPath();
+    env_map["PATH_TRANSLATED"]   = uri_.GetLocalPath();
+    env_map["QUERY_STRING"]      = uri_.GetQuery();
+
+    env_map["REMOTE_ADDR"] = ""; // ipアドレス
+    env_map["REMOTE_HOST"] = ""; // ipアドレスから逆引きしたホスト名
+    env_map["REMOTE_IDENT"] = "";
+    env_map["REMOTE_USER"]  = "";
+
+    env_map["REQUEST_METHOD"] = req_.GetMethod();
+    env_map["SCRIPT_NAME"]    = uri_.GetRawPath();
+    env_map["SERVER_NAME"]    = uri_.GetServerConfig().getServerName();
+
+    oss << uri_.GetServerConfig().getListen() << std::flush;
+    env_map["SERVER_PORT"] = oss.str();
+    oss.str("");
+    env_map["SERVER_PROTOCOL"] = req_.GetVersion();
+    env_map["SERVER_SOFTWARE"] = "webserv/1.0.0";
 
     std::vector<std::string> envs;
 
@@ -135,7 +141,7 @@ std::vector<std::string> CGI::makeEnvs() {
 }
 
 void CGI::createPipe() {
-    if (method_ == "POST") {
+    if (req_.GetMethod() == "POST") {
         if (pipe(pipe_for_cgi_read_) < 0) {
             throw SysError("pipe", errno);
         }

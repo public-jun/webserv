@@ -17,8 +17,8 @@ int main(void) {
         EventExecutor executor;
         executor.Init();
 
-        ConfigParser::parseConfigFile("./config/duplicated_port.conf");
-        std::map<int, std::vector<const ServerConfig> > server_configs =
+        ConfigParser::parseConfigFile("./config/google_test.conf");
+        const std::map<int, std::vector<const ServerConfig> >& server_configs =
             Config::instance()->GetServerConfigs();
 
         std::map<int, std::vector<const ServerConfig> >::const_iterator it_end =
@@ -29,8 +29,8 @@ int main(void) {
                  it = server_configs.begin();
              it != it_end; it++) {
 
-            int                             port    = it->first;
-            std::vector<const ServerConfig> configs = it->second;
+            int                                    port    = it->first;
+            const std::vector<const ServerConfig>& configs = it->second;
 
             ListeningSocket ls(configs);
             ls.Bind("127.0.0.1", port);
