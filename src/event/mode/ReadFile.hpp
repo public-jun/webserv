@@ -11,6 +11,7 @@
 class ReadFile : public IOEvent {
 public:
     ReadFile(StreamSocket stream, HTTPRequest req);
+    ReadFile(StreamSocket stream, int fd);
     virtual ~ReadFile();
 
     virtual void     Run();
@@ -18,9 +19,10 @@ public:
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
+    static const std::size_t buf_size;
+
 private:
     ReadFile();
-    void openFile();
     // ReadFile に必要な入力
     StreamSocket stream_;
     HTTPRequest  req_;
