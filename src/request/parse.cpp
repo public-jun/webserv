@@ -11,12 +11,6 @@ void throw_code_badrequest(const std::string err_message = "bad request") {
     throw status::bad_request;
 }
 
-void throw_code_method_not_allowed(
-    const std::string err_message = "method not allowed") {
-    std::cerr << err_message << std::endl;
-    throw status::method_not_allowed;
-}
-
 void throw_code_version_not_supported(
     const std::string err_message = "version not supported") {
     std::cerr << err_message << std::endl;
@@ -114,13 +108,6 @@ void validate_version_not_suppoted(const std::string& version) {
     }
 }
 
-void validate_method_not_allowed(const HTTPRequest& req) {
-    if (req.GetMethod() != "GET" && req.GetMethod() != "POST" &&
-        req.GetMethod() != "DELETE") {
-        throw_code_method_not_allowed();
-    }
-}
-
 // 前後のスペースをtrim
 std::string trim_space(const std::string& str,
                        const std::string  trim_char_set = " ") {
@@ -165,9 +152,6 @@ void parse_firstline(HTTPRequest& req, const std::string& line) {
 
     iss >> method >> request_target >> version;
 
-    if (request_target == "/") {
-        request_target = "index.html";
-    }
     // validate
     validate_method(method);
     validate_request_target(request_target);
@@ -222,7 +206,6 @@ bool has_done_header_line(const std::string& line) { return line == ""; }
 void validate_after_parse_header(HTTPRequest& req) {
     validate_host(req);
     validate_version_not_suppoted(req.GetVersion());
-    validate_method_not_allowed(req);
 }
 
 } // namespace
