@@ -41,7 +41,6 @@ void RecvRequest::Run() {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
         // parseエラーが起きた場合
-        // TODO: pairを投げる関数作る
         throw std::make_pair(stream_, code);
         // EventExecutor::onEventでcatch
     }
@@ -57,9 +56,11 @@ IOEvent* RecvRequest::RegisterNext() {
     }
 
     // methodによって次のイベントが分岐
-    IOEvent* new_event = prepareResponse();
-
-    return new_event;
+    try {
+        IOEvent* new_event = prepareResponse();
+        return new_event;
+    } catch (status::code code) { throw std::make_pair(stream_, code); }
+    return NULL;
 }
 
 IOEvent* RecvRequest::prepareResponse() {
