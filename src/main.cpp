@@ -17,9 +17,9 @@ int main(void) {
         EventExecutor executor;
         executor.Init();
 
-        ConfigParser::parseConfigFile("./config/google_test.conf");
-        const std::map<int, std::vector<const ServerConfig> >& server_configs =
-            Config::instance()->GetServerConfigs();
+        ConfigParser::ParseConfigFile("./config/google_test.conf");
+        std::map<int, std::vector<const ServerConfig> > server_configs =
+            Config::Instance()->GetServerConfigs();
 
         std::map<int, std::vector<const ServerConfig> >::const_iterator it_end =
             server_configs.end();

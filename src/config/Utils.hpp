@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-enum e_drctv_cd {
+enum EDrctvCd {
     SRVR,
     LCTN,
     LSTN,
@@ -20,18 +20,18 @@ enum e_drctv_cd {
     MAIN,
 };
 
-enum e_pos_type {
+enum EPosType {
     BEGIN,
     END,
 };
 
-enum e_allowed_mothod_type {
+enum EAllowedMothodType {
     GET,
     POST,
     DELETE,
 };
 
-enum e_auto_index_type {
+enum EAutoIndexType {
     ON,
     OFF,
 };
@@ -46,7 +46,7 @@ public:
     ~Utils();
     Utils& operator=(const Utils& src);
 
-    static void findEndBrace(str_vec_itr& it);
+    static void FindEndBrace(str_vec_itr& it);
 };
 
 #endif

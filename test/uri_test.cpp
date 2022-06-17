@@ -15,8 +15,8 @@ protected:
     virtual void SetUp() {
         typedef std::map<int, std::vector<const ServerConfig> > configs_map;
 
-        ConfigParser::parseConfigFile("./config/google_test.conf");
-        configs_map servers_map = Config::instance()->GetServerConfigs();
+        ConfigParser::ParseConfigFile("./config/google_test.conf");
+        configs_map servers_map = Config::Instance()->GetServerConfigs();
 
         configs_map::const_iterator it = servers_map.begin();
 

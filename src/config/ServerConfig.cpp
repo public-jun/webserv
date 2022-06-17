@@ -20,38 +20,38 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& src) {
     return (*this);
 }
 
-void ServerConfig::setListen(int listen) { this->listen_ = listen; }
+void ServerConfig::SetListen(int listen) { this->listen_ = listen; }
 
-void ServerConfig::setServerName(std::string server_name) {
+void ServerConfig::SetServerName(std::string server_name) {
     this->server_name_ = server_name;
 }
 
-void ServerConfig::setMaxClientBodySize(std::string max_client_body_size) {
+void ServerConfig::SetMaxClientBodySize(std::string max_client_body_size) {
     this->max_client_body_size_ = max_client_body_size;
 }
 
-void ServerConfig::setErrorPage(int status_code, std::string location) {
+void ServerConfig::SetErrorPage(int status_code, std::string location) {
     this->error_page_[status_code] = location;
 }
 
-void ServerConfig::setLocationConfigs(LocationConfig& location_config) {
+void ServerConfig::SetLocationConfigs(LocationConfig& location_config) {
     this->location_configs_.insert(
-        std::make_pair(location_config.getTarget(), location_config));
+        std::make_pair(location_config.GetTarget(), location_config));
 }
 
-int ServerConfig::getListen() const { return (this->listen_); }
+int ServerConfig::GetListen() const { return (this->listen_); }
 
-std::string ServerConfig::getServerName() const { return (this->server_name_); }
+std::string ServerConfig::GetServerName() const { return (this->server_name_); }
 
-std::string ServerConfig::getMaxClientBodySize() const {
+std::string ServerConfig::GetMaxClientBodySize() const {
     return (this->max_client_body_size_);
 }
 
-std::map<int, std::string> ServerConfig::getErrorPage() const {
+std::map<int, std::string> ServerConfig::GetErrorPage() const {
     return (this->error_page_);
 }
 
 std::map<const std::string, const LocationConfig>
-ServerConfig::getLocationConfigs() const {
+ServerConfig::GetLocationConfigs() const {
     return (this->location_configs_);
 }

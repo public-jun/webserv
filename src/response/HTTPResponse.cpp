@@ -2,7 +2,7 @@
 #include "HTTPStatus.hpp"
 #include <sstream>
 
-const std::string HTTPResponse::default_version = "HTTP/1.1";
+const std::string HTTPResponse::DEFAULT_VERSION = "HTTP/1.1";
 
 std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
@@ -12,10 +12,10 @@ std::map<int, std::string> make_status_text() {
     return status_text;
 }
 
-std::map<int, std::string> HTTPResponse::status_text = make_status_text();
+std::map<int, std::string> HTTPResponse::status_text_ = make_status_text();
 
 HTTPResponse::HTTPResponse()
-    : HTTPVersion_(default_version), status_code_(status::ok) {}
+    : HTTPVersion_(DEFAULT_VERSION), status_code_(status::ok) {}
 
 HTTPResponse::~HTTPResponse() {}
 
@@ -32,7 +32,7 @@ void HTTPResponse::SetStatusCode(int status) { status_code_ = status; }
 std::string HTTPResponse::ConvertToStr() const {
     std::stringstream ss;
     ss << HTTPVersion_ << " " << status_code_ << " "
-       << status_text[status_code_] << "\r\n";
+       << status_text_[status_code_] << "\r\n";
 
     for (std::map<std::string, std::string>::const_iterator it =
              headers_.begin();

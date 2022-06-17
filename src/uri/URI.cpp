@@ -120,7 +120,7 @@ void URI::findLocationConfig() {
                      const LocationConfig>::const_reverse_iterator
         const_reverse_iterator;
 
-    location_map locations = server_config_.getLocationConfigs();
+    location_map locations = server_config_.GetLocationConfigs();
 
     // location configを決定する
     std::string            location_target_dir;
@@ -143,13 +143,13 @@ void URI::findLocationConfig() {
 }
 
 void URI::storeLocalPath() {
-    std::string location_target_dir = location_config_.getTarget();
+    std::string location_target_dir = location_config_.GetTarget();
     if (*location_target_dir.rbegin() != '/') {
         location_target_dir += "/";
     }
 
     // local_path_を設定する
-    std::string alias = location_config_.getAlias();
+    std::string alias = location_config_.GetAlias();
     if (*alias.rbegin() != '/') {
         alias += "/";
     }

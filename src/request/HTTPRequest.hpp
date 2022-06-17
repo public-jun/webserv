@@ -26,8 +26,8 @@ public:
     void SetBody(const std::string);
 
     // 改行コード
-    static const std::string            crlf;
-    static const std::string::size_type crlf_size;
+    static const std::string            CRLF;
+    static const std::string::size_type CRLF_SIZE;
 
 private:
     std::string                        method_;
