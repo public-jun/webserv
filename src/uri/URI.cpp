@@ -10,13 +10,14 @@
 #include "ServerConfig.hpp"
 #include "SysError.hpp"
 
-URI::URI(const ServerConfig& server_config, const std::string target)
+URI::URI(const ServerConfig server_config, const std::string target)
     : server_config_(server_config), raw_target_(target) {}
 
 URI::~URI() {}
 
 const ServerConfig& URI::GetServerConfig() const { return server_config_; }
 const std::string&  URI::GetRawTarget() const { return raw_target_; }
+const std::string&  URI::GetExtension() const { return extension_; }
 const std::string&  URI::GetRawPath() const { return raw_path_; }
 const std::string&  URI::GetQuery() const { return query_; }
 
@@ -47,7 +48,11 @@ void URI::divideRawTarget() {
 
     p         = divideByTheFirstDelimiterFound(raw_target, "?");
     raw_path_ = p.first;
-    query_    = p.second;
+    std::string::size_type dot_pos = raw_path_.rfind(".");
+    if (dot_pos != std::string::npos) {
+        extension_ = raw_path_.substr(dot_pos);
+    }
+    query_ = p.second;
 }
 
 // str を <first> 'sep' <last> に分割する
@@ -115,7 +120,7 @@ void URI::findLocationConfig() {
                      const LocationConfig>::const_reverse_iterator
         const_reverse_iterator;
 
-    const location_map& locations = server_config_.getLocationConfigs();
+    location_map locations = server_config_.getLocationConfigs();
 
     // location configを決定する
     std::string            location_target_dir;
