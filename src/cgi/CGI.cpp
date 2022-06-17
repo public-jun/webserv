@@ -126,7 +126,7 @@ std::vector<std::string> CGI::makeEnvs() {
     oss << uri_.GetServerConfig().getListen() << std::flush;
     env_map["SERVER_PORT"] = oss.str();
     oss.str("");
-    env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
+    env_map["SERVER_PROTOCOL"] = req_.GetVersion();
     env_map["SERVER_SOFTWARE"] = "webserv/1.0.0";
 
     std::vector<std::string> envs;
