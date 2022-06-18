@@ -95,6 +95,7 @@ void ConfigParser::setupServerConfig(const std::vector<std::string> tokens) {
         setupIndex(it, server_config);
         setupAllowedMethod(it, server_config);
         setupAlias(it, server_config);
+        setupRoot(it, server_config);
         setupLocationConfig(it[BEGIN], it[END], server_config);
         Config::AddServerConfig(server_config);
         it[BEGIN] = std::find(it[BEGIN], tokens.end(),
@@ -118,6 +119,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
         setupAlias(it, location_config);
         setupAutoIndex(it, location_config);
         setupIndex(it, location_config);
+        setupRoot(it, location_config);
         setupCgiExtensions(it, location_config);
         setupReturn(it, location_config);
 

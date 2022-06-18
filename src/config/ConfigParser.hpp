@@ -45,6 +45,8 @@ private:
     static void setupAllowedMethod(str_vec_itr it[2], T& location_config);
     template <class T>
     static void setupAlias(str_vec_itr it[2], T& location_config);
+    template <class T>
+    static void setupRoot(str_vec_itr it[2], T& location_config);
     static void setupAutoIndex(str_vec_itr     it[2],
                                LocationConfig& location_config);
     template <class T>
@@ -63,19 +65,27 @@ void ConfigParser::setupIndex(str_vec_itr it[2], T& target) {
 }
 
 template <class T>
-void ConfigParser::setupAllowedMethod(str_vec_itr it[2], T& location_config) {
+void ConfigParser::setupAllowedMethod(str_vec_itr it[2], T& target) {
     str_vec_itr allowed_method =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALLWD_MTHD));
     if (allowed_method != it[END])
         while (*++allowed_method != ";")
-            location_config.SetAllowedMethods(*allowed_method);
+            target.SetAllowedMethods(*allowed_method);
 }
 
 template <class T>
-void ConfigParser::setupAlias(str_vec_itr it[2], T& location_config) {
+void ConfigParser::setupAlias(str_vec_itr it[2], T& target) {
     str_vec_itr alias =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALIAS));
     if (alias != it[END])
-        location_config.SetAlias(*++alias);
+        target.SetAlias(*++alias);
+}
+
+template <class T>
+void ConfigParser::setupRoot(str_vec_itr it[2], T& target) {
+    str_vec_itr root =
+        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ROOT));
+    if (root != it[END])
+        target.SetRoot(*++root);
 }
 #endif
