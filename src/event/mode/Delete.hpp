@@ -8,12 +8,13 @@
 #include "IOEvent.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
+#include "URI.hpp"
 #include <sys/stat.h>
 #include <unistd.h>
 
 class Delete : public IOEvent {
 public:
-    Delete(StreamSocket stream, HTTPRequest req);
+    Delete(StreamSocket stream, URI& uri);
     virtual ~Delete();
 
     virtual void     Run();
@@ -23,11 +24,8 @@ public:
 
 private:
     Delete();
-    // Delete に必要な入力
     StreamSocket stream_;
-    HTTPRequest  req_;
-
-    // Delete によってできる出力
+    URI&         uri_;
     HTTPResponse resp_;
 };
 
