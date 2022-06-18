@@ -92,7 +92,7 @@ IOEvent* RecvRequest::prepareResponse() {
         }
     }
     if (req_.GetMethod() == "DELETE") {
-        Delete dlt(stream_, req_);
+        Delete dlt(stream_, uri);
 
         dlt.Run();
         return dlt.RegisterNext();
