@@ -115,6 +115,8 @@ bool ConfigValidator::isDerectiveDuplicated(str_vec_itr begin,
         target == Config::DERECTIVE_NAMES.at(ERR_PG))
         return (false);
     while (++begin != end) {
+        if (*begin == "{")
+            Utils::FindEndBrace(++begin);
         if (!isDirective(begin))
             continue;
         if (target == *begin)

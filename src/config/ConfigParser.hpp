@@ -41,15 +41,41 @@ private:
     static void setupErrorPage(str_vec_itr it[2], ServerConfig& server_config);
     static void setupTarget(std::string     target,
                             LocationConfig& location_config);
-    static void setupAllowedMethod(str_vec_itr     it[2],
-                                   LocationConfig& location_config);
-    static void setupAlias(str_vec_itr it[2], LocationConfig& location_config);
+    template <class T>
+    static void setupAllowedMethod(str_vec_itr it[2], T& location_config);
+    template <class T>
+    static void setupAlias(str_vec_itr it[2], T& location_config);
     static void setupAutoIndex(str_vec_itr     it[2],
                                LocationConfig& location_config);
-    static void setupIndex(str_vec_itr it[2], LocationConfig& location_config);
+    template <class T>
+    static void setupIndex(str_vec_itr it[2], T& location_config);
     static void setupCgiExtensions(str_vec_itr     it[2],
                                    LocationConfig& location_config);
     static void setupReturn(str_vec_itr it[2], LocationConfig& location_config);
 };
 
+template <class T>
+void ConfigParser::setupIndex(str_vec_itr it[2], T& target) {
+    str_vec_itr index =
+        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(INDX));
+    if (index != it[END])
+        target.SetIndex(*++index);
+}
+
+template <class T>
+void ConfigParser::setupAllowedMethod(str_vec_itr it[2], T& location_config) {
+    str_vec_itr allowed_method =
+        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALLWD_MTHD));
+    if (allowed_method != it[END])
+        while (*++allowed_method != ";")
+            location_config.SetAllowedMethods(*allowed_method);
+}
+
+template <class T>
+void ConfigParser::setupAlias(str_vec_itr it[2], T& location_config) {
+    str_vec_itr alias =
+        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALIAS));
+    if (alias != it[END])
+        location_config.SetAlias(*++alias);
+}
 #endif

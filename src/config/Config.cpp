@@ -61,6 +61,9 @@ Config::createDerectiveMap() {
     server_dirs.push_back(DERECTIVE_NAMES.at(SRVR_NM));
     server_dirs.push_back(DERECTIVE_NAMES.at(MX_CLNT_BDY_SZ));
     server_dirs.push_back(DERECTIVE_NAMES.at(ERR_PG));
+    server_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
+    server_dirs.push_back(DERECTIVE_NAMES.at(ALIAS));
+    server_dirs.push_back(DERECTIVE_NAMES.at(INDX));
     location_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
     location_dirs.push_back(DERECTIVE_NAMES.at(ALIAS));
     location_dirs.push_back(DERECTIVE_NAMES.at(AUTO_INDX));
@@ -114,6 +117,17 @@ void Config::PrintConfigs() {
                       << std::endl;
             std::cout << "max client body size\t:"
                       << server_config.GetMaxClientBodySize() << std::endl;
+            std::cout << "index\t\t\t:" << server_config.GetIndex()
+                      << std::endl;
+            std::cout << "allowed method\t\t:";
+            std::vector<std::string> allowed_methods =
+                server_config.GetAllowedMethods();
+            size_t k = -1;
+            while (++k < allowed_methods.size())
+                std::cout << allowed_methods[k] << " ";
+            std::cout << std::endl;
+            std::cout << "alias\t\t\t:" << server_config.GetAlias()
+                      << std::endl;
             std::map<int, std::string> error_page =
                 server_config.GetErrorPage();
             std::map<int, std::string>::iterator it = error_page.begin();
@@ -137,7 +151,7 @@ void Config::PrintConfigs() {
                     location_config.GetAllowedMethods();
                 size_t k = -1;
                 while (++k < allowed_methods.size())
-                    std::cout << " " << allowed_methods[k];
+                    std::cout << allowed_methods[k] << " ";
                 std::cout << std::endl;
                 std::cout << "\talias\t\t:" << location_config.GetAlias()
                           << std::endl;
