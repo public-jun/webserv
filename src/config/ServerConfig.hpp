@@ -21,6 +21,7 @@ public:
     void SetErrorPage(int status_code, std::string location);
     void SetIndex(std::string index);
     void SetAlias(std::string alias);
+    void SetRoot(std::string root);
     void SetAllowedMethods(std::string allowed_method);
     void SetLocationConfigs(LocationConfig& location_config);
 
@@ -30,6 +31,7 @@ public:
     std::map<int, std::string> GetErrorPage() const;
     std::string                GetIndex() const;
     std::string                GetAlias() const;
+    std::string                GetRoot() const;
     std::vector<std::string>   GetAllowedMethods() const;
     std::map<const std::string, const LocationConfig>
     GetLocationConfigs() const;
@@ -41,6 +43,7 @@ private:
     std::map<int, std::string>                        error_page_;
     std::string                                       index_;
     std::string                                       alias_;
+    std::string                                       root_;
     std::vector<std::string>                          allowed_methods_;
     std::map<const std::string, const LocationConfig> location_configs_;
 };

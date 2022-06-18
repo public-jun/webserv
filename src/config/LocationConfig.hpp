@@ -21,6 +21,7 @@ public:
     void SetAlias(std::string alias);
     void SetAutoIndex(std::string auto_index);
     void SetIndex(std::string index);
+    void SetRoot(std::string root);
     void SetCgiExtensions(std::string cgi_extension);
     void SetReturn(int status_code, std::string url);
 
@@ -29,6 +30,7 @@ public:
     std::string                 GetAlias() const;
     EAutoIndexType              GetAutoIndex() const;
     std::string                 GetIndex() const;
+    std::string                 GetRoot() const;
     std::vector<std::string>    GetCgiExtensions() const;
     std::pair<int, std::string> GetReturn() const;
 
@@ -38,6 +40,7 @@ private:
     std::string                 alias_;
     EAutoIndexType              auto_index_;
     std::string                 index_;
+    std::string                 root_;
     std::vector<std::string>    cgi_extensions_;
     std::pair<int, std::string> return_;
 };

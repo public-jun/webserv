@@ -17,6 +17,7 @@ enum EDrctvCd {
     RTRN,
     ERR_PG,
     CGI,
+    ROOT,
     MAIN,
 };
 

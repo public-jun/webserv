@@ -45,6 +45,7 @@ const std::map<const EDrctvCd, std::string> Config::createDerectiveNames() {
     directive_names[RTRN]           = "return";
     directive_names[ERR_PG]         = "error_page";
     directive_names[CGI]            = "cgi_extension";
+    directive_names[ROOT]           = "root";
     return (directive_names);
 }
 
@@ -64,12 +65,14 @@ Config::createDerectiveMap() {
     server_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
     server_dirs.push_back(DERECTIVE_NAMES.at(ALIAS));
     server_dirs.push_back(DERECTIVE_NAMES.at(INDX));
+    server_dirs.push_back(DERECTIVE_NAMES.at(ROOT));
     location_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
     location_dirs.push_back(DERECTIVE_NAMES.at(ALIAS));
     location_dirs.push_back(DERECTIVE_NAMES.at(AUTO_INDX));
     location_dirs.push_back(DERECTIVE_NAMES.at(INDX));
     location_dirs.push_back(DERECTIVE_NAMES.at(RTRN));
     location_dirs.push_back(DERECTIVE_NAMES.at(CGI));
+    location_dirs.push_back(DERECTIVE_NAMES.at(ROOT));
     derective_map[MAIN] = main_dirs;
     derective_map[SRVR] = server_dirs;
     derective_map[LCTN] = location_dirs;
@@ -128,6 +131,7 @@ void Config::PrintConfigs() {
             std::cout << std::endl;
             std::cout << "alias\t\t\t:" << server_config.GetAlias()
                       << std::endl;
+            std::cout << "root\t\t\t:" << server_config.GetRoot() << std::endl;
             std::map<int, std::string> error_page =
                 server_config.GetErrorPage();
             std::map<int, std::string>::iterator it = error_page.begin();
@@ -160,6 +164,8 @@ void Config::PrintConfigs() {
                                                                    : "off")
                           << std::endl;
                 std::cout << "\tindex\t\t:" << location_config.GetIndex()
+                          << std::endl;
+                std::cout << "\troot\t\t:" << server_config.GetRoot()
                           << std::endl;
                 std::cout << "\treturn\t\t:";
                 std::pair<int, std::string> rtrn = location_config.GetReturn();
