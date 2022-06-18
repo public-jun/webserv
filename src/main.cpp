@@ -12,12 +12,15 @@
 
 #include <iostream>
 
-int main(void) {
+int main(int argc, char** argv) {
     try {
+        if (argc != 2)
+            throw(std::runtime_error("invalid number of arguments"));
         EventExecutor executor;
         executor.Init();
 
-        ConfigParser::ParseConfigFile("./config/google_test.conf");
+        std::string config_file_path = argv[1];
+        ConfigParser::ParseConfigFile(config_file_path);
         std::map<int, std::vector<const ServerConfig> > server_configs =
             Config::Instance()->GetServerConfigs();
 

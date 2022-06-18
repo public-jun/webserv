@@ -92,6 +92,9 @@ void ConfigParser::setupServerConfig(const std::vector<std::string> tokens) {
         setupServerName(it, server_config);
         setupMaxClientBodySize(it, server_config);
         setupErrorPage(it, server_config);
+        setupIndex(it, server_config);
+        setupAllowedMethod(it, server_config);
+        setupRoot(it, server_config);
         setupLocationConfig(it[BEGIN], it[END], server_config);
         Config::AddServerConfig(server_config);
         it[BEGIN] = std::find(it[BEGIN], tokens.end(),
@@ -115,6 +118,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
         setupAlias(it, location_config);
         setupAutoIndex(it, location_config);
         setupIndex(it, location_config);
+        setupRoot(it, location_config);
         setupCgiExtensions(it, location_config);
         setupReturn(it, location_config);
 
@@ -164,37 +168,12 @@ void ConfigParser::setupTarget(std::string     target,
     location_config.SetTarget(target);
 }
 
-void ConfigParser::setupAllowedMethod(str_vec_itr     it[2],
-                                      LocationConfig& location_config) {
-    str_vec_itr allowed_method =
-        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALLWD_MTHD));
-    if (allowed_method != it[END])
-        while (*++allowed_method != ";")
-            location_config.SetAllowedMethods(*allowed_method);
-}
-
-void ConfigParser::setupAlias(str_vec_itr     it[2],
-                              LocationConfig& location_config) {
-    str_vec_itr alias =
-        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALIAS));
-    if (alias != it[END])
-        location_config.SetAlias(*++alias);
-}
-
 void ConfigParser::setupAutoIndex(str_vec_itr     it[2],
                                   LocationConfig& location_config) {
     str_vec_itr auto_index =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(AUTO_INDX));
     if (auto_index != it[END])
         location_config.SetAutoIndex(*++auto_index);
-}
-
-void ConfigParser::setupIndex(str_vec_itr     it[2],
-                              LocationConfig& location_config) {
-    str_vec_itr index =
-        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(INDX));
-    if (index != it[END])
-        location_config.SetIndex(*++index);
 }
 
 void ConfigParser::setupCgiExtensions(str_vec_itr     it[2],
