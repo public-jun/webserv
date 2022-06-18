@@ -17,7 +17,6 @@ ServerConfig& ServerConfig::operator=(const ServerConfig& src) {
         this->error_page_           = src.error_page_;
         this->index_                = src.index_;
         this->allowed_methods_      = src.allowed_methods_;
-        this->alias_                = src.alias_;
         this->root_                 = src.root_;
         this->location_configs_     = src.location_configs_;
     }
@@ -41,8 +40,6 @@ void ServerConfig::SetErrorPage(int status_code, std::string location) {
 void ServerConfig::SetAllowedMethods(std::string allowed_method) {
     this->allowed_methods_.push_back(allowed_method);
 }
-
-void ServerConfig::SetAlias(std::string alias) { this->alias_ = alias; }
 
 void ServerConfig::SetRoot(std::string root) { this->root_ = root; }
 
@@ -68,8 +65,6 @@ std::map<int, std::string> ServerConfig::GetErrorPage() const {
 std::vector<std::string> ServerConfig::GetAllowedMethods() const {
     return (this->allowed_methods_);
 }
-
-std::string ServerConfig::GetAlias() const { return (this->alias_); }
 
 std::string ServerConfig::GetRoot() const { return (this->root_); }
 

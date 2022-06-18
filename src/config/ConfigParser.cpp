@@ -94,7 +94,6 @@ void ConfigParser::setupServerConfig(const std::vector<std::string> tokens) {
         setupErrorPage(it, server_config);
         setupIndex(it, server_config);
         setupAllowedMethod(it, server_config);
-        setupAlias(it, server_config);
         setupRoot(it, server_config);
         setupLocationConfig(it[BEGIN], it[END], server_config);
         Config::AddServerConfig(server_config);

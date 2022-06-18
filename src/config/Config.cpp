@@ -63,7 +63,6 @@ Config::createDerectiveMap() {
     server_dirs.push_back(DERECTIVE_NAMES.at(MX_CLNT_BDY_SZ));
     server_dirs.push_back(DERECTIVE_NAMES.at(ERR_PG));
     server_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
-    server_dirs.push_back(DERECTIVE_NAMES.at(ALIAS));
     server_dirs.push_back(DERECTIVE_NAMES.at(INDX));
     server_dirs.push_back(DERECTIVE_NAMES.at(ROOT));
     location_dirs.push_back(DERECTIVE_NAMES.at(ALLWD_MTHD));
@@ -129,8 +128,6 @@ void Config::PrintConfigs() {
             while (++k < allowed_methods.size())
                 std::cout << allowed_methods[k] << " ";
             std::cout << std::endl;
-            std::cout << "alias\t\t\t:" << server_config.GetAlias()
-                      << std::endl;
             std::cout << "root\t\t\t:" << server_config.GetRoot() << std::endl;
             std::map<int, std::string> error_page =
                 server_config.GetErrorPage();
