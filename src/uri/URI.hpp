@@ -36,12 +36,12 @@ private:
     void        storeLocalPath();
     void        statLocalPath();
     std::string urlDecode(std::string raw_path);
-    std::string percentDecode(std::string str, std::string::size_type& per_pos);
-    char        hexToChar(std::string hex);
 
     std::pair<std::string, std::string>
     divideByTheFirstDelimiterFound(std::string str, std::string delimiter);
     std::vector<std::string> split(std::string str, std::string sep);
+    std::string percentDecode(std::string str, std::string::size_type& per_pos);
+    char        hexToChar(std::string hex);
 
 private:
     const ServerConfig server_config_;

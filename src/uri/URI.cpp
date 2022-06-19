@@ -147,17 +147,33 @@ void URI::findLocationConfig() {
 }
 
 void URI::storeLocalPath() {
-    std::string location_target_dir = location_config_.GetTarget();
-    if (*location_target_dir.rbegin() != '/') {
-        location_target_dir += "/";
-    }
+    if (location_config_.GetAlias() != "") {
+        std::string location_target_dir = location_config_.GetTarget();
+        if (*location_target_dir.rbegin() != '/') {
+            location_target_dir += "/";
+        }
 
-    // local_path_を設定する
-    std::string alias = location_config_.GetAlias();
-    if (*alias.rbegin() != '/') {
-        alias += "/";
+        // local_path_を設定する
+        std::string alias          = location_config_.GetAlias();
+        if (*alias.rbegin() != '/') {
+            alias += "/";
+        }
+        local_path_ = alias + decode_path_.substr(location_target_dir.length());
+    } else if (location_config_.GetRoot() != "") {
+        std::string root = location_config_.GetRoot();
+        if (*root.rbegin() != '/') {
+            root += "/";
+        }
+        local_path_ = root + decode_path_.substr(1);
+    } else if (server_config_.GetRoot() != "") {
+        std::string root = server_config_.GetRoot();
+        if (*root.rbegin() != '/') {
+            root += "/";
+        }
+        local_path_ = root + decode_path_.substr(1);
+    } else {
+        throw status::bad_request;
     }
-    local_path_ = alias + decode_path_.substr(location_target_dir.length());
 }
 
 void URI::statLocalPath() {
