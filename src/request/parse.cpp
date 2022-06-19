@@ -96,7 +96,6 @@ void validate_version(const std::string& version) {
 }
 
 void validate_host(const HTTPRequest& req) {
-    // TODO: find使って調べる
     if (req.GetHeaderValue("Host").empty()) {
         throw_code_badrequest("empty host");
     }
