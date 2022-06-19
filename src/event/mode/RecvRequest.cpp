@@ -7,6 +7,7 @@
 #include "CGI.hpp"
 #include "Delete.hpp"
 #include "EventRegister.hpp"
+#include "Get.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
 #include "Post.hpp"
@@ -41,7 +42,6 @@ void RecvRequest::Run() {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
         // parseエラーが起きた場合
-        // TODO: pairを投げる関数作る
         throw std::make_pair(stream_, code);
         // EventExecutor::onEventでcatch
     }
@@ -57,9 +57,11 @@ IOEvent* RecvRequest::RegisterNext() {
     }
 
     // methodによって次のイベントが分岐
-    IOEvent* new_event = prepareResponse();
-
-    return new_event;
+    try {
+        IOEvent* new_event = prepareResponse();
+        return new_event;
+    } catch (status::code code) { throw std::make_pair(stream_, code); }
+    return NULL;
 }
 
 IOEvent* RecvRequest::prepareResponse() {
@@ -76,7 +78,9 @@ IOEvent* RecvRequest::prepareResponse() {
             cgi.Run();
             new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
         } else {
-            new_event = new ReadFile(stream_, req_);
+            Get get(stream_, uri);
+            get.Run();
+            new_event = get.NextEvent();
         }
 
         this->Unregister();
