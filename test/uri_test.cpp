@@ -267,3 +267,45 @@ TEST_F(URITest, statLocalPath) {
         EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
     }
 }
+
+TEST_F(URITest, DecodeURI) {
+    {
+        URI uri(multi_location, "/%E3%81%82%E3%81%84%E3%81%86");
+        uri.Init();
+
+        EXPECT_EQ("/あいう", uri.GetDecodePath());
+    }
+
+    {
+        URI uri(multi_location,
+                "/%E3%81%82%E3%81%84%E3%81%86aiu%E3%81%88%E3%81%8A");
+        uri.Init();
+        EXPECT_EQ("/あいうaiuえお", uri.GetDecodePath());
+    }
+
+    {
+        URI uri(
+            multi_location,
+            "/%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3D%3B%25%20");
+        uri.Init();
+        EXPECT_EQ("/:/?#[]@!$&'()*+,=;% ", uri.GetDecodePath());
+    }
+
+    {
+        URI uri(multi_location,
+                "/%E3%81%82%25%E3%81%84%E3%81%863A%25z%E3%81%88yz");
+        uri.Init();
+
+        EXPECT_EQ("/あ%いう3A%zえyz", uri.GetDecodePath());
+    }
+
+    {
+        URI uri(multi_location,
+                "/%E3%81%82%E3%81%84%E3%81%86/"
+                "%E3%81%82%E3%81%84%E3%81%86?%E3%81%82%E3%81%84%E3%81%86");
+        uri.Init();
+
+        EXPECT_EQ("/あいう/あいう", uri.GetDecodePath());
+        EXPECT_EQ("%E3%81%82%E3%81%84%E3%81%86", uri.GetQuery());
+    }
+}

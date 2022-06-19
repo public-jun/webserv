@@ -15,7 +15,7 @@
 #include "SendResponse.hpp"
 #include "SysError.hpp"
 
-const std::size_t ReadFile::buf_size = 2048;
+const std::size_t ReadFile::BUF_SIZE = 2048;
 
 ReadFile::ReadFile(StreamSocket stream, int fd)
     : IOEvent(fd, READ_FILE), stream_(stream) {}
@@ -32,10 +32,10 @@ ReadFile::~ReadFile() {
 }
 
 void ReadFile::Run() {
-    char buf[buf_size];
+    char buf[BUF_SIZE];
     int  fd = polled_fd_;
 
-    int read_size = read(fd, buf, buf_size);
+    int read_size = read(fd, buf, BUF_SIZE);
     // TODO: エラー処理
     file_content_.append(buf, read_size);
 }
