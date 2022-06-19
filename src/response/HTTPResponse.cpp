@@ -8,6 +8,7 @@ std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
     status_text[status::ok]           = "OK";
     status_text[status::bad_request]  = "Bad Request";
+    status_text[status::forbidden]    = "Forbidden";
     status_text[status::not_found]    = "Not Found";
     status_text[status::server_error] = "Internal Server Error";
     return status_text;
