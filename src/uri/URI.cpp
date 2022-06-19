@@ -200,11 +200,13 @@ std::string URI::urlDecode(std::string raw_path) {
     return decode_path;
 }
 
-// %エンコード一文字分だけ実行
+// %エンコード1byte分だけ実行
 std::string URI::percentDecode(std::string             str,
                                std::string::size_type& per_pos) {
+    // %E3(16進数) を charに変換
     std::string hex = str.substr(per_pos + 1, 2);
     char        c   = hexToChar(hex);
+    // %E3をスキップした次の文字から解析
     per_pos += 3;
     return std::string(1, c);
 }
@@ -213,9 +215,9 @@ char URI::hexToChar(std::string hex) {
     char* endp = NULL;
     long  n    = std::strtol(hex.c_str(), &endp, 16);
     if (*endp != '\0' || n < 0) {
-        throw status::no_contenxt;
+        throw status::bad_request;
     } else if ((n == LONG_MAX || n == LONG_MIN) && errno == ERANGE) {
-        throw status::no_contenxt;
+        throw status::bad_request;
     }
     return static_cast<char>(n);
 }
