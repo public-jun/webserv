@@ -9,6 +9,7 @@
 #include "EventRegister.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "Post.hpp"
 #include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
@@ -89,6 +90,11 @@ IOEvent* RecvRequest::prepareResponse() {
             this->Unregister();
             new_event->Register();
             return new_event;
+        } else {
+            Post post(stream_, req_);
+
+            post.Run();
+            return post.RegisterNext();
         }
     }
     if (req_.GetMethod() == "DELETE") {

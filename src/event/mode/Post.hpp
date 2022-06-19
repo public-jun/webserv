@@ -4,6 +4,7 @@
 #include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include "IOEvent.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
@@ -20,7 +21,6 @@
 class Post : public IOEvent {
 public:
     Post(StreamSocket stream, HTTPRequest req);
-    Post();
     virtual ~Post();
 
     virtual void     Run();
@@ -30,14 +30,11 @@ public:
     void             openFile();
 
 private:
-    // Post に必要な入力
     StreamSocket stream_;
     HTTPRequest  req_;
-    std::string  generateFileName();
-
-    // Post によってできる出力
     HTTPResponse resp_;
     std::string  content_;
+    std::string  generateFileName();
 };
 
 #endif
