@@ -11,8 +11,8 @@ using namespace std;
 // ======= OK CASE =======
 
 TEST(HTTPParser, ParseAllAtOnce) {
-    string            message("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n");
-    HTTPRequest       req;
+    string      message("GET index.html HTTP/1.1\r\nHost: localhost\r\n\r\n");
+    HTTPRequest req;
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
@@ -25,7 +25,7 @@ TEST(HTTPParser, ParseAllAtOnce) {
 }
 
 TEST(HTTPParser, EmptyVersion) {
-    string            message("GET / \r\nHost: localhost\r\n\r\n");
+    string            message("GET index.html \r\nHost: localhost\r\n\r\n");
     HTTPRequest       req;
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
@@ -53,7 +53,7 @@ TEST(HTTPParser, ParseBody) {
 TEST(HTTPParser, ParsePart1) {
     vector<string> m;
     m.push_back("GE");
-    m.push_back("T / HTTP/1.1\r\nHost: localhost\r\n\r\n");
+    m.push_back("T index.html HTTP/1.1\r\nHost: localhost\r\n\r\n");
 
     HTTPRequest       req;
     HTTPParser::State state(req);
@@ -71,7 +71,7 @@ TEST(HTTPParser, ParsePart1) {
 
 TEST(HTTPParser, ParsePart2) {
     vector<string> m;
-    m.push_back("GET / HTTP/1.1\r");
+    m.push_back("GET index.html HTTP/1.1\r");
     m.push_back("\nHost: localhost\r\n");
     m.push_back("\r\n");
 
