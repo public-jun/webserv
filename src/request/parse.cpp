@@ -1,4 +1,3 @@
-#include "DefaultErrorPage.hpp"
 #include "HTTPParser.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"

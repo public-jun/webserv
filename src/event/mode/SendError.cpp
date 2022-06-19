@@ -1,5 +1,4 @@
 #include "SendError.hpp"
-#include "DefaultErrorPage.hpp"
 #include "EventRegister.hpp"
 #include "SendResponse.hpp"
 #include <sstream>
