@@ -19,6 +19,7 @@ public:
     const ServerConfig&             GetServerConfig() const;
     const std::string&              GetRawTarget() const;
     const std::string&              GetRawPath() const;
+    const std::string&              GetDecodePath() const;
     const std::string&              GetExtension() const;
     const std::string&              GetQuery() const;
     const std::vector<std::string>& GetArgs() const;
@@ -29,11 +30,14 @@ public:
 private:
     URI();
 
-    void divideRawTarget();
-    void storeArgsFromQuery();
-    void findLocationConfig();
-    void storeLocalPath();
-    void statLocalPath();
+    void        divideRawTarget();
+    void        storeArgsFromQuery();
+    void        findLocationConfig();
+    void        storeLocalPath();
+    void        statLocalPath();
+    std::string urlDecode(std::string raw_path);
+    std::string percentDecode(std::string str, std::string::size_type& per_pos);
+    char        hexToChar(std::string hex);
 
     std::pair<std::string, std::string>
     divideByTheFirstDelimiterFound(std::string str, std::string delimiter);
@@ -41,9 +45,10 @@ private:
 
 private:
     const ServerConfig server_config_;
-    const std::string   raw_target_;
+    const std::string  raw_target_;
 
     std::string              raw_path_;
+    std::string              decode_path_;
     std::string              extension_;
     std::string              query_;
     std::vector<std::string> args_;

@@ -1,11 +1,13 @@
 #include "URI.hpp"
 
 #include <cerrno>
+#include <sstream>
 #include <string>
 #include <sys/stat.h>
 #include <utility>
 
 #include "Config.hpp"
+#include "HTTPStatus.hpp"
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
 #include "SysError.hpp"
@@ -19,6 +21,7 @@ const ServerConfig& URI::GetServerConfig() const { return server_config_; }
 const std::string&  URI::GetRawTarget() const { return raw_target_; }
 const std::string&  URI::GetExtension() const { return extension_; }
 const std::string&  URI::GetRawPath() const { return raw_path_; }
+const std::string&  URI::GetDecodePath() const { return decode_path_; }
 const std::string&  URI::GetQuery() const { return query_; }
 
 const std::vector<std::string>& URI::GetArgs() const { return args_; }
@@ -46,11 +49,12 @@ void URI::divideRawTarget() {
     std::pair<std::string, std::string> p;
     std::string                         raw_target = raw_target_;
 
-    p         = divideByTheFirstDelimiterFound(raw_target, "?");
-    raw_path_ = p.first;
-    std::string::size_type dot_pos = raw_path_.rfind(".");
+    p            = divideByTheFirstDelimiterFound(raw_target, "?");
+    raw_path_    = p.first;
+    decode_path_ = urlDecode(raw_path_);
+    std::string::size_type dot_pos = decode_path_.rfind(".");
     if (dot_pos != std::string::npos) {
-        extension_ = raw_path_.substr(dot_pos);
+        extension_ = decode_path_.substr(dot_pos);
     }
     query_ = p.second;
 }
@@ -133,8 +137,8 @@ void URI::findLocationConfig() {
 
         // location の target と
         // raw_path_のディレクトリのパス部分が最大長で一致するもの
-        if (location_target_dir.length() <= raw_path_.length() &&
-            raw_path_.substr(0, location_target_dir.length()) ==
+        if (location_target_dir.length() <= decode_path_.length() &&
+            decode_path_.substr(0, location_target_dir.length()) ==
                 location_target_dir) {
             location_config_ = it->second;
             break;
@@ -153,7 +157,7 @@ void URI::storeLocalPath() {
     if (*alias.rbegin() != '/') {
         alias += "/";
     }
-    local_path_ = alias + raw_path_.substr(location_target_dir.length());
+    local_path_ = alias + decode_path_.substr(location_target_dir.length());
 }
 
 void URI::statLocalPath() {
@@ -161,4 +165,59 @@ void URI::statLocalPath() {
     // if (stat(local_path_.c_str(), &stat_buf_) < 0) {
     //     throw SysError("stat", errno);
     // }
+}
+
+// URLエンコーディングをデコードする
+std::string URI::urlDecode(std::string raw_path) {
+    // %E3%81%82%E3%81%84%E3%81%86
+    std::string decode_path;
+
+    std::string::size_type per_pos = raw_path.find("%");
+    // %が見つからなかったら即時リターン
+    if (per_pos == std::string::npos) {
+        return raw_path;
+    }
+
+    // raw_pathの最初から%の直前まで追加
+    decode_path.insert(decode_path.end(), raw_path.begin(),
+                       raw_path.begin() + per_pos);
+
+    while (per_pos != std::string::npos) {
+        decode_path += percentDecode(raw_path, per_pos);
+
+        std::string::size_type perse_start_pos = per_pos;
+
+        per_pos = raw_path.find("%", perse_start_pos);
+        if (per_pos == std::string::npos) {
+            decode_path.insert(decode_path.end(),
+                               raw_path.begin() + perse_start_pos,
+                               raw_path.end());
+        } else {
+            decode_path.append(raw_path, perse_start_pos,
+                               per_pos - perse_start_pos);
+        }
+    }
+    return decode_path;
+}
+
+// %エンコード1byte分だけ実行
+std::string URI::percentDecode(std::string             str,
+                               std::string::size_type& per_pos) {
+    // %E3(16進数) を charに変換
+    std::string hex = str.substr(per_pos + 1, 2);
+    char        c   = hexToChar(hex);
+    // %E3をスキップした次の文字から解析
+    per_pos += 3;
+    return std::string(1, c);
+}
+
+char URI::hexToChar(std::string hex) {
+    char* endp = NULL;
+    long  n    = std::strtol(hex.c_str(), &endp, 16);
+    if (*endp != '\0' || n < 0) {
+        throw status::bad_request;
+    } else if ((n == LONG_MAX || n == LONG_MIN) && errno == ERANGE) {
+        throw status::bad_request;
+    }
+    return static_cast<char>(n);
 }
