@@ -255,7 +255,8 @@ void update_state(State& state, const std::string new_buf) {
             }
         }
     } catch (std::exception& e) {
-        std::cerr << "Unexpected error: " << e.what() << std::endl;
+        std::cerr << "update_state: " << e.what() << std::endl;
+        throw status::server_error;
     }
 }
 } // namespace HTTPParser
