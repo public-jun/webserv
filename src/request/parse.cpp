@@ -255,8 +255,6 @@ void update_state(State& state, const std::string new_buf) {
                 return;
             }
         }
-    } catch (std::runtime_error& e) {
-        std::cerr << e.what() << std::endl;
     } catch (std::exception& e) {
         std::cerr << "Unexpected error: " << e.what() << std::endl;
     }

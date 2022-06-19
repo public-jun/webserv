@@ -29,8 +29,6 @@ IOEvent* SendError::RegisterNext() {
     resp.AppendHeader("Content-Length", body_size.str());
     resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
 
-    std::cout << resp.ConvertToStr() << std::endl;
-
     IOEvent* send_response = new SendResponse(stream_, resp.ConvertToStr());
     EventRegister::Instance().AddWriteEvent(send_response);
     return send_response;
