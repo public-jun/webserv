@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "Config.hpp"
+#include "HTTPStatus.hpp"
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
 #include "SysError.hpp"
@@ -157,8 +158,15 @@ void URI::storeLocalPath() {
 }
 
 void URI::statLocalPath() {
-    stat(local_path_.c_str(), &stat_buf_);
-    // if (stat(local_path_.c_str(), &stat_buf_) < 0) {
-    //     throw SysError("stat", errno);
-    // }
+    errno = 0;
+    if (stat(local_path_.c_str(), &stat_buf_) == -1) {
+        switch (errno) {
+        case ENOENT:
+            throw status::not_found;
+        case ENAMETOOLONG:
+            throw status::request_uri_too_long;
+        default:
+            throw status::server_error;
+        }
+    }
 }
