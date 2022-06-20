@@ -76,7 +76,7 @@ void Get::prepareReadFile(std::string path) {
 
 void Get::Run() {
     const std::string& path = uri_.GetLocalPath();
-    const struct stat& s    = uri_.Stat(path);
+    const struct stat  s    = uri_.Stat(path);
 
     if (S_ISDIR(s.st_mode)) {
         autoIndex(path);
