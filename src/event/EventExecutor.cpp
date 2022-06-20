@@ -64,17 +64,12 @@ void EventExecutor::onEvent(std::vector<struct kevent> event_vec,
             continue;
         }
 
-        IOEvent* next_event;
         try {
-            // イベント実行
             doEvent(event);
-            next_event = event;
-        } catch (std::pair<StreamSocket, status::code>& err) {
-            next_event = new SendError(err.first, err.second);
-            event->Unregister();
-            delete event;
-        } catch (const std::exception& e) { std::cerr << e.what() << '\n'; }
-        nextEvent(next_event);
+            nextEvent(event);
+        } catch (std::pair<StreamSocket, status::code> err) {
+            errorNextEvent(event, new SendError(err.first, err.second));
+        }
     }
 }
 
@@ -86,4 +81,12 @@ void EventExecutor::nextEvent(IOEvent* event) {
         next_event != event) {
         delete event;
     }
+}
+
+void EventExecutor::errorNextEvent(IOEvent* prev, IOEvent* next) {
+    prev->Unregister();
+    if (prev->GetIOEventMode() != IOEvent::ACCEPT_CONNECTION) {
+        delete prev;
+    }
+    nextEvent(next);
 }

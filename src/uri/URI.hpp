@@ -25,7 +25,7 @@ public:
     const std::vector<std::string>& GetArgs() const;
     const LocationConfig&           GetLocationConfig() const;
     const std::string&              GetLocalPath() const;
-    const struct stat&              GetStat() const;
+    struct stat                     Stat(const std::string path) const;
 
 private:
     URI();
@@ -56,7 +56,6 @@ private:
     std::vector<std::string> args_;
     std::string              local_path_;
     LocationConfig           location_config_;
-    struct stat              stat_buf_;
 };
 
 #endif

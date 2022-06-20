@@ -39,6 +39,8 @@ void SendResponse::Unregister() {
 }
 
 IOEvent* SendResponse::RegisterNext() {
+    // TODO: keep-alive
+    close(stream_.GetSocketFd());
     this->Unregister();
 
     // To Do Keep alive

@@ -221,7 +221,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./Makefile", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISREG(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
     {
@@ -229,7 +229,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./src", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISDIR(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISDIR(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
     {
@@ -237,7 +237,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./test/gtest.cc", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISREG(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
     {
@@ -245,7 +245,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./docs/cgi", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISDIR(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISDIR(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
     {
@@ -253,7 +253,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./docs/cgi/hello.py", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISREG(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
     {
@@ -261,7 +261,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./src/main.cpp", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISREG(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
     {
@@ -269,7 +269,7 @@ TEST_F(URITest, statLocalPath) {
         uri.Init();
 
         EXPECT_EQ("./src/event/mode/WriteCGI.cpp", uri.GetLocalPath());
-        EXPECT_TRUE(S_ISREG(uri.GetStat().st_mode));
+        EXPECT_TRUE(S_ISREG(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 }
 
