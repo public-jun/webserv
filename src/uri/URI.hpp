@@ -34,6 +34,8 @@ private:
     void        storeArgsFromQuery();
     void        findLocationConfig();
     void        storeLocalPath();
+    std::string applyAliasDirective(std::string alias_dir);
+    std::string applyRootDirective(std::string root_dir);
     void        statLocalPath();
     std::string urlDecode(std::string raw_path);
 

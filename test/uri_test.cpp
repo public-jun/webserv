@@ -345,9 +345,16 @@ TEST_F(URITest, MixURI) {
     }
 
     {
-        URI uri(mix_path_conf, "/c/1");
+        URI uri(mix_path_conf, "/c/1/2");
         uri.Init();
 
-        EXPECT_EQ("./default/c/1", uri.GetLocalPath());
+        EXPECT_EQ("./C/CC/1/2", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(mix_path_conf, "/d/1");
+        uri.Init();
+
+        EXPECT_EQ("./default/d/1", uri.GetLocalPath());
     }
 }
