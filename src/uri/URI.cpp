@@ -29,7 +29,24 @@ const LocationConfig&           URI::GetLocationConfig() const {
     return location_config_;
 }
 const std::string& URI::GetLocalPath() const { return local_path_; }
-const struct stat& URI::GetStat() const { return stat_buf_; }
+
+// ラッパー関数を集めたところに入れたい
+struct stat URI::Stat(const std::string path) const {
+    struct stat s;
+    errno = 0;
+
+    if (stat(path.c_str(), &s) == -1) {
+        switch (errno) {
+        case ENOENT:
+            throw status::not_found;
+        case ENAMETOOLONG:
+            throw status::request_uri_too_long;
+        default:
+            throw status::server_error;
+        }
+    }
+    return s;
+}
 
 void URI::Init() {
     // raw_targetを'?'で分割する
@@ -40,8 +57,6 @@ void URI::Init() {
     findLocationConfig();
     // location_configのtargetからlocal_pathを作成する
     storeLocalPath();
-    // local_path_のstat取得
-    statLocalPath();
 }
 
 // raw_target を <raw_path_> '?' <query_> に分割する
@@ -158,20 +173,6 @@ void URI::storeLocalPath() {
         alias += "/";
     }
     local_path_ = alias + decode_path_.substr(location_target_dir.length());
-}
-
-void URI::statLocalPath() {
-    errno = 0;
-    if (stat(local_path_.c_str(), &stat_buf_) == -1) {
-        switch (errno) {
-        case ENOENT:
-            throw status::not_found;
-        case ENAMETOOLONG:
-            throw status::request_uri_too_long;
-        default:
-            throw status::server_error;
-        }
-    }
 }
 
 // URLエンコーディングをデコードする
