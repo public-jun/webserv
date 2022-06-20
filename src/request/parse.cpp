@@ -1,4 +1,3 @@
-#include "DefaultErrorPage.hpp"
 #include "HTTPParser.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
@@ -96,7 +95,6 @@ void validate_version(const std::string& version) {
 }
 
 void validate_host(const HTTPRequest& req) {
-    // TODO: find使って調べる
     if (req.GetHeaderValue("Host").empty()) {
         throw_code_badrequest("empty host");
     }
@@ -256,10 +254,9 @@ void update_state(State& state, const std::string new_buf) {
                 return;
             }
         }
-    } catch (std::runtime_error& e) {
-        std::cerr << e.what() << std::endl;
     } catch (std::exception& e) {
-        std::cerr << "Unexpected error: " << e.what() << std::endl;
+        std::cerr << "update_state: " << e.what() << std::endl;
+        throw status::server_error;
     }
 }
 } // namespace HTTPParser
