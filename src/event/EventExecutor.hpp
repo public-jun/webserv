@@ -20,7 +20,7 @@ private:
     void onEvent(std::vector<struct kevent> event_vec, int event_size);
     void doEvent(IOEvent* event);
     void nextEvent(IOEvent* event);
-    void errorNextEvent(IOEvent* old, IOEvent* next);
+    void errorNextEvent(IOEvent* prev, IOEvent* next);
 
 private:
     int                         kqueue_fd_;

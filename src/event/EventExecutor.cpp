@@ -83,7 +83,10 @@ void EventExecutor::nextEvent(IOEvent* event) {
     }
 }
 
-void EventExecutor::errorNextEvent(IOEvent* old, IOEvent* next) {
-    old->Unregister();
+void EventExecutor::errorNextEvent(IOEvent* prev, IOEvent* next) {
+    prev->Unregister();
+    if (prev->GetIOEventMode() != IOEvent::ACCEPT_CONNECTION) {
+        delete prev;
+    }
     nextEvent(next);
 }
