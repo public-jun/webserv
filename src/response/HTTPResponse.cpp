@@ -6,18 +6,27 @@ const std::string HTTPResponse::DEFAULT_VERSION = "HTTP/1.1";
 
 std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
-    status_text[status::ok]          = "OK";
-    status_text[status::bad_request] = "Bad Request";
-    status_text[status::not_found]   = "Not Found";
+    status_text[status::ok]           = "OK";
+    status_text[status::bad_request]  = "Bad Request";
+    status_text[status::forbidden]    = "Forbidden";
+    status_text[status::not_found]    = "Not Found";
+    status_text[status::server_error] = "Internal Server Error";
     return status_text;
 }
 
 std::map<int, std::string> HTTPResponse::status_text_ = make_status_text();
 
+std::map<status::code, std::string> HTTPResponse::default_error_body_ =
+    setDefaultErrorBody();
+
 HTTPResponse::HTTPResponse()
     : HTTPVersion_(DEFAULT_VERSION), status_code_(status::ok) {}
 
 HTTPResponse::~HTTPResponse() {}
+
+std::string HTTPResponse::GetDefaultErrorBody(status::code code) {
+    return default_error_body_[code];
+}
 
 void HTTPResponse::AppendHeader(std::string key, std::string value) {
     headers_.insert(std::make_pair(key, value));

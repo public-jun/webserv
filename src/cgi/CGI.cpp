@@ -120,7 +120,7 @@ std::vector<std::string> CGI::makeEnvs() {
     env_map["REMOTE_USER"]  = "";
 
     env_map["REQUEST_METHOD"] = req_.GetMethod();
-    env_map["SCRIPT_NAME"]    = uri_.GetRawPath();
+    env_map["SCRIPT_NAME"]    = uri_.GetDecodePath();
     env_map["SERVER_NAME"]    = uri_.GetServerConfig().GetServerName();
 
     oss << uri_.GetServerConfig().GetListen() << std::flush;
