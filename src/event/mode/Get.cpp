@@ -29,8 +29,20 @@ void Get::Run() {
     }
 }
 
+// n - name.size() 個のspaceを返す
+std::string Get::spaces(std::string name, int n) {
+    // TODO: マイナスになったばあい
+    int         size = n - name.size();
+    std::string spaces(size, ' ');
+    return spaces;
+}
+
 IOEvent* Get::NextEvent() { return next_event_; }
 
+// TODO:
+// - "."削除
+// - "ファイルのタイムスタンプ表示"
+// - "ファイルサイズ表示"
 std::string Get::aElement(struct dirent* ent) {
     std::stringstream ss;
     std::string       name = ent->d_name;
@@ -44,6 +56,23 @@ std::string Get::aElement(struct dirent* ent) {
     return ss.str();
 }
 
+std::string Get::fileInfo(struct dirent* ent, std::string path) {
+    std::stringstream ss;
+    std::string       time_stamp("19-Jun-2022 11:46");
+
+    std::string name     = ent->d_name;
+    std::string fullpath = "." + path + "/" + name;
+    std::cout << "path: " << fullpath << std::endl;
+
+    struct stat s;
+    stat(fullpath.c_str(), &s);
+
+    s.st_mtime;
+
+    ss << spaces(name, 50) << time_stamp << spaces(time_stamp, 35) << "-";
+    return ss.str();
+}
+
 void Get::autoIndex(std::string path) {
     errno    = 0;
     DIR* dir = opendir(path.c_str());
@@ -54,6 +83,7 @@ void Get::autoIndex(std::string path) {
         }
         throw status::server_error;
     }
+    path = path.substr(1);
 
     std::stringstream ss;
     ss << "<html>\r\n"
@@ -67,9 +97,11 @@ void Get::autoIndex(std::string path) {
        << "<pre>\r\n";
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
-        ss << aElement(ent) << "\r\n";
-        /* ss << "<a href=\"" << file_name << "\">" << file_name << "</a>\r\n";
-         */
+        if (std::string(".") == ent->d_name) {
+            continue;
+        }
+
+        ss << aElement(ent) << fileInfo(ent, path) << "\r\n";
     }
     ss << "</pre>\r\n"
        << "<hr>\r\n"

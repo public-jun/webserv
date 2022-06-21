@@ -17,6 +17,10 @@ private:
     void        autoIndex(std::string path);
     void        prepareReadFile(std::string path);
     std::string aElement(struct dirent* ent);
+    std::string fileInfo(struct dirent* ent, std::string path);
+    std::string spaces(std::string name, int n);
+    std::string timeStamp(struct timespec* st_mtim);
+    std::string fileSize(std::string path);
 
     StreamSocket stream_;
     IOEvent*     next_event_;
