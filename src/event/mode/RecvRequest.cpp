@@ -98,6 +98,7 @@ IOEvent* RecvRequest::prepareResponse() {
             Post post(stream_, req_);
 
             post.Run();
+            this->Unregister();
             return post.RegisterNext();
         }
     }
@@ -105,6 +106,7 @@ IOEvent* RecvRequest::prepareResponse() {
         Delete dlt(stream_, uri);
 
         dlt.Run();
+        this->Unregister();
         return dlt.RegisterNext();
     }
     return NULL;
