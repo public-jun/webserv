@@ -1,8 +1,9 @@
 #include "LocationConfig.hpp"
 
 LocationConfig::LocationConfig() {
-    this->auto_index_ = OFF;
-    this->return_     = std::make_pair(-1, "");
+    this->auto_index_  = OFF;
+    this->return_      = std::make_pair(-1, "");
+    this->upload_path_ = "./upload_files";
 }
 
 LocationConfig::LocationConfig(const LocationConfig& src) { *this = src; }

@@ -3,6 +3,7 @@
 ServerConfig::ServerConfig() {
     this->listen_               = -1;
     this->max_client_body_size_ = "1m";
+    this->root_                 = "./";
 }
 
 ServerConfig::ServerConfig(const ServerConfig& src) { *this = src; }
