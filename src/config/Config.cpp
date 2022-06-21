@@ -46,6 +46,7 @@ const std::map<const EDrctvCd, std::string> Config::createDerectiveNames() {
     directive_names[ERR_PG]         = "error_page";
     directive_names[CGI]            = "cgi_extension";
     directive_names[ROOT]           = "root";
+    directive_names[UPLD_PATH]      = "upload_path";
     return (directive_names);
 }
 
@@ -72,6 +73,7 @@ Config::createDerectiveMap() {
     location_dirs.push_back(DERECTIVE_NAMES.at(RTRN));
     location_dirs.push_back(DERECTIVE_NAMES.at(CGI));
     location_dirs.push_back(DERECTIVE_NAMES.at(ROOT));
+    location_dirs.push_back(DERECTIVE_NAMES.at(UPLD_PATH));
     derective_map[MAIN] = main_dirs;
     derective_map[SRVR] = server_dirs;
     derective_map[LCTN] = location_dirs;
@@ -167,6 +169,8 @@ void Config::PrintConfigs() {
                 std::cout << "\treturn\t\t:";
                 std::pair<int, std::string> rtrn = location_config.GetReturn();
                 std::cout << rtrn.first << " > " << rtrn.second << std::endl;
+                std::cout << "\tupload_path\t:"
+                          << location_config.GetUploadPath() << std::endl;
                 std::cout << "\tcgi extension\t:";
                 std::vector<std::string> cgi_extensions =
                     location_config.GetCgiExtensions();

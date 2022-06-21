@@ -18,6 +18,7 @@ enum EDrctvCd {
     ERR_PG,
     CGI,
     ROOT,
+    UPLD_PATH,
     MAIN,
 };
 

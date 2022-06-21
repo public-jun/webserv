@@ -19,6 +19,7 @@ LocationConfig& LocationConfig::operator=(const LocationConfig& src) {
         this->root_            = src.root_;
         this->cgi_extensions_  = src.cgi_extensions_;
         this->return_          = src.return_;
+        this->upload_path_     = src.upload_path_;
     }
     return (*this);
 }
@@ -47,6 +48,10 @@ void LocationConfig::SetReturn(int status_code, std::string url) {
     this->return_ = std::make_pair(status_code, url);
 }
 
+void LocationConfig::SetUploadPath(std::string upload_path) {
+    this->upload_path_ = upload_path;
+}
+
 std::string LocationConfig::GetTarget() const { return (this->target_); }
 
 std::vector<std::string> LocationConfig::GetAllowedMethods() const {
@@ -69,4 +74,8 @@ std::vector<std::string> LocationConfig::GetCgiExtensions() const {
 
 std::pair<int, std::string> LocationConfig::GetReturn() const {
     return (this->return_);
+}
+
+std::string LocationConfig::GetUploadPath() const {
+    return (this->upload_path_);
 }

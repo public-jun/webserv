@@ -54,6 +54,8 @@ private:
     static void setupCgiExtensions(str_vec_itr     it[2],
                                    LocationConfig& location_config);
     static void setupReturn(str_vec_itr it[2], LocationConfig& location_config);
+    static void setupUploadPath(str_vec_itr     it[2],
+                                LocationConfig& location_config);
 };
 
 template <class T>

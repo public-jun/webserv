@@ -121,6 +121,7 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
         setupRoot(it, location_config);
         setupCgiExtensions(it, location_config);
         setupReturn(it, location_config);
+        setupUploadPath(it, location_config);
 
         server_config.SetLocationConfigs(location_config);
         it[BEGIN] = std::find(it[BEGIN], end, Config::DERECTIVE_NAMES.at(LCTN));
@@ -191,4 +192,11 @@ void ConfigParser::setupReturn(str_vec_itr     it[2],
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(RTRN));
     if (rtrn != it[END])
         location_config.SetReturn(strtol((*++rtrn).c_str(), NULL, 10), *++rtrn);
+}
+
+void ConfigParser::setupUploadPath(str_vec_itr it[2], LocationConfig& target) {
+    str_vec_itr upload_path =
+        std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(UPLD_PATH));
+    if (upload_path != it[END])
+        target.SetUploadPath(*++upload_path);
 }
