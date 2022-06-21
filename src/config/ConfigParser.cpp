@@ -131,8 +131,20 @@ void ConfigParser::setupLocationConfig(str_vec_itr begin, str_vec_itr end,
 void ConfigParser::setupListen(str_vec_itr it[2], ServerConfig& server_config) {
     str_vec_itr listen =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(LSTN));
-    if (listen != it[END])
-        server_config.SetListen(std::strtol((*++listen).c_str(), NULL, 10));
+    if (listen != it[END]) {
+        size_t      index = (*++listen).find(":");
+        std::string host;
+        std::string port;
+        if (index == std::string::npos) {
+            host = "127.0.0.1";
+            port = *listen;
+        } else {
+            host = (*listen).substr(0, index);
+            port = (*listen).substr(index + 1);
+        }
+        server_config.SetHost(host);
+        server_config.SetPort(std::strtol(port.c_str(), NULL, 10));
+    }
 }
 
 void ConfigParser::setupServerName(str_vec_itr   it[2],

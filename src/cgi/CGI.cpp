@@ -123,7 +123,7 @@ std::vector<std::string> CGI::makeEnvs() {
     env_map["SCRIPT_NAME"]    = uri_.GetDecodePath();
     env_map["SERVER_NAME"]    = uri_.GetServerConfig().GetServerName();
 
-    oss << uri_.GetServerConfig().GetListen() << std::flush;
+    oss << uri_.GetServerConfig().GetPort() << std::flush;
     env_map["SERVER_PORT"] = oss.str();
     oss.str("");
     env_map["SERVER_PROTOCOL"] = req_.GetVersion();

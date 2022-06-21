@@ -90,7 +90,7 @@ const std::vector<std::string> Config::createAllowedMethodsVec() {
 }
 
 void Config::AddServerConfig(const ServerConfig& server_config) {
-    int port = server_config.GetListen();
+    int port = server_config.GetPort();
     std::map<int, std::vector<const ServerConfig> >::iterator target =
         server_configs_.find(port);
 
@@ -115,8 +115,8 @@ void Config::PrintConfigs() {
         while (sc_itr != map_itr->second.end()) {
             std::cout << "--------- server config ------------" << std::endl;
             ServerConfig server_config = *sc_itr;
-            std::cout << "listen\t\t\t:" << server_config.GetListen()
-                      << std::endl;
+            std::cout << "host\t\t\t:" << server_config.GetHost() << std::endl;
+            std::cout << "port\t\t\t:" << server_config.GetPort() << std::endl;
             std::cout << "server name\t\t:" << server_config.GetServerName()
                       << std::endl;
             std::cout << "max client body size\t:"
