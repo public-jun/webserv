@@ -12,7 +12,7 @@ void Delete::Unregister() {}
 
 void Delete::Run() {
     std::string        target_path = uri_.GetLocalPath();
-    const struct stat& stat_buf    = uri_.GetStat();
+    const struct stat& stat_buf    = uri_.Stat(target_path);
 
     if (S_ISDIR(stat_buf.st_mode) || (stat_buf.st_mode & S_IWOTH) != S_IWOTH) {
         status_ = status::forbidden;
