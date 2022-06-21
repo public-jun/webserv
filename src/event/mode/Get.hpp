@@ -14,8 +14,9 @@ public:
     IOEvent* NextEvent();
 
 private:
-    void autoIndex(std::string path);
-    void prepareReadFile(std::string path);
+    void        autoIndex(std::string path);
+    void        prepareReadFile(std::string path);
+    std::string aElement(struct dirent* ent);
 
     StreamSocket stream_;
     IOEvent*     next_event_;

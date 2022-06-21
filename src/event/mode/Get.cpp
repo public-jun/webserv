@@ -18,6 +18,32 @@ Get::Get(StreamSocket stream, URI& uri) : stream_(stream), uri_(uri) {}
 
 Get::~Get() {}
 
+void Get::Run() {
+    const std::string& path = uri_.GetLocalPath();
+    const struct stat  s    = uri_.Stat(path);
+
+    if (S_ISDIR(s.st_mode)) {
+        autoIndex(path);
+    } else {
+        prepareReadFile(path);
+    }
+}
+
+IOEvent* Get::NextEvent() { return next_event_; }
+
+std::string Get::aElement(struct dirent* ent) {
+    std::stringstream ss;
+    std::string       name = ent->d_name;
+
+    ss << "<a href=\"" << name;
+    if (ent->d_type == DT_DIR) {
+        ss << "/";
+    }
+    ss << "\">" << name << "</a>";
+
+    return ss.str();
+}
+
 void Get::autoIndex(std::string path) {
     errno    = 0;
     DIR* dir = opendir(path.c_str());
@@ -41,8 +67,9 @@ void Get::autoIndex(std::string path) {
        << "<pre>\r\n";
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
-        std::string file_name = ent->d_name;
-        ss << "<a href=\"" << file_name << "\">" << file_name << "</a>\r\n";
+        ss << aElement(ent) << "\r\n";
+        /* ss << "<a href=\"" << file_name << "\">" << file_name << "</a>\r\n";
+         */
     }
     ss << "</pre>\r\n"
        << "<hr>\r\n"
@@ -74,15 +101,3 @@ void Get::prepareReadFile(std::string path) {
     next_event_ = new ReadFile(stream_, fd);
 }
 
-void Get::Run() {
-    const std::string& path = uri_.GetLocalPath();
-    const struct stat  s    = uri_.Stat(path);
-
-    if (S_ISDIR(s.st_mode)) {
-        autoIndex(path);
-    } else {
-        prepareReadFile(path);
-    }
-}
-
-IOEvent* Get::NextEvent() { return next_event_; }
