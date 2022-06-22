@@ -9,6 +9,7 @@
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
+#include "URI.hpp"
 #include "WriteFile.hpp"
 #include <ctime>
 #include <fcntl.h>
@@ -21,7 +22,7 @@
 
 class Post : public IOEvent {
 public:
-    Post(StreamSocket stream, HTTPRequest req);
+    Post(StreamSocket stream, HTTPRequest req, URI& uri);
     virtual ~Post();
 
     virtual void     Run();
@@ -32,6 +33,7 @@ public:
 
 private:
     StreamSocket stream_;
+    URI&         uri_;
     HTTPRequest  req_;
     int          fd_;
     std::string  generateFileName();

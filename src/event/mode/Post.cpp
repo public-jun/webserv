@@ -7,7 +7,9 @@ Post::Post(StreamSocket stream, HTTPRequest req, URI& uri)
 Post::~Post() {}
 
 void Post::Run() {
-    std::string base_path = "./upload_files/";
+    std::string base_path = uri_.GetLocationConfig().GetUploadPath();
+    if (base_path.substr(base_path.length() - 1) != "/")
+        base_path += "/";
     std::string file_name = generateFileName();
     std::string file_path = base_path + file_name;
 
