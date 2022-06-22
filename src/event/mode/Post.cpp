@@ -1,8 +1,8 @@
 #include "Post.hpp"
 #include <iostream>
 
-Post::Post(StreamSocket stream, HTTPRequest req)
-    : IOEvent(POST), stream_(stream), req_(req), resp_(HTTPResponse()) {}
+Post::Post(StreamSocket stream, HTTPRequest req, URI& uri)
+    : IOEvent(POST), stream_(stream), uri_(uri), req_(req) {}
 
 Post::~Post() {}
 
@@ -11,16 +11,10 @@ void Post::Run() {
     std::string file_name = generateFileName();
     std::string file_path = base_path + file_name;
 
-    std::cout << file_path << std::endl;
-    content_ = req_.GetBody().c_str();
-    int fd = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK,
-                  0644);
-    if (fd < 0)
-        throw SysError("open", errno);
-    int size = write(fd, content_.c_str(), content_.size());
-    if (size < 0 || static_cast<size_t>(size) != content_.size())
-        throw SysError("write", errno);
-    status_ = status::created;
+    fd_ = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK,
+               0644);
+    if (fd_ < 0)
+        throw status::server_error;
 }
 
 void Post::Register() {}
@@ -28,17 +22,10 @@ void Post::Register() {}
 void Post::Unregister() {}
 
 IOEvent* Post::RegisterNext() {
-    resp_.AppendHeader("Content-Length", "0");
-    resp_.AppendHeader("Server", "Webserv/1.0.0");
-    resp_.SetStatusCode(status_);
-    IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
-
-    send_response->Register();
-
-    return send_response;
+    IOEvent* write_file = new WriteFile(stream_, fd_, req_);
+    write_file->Register();
+    return (write_file);
 }
-
-void Post::openFile() {}
 
 std::string Post::generateFileName() {
     time_t            t     = time(NULL);

@@ -1,5 +1,5 @@
-#ifndef POST_HPP
-#define POST_HPP
+#ifndef WRITE_HPP
+#define WRITE_HPP
 
 #include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
@@ -9,32 +9,24 @@
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
-#include "WriteFile.hpp"
-#include <ctime>
-#include <fcntl.h>
-#include <iostream>
-#include <sstream>
-#include <stdio.h>
-#include <sys/time.h>
-#include <time.h>
-#include <unistd.h>
 
-class Post : public IOEvent {
+class WriteFile : public IOEvent {
 public:
-    Post(StreamSocket stream, HTTPRequest req);
-    virtual ~Post();
+    WriteFile(StreamSocket stream, int fd, HTTPRequest req);
+    virtual ~WriteFile();
 
     virtual void     Run();
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
-    void             openFile();
+
+private:
+    WriteFile();
 
 private:
     StreamSocket stream_;
     HTTPRequest  req_;
-    int          fd_;
-    std::string  generateFileName();
+    HTTPResponse resp_;
 };
 
 #endif
