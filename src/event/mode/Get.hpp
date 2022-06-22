@@ -19,8 +19,8 @@ private:
     std::string aElement(struct dirent* ent);
     std::string fileInfo(struct dirent* ent, std::string path);
     std::string spaces(std::string name, int n);
-    std::string timeStamp(struct timespec* st_mtim);
-    std::string fileSize(std::string path);
+    std::string timeStamp(time_t* time);
+    std::string fileSize(struct stat* s);
 
     StreamSocket stream_;
     IOEvent*     next_event_;

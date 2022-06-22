@@ -7,8 +7,10 @@
 
 #include "HTTPStatus.hpp"
 #include <cstdio>
+#include <ctime>
 #include <dirent.h>
 #include <fcntl.h>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -46,30 +48,50 @@ IOEvent* Get::NextEvent() { return next_event_; }
 std::string Get::aElement(struct dirent* ent) {
     std::stringstream ss;
     std::string       name = ent->d_name;
+    if (ent->d_type == DT_DIR) {
+        /* ss << "/"; */
+        name = name + "/";
+    }
 
     ss << "<a href=\"" << name;
-    if (ent->d_type == DT_DIR) {
-        ss << "/";
-    }
     ss << "\">" << name << "</a>";
 
     return ss.str();
 }
 
+std::string Get::timeStamp(time_t* time) {
+    struct tm*        tm      = localtime(time);
+    const std::string month[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    std::stringstream ss;
+    ss << tm->tm_mday << "-" << month[tm->tm_mon] << "-" << 1900 + tm->tm_year
+       << " " << tm->tm_hour << ":" << std::setfill('0') << std::setw(2)
+       << tm->tm_min;
+    return ss.str();
+}
+
+std::string Get::fileSize(struct stat* s) {
+    if (S_ISDIR(s->st_mode)) {
+        return "-";
+    }
+    std::stringstream ss;
+    ss << s->st_size;
+    return ss.str();
+}
+
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
     std::stringstream ss;
-    std::string       time_stamp("19-Jun-2022 11:46");
 
     std::string name     = ent->d_name;
     std::string fullpath = "." + path + "/" + name;
     std::cout << "path: " << fullpath << std::endl;
 
-    struct stat s;
-    stat(fullpath.c_str(), &s);
+    struct stat s = URI::Stat(fullpath);
 
-    s.st_mtime;
+    std::string time_stamp = timeStamp(&s.st_mtime);
 
-    ss << spaces(name, 50) << time_stamp << spaces(time_stamp, 35) << "-";
+    ss << spaces(name, 50) << time_stamp << spaces(time_stamp, 35)
+       << fileSize(&s);
     return ss.str();
 }
 
