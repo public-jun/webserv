@@ -24,76 +24,114 @@ Get::Get(StreamSocket stream, URI& uri)
 
 Get::~Get() {}
 
-// ディレクトリかどうか
-// - ディレクトリの場合:
-//     location_configにindexがあるか
-//     - ある場合:
-//       そのファイルが存在するか
-//       - ある場合:
-//         prepareReadFile
-//
-//       - ない場合:
-//         autoindexがONか確認:
-//         - ONの場合
-//           autoIndex
-//
-//         - OFFの場合
-//           throw 404
-//
-//     - ない場合:
-//       autoIndexがONか確認:
-//       - ONの場合
-//         autoIndex
-//
-//       - OFFの場合
-//         throw 404
-//
-// - ファイルの場合:
-//   prepareReadFile
-//
+/*
+
+ディレクトリかどうか
+- ディレクトリの場合:
+  location_configにindexがあるか
+  - ある場合:
+    そのファイルが存在するか
+    - ある場合:
+      prepareReadFile
+
+    - ない場合:
+      autoindexがONか確認:
+      - ONの場合
+        autoIndex
+
+      - OFFの場合
+        throw 404
+
+  - ない場合:
+    autoIndexがONか確認:
+    - ONの場合
+      autoIndex
+
+    - OFFの場合
+      throw 404
+
+- ファイルの場合:
+  prepareReadFile
+
+*/
+
+void Get::Run() {
+    std::string       local_path = uri_.GetLocalPath();
+    const struct stat s          = URI::Stat(local_path);
+
+    std::string index = location_config_.GetIndex();
+
+    if (S_ISDIR(s.st_mode)) {
+        processDir(index, local_path);
+    } else {
+        prepareReadFile(local_path);
+    }
+}
+
+IOEvent* Get::NextEvent() { return next_event_; }
+
+void Get::processDir(std::string index, std::string local_path) {
+    complementSlash(local_path);
+
+    if (hasIndex(index)) {
+        processIndex(local_path + index, local_path);
+    } else {
+        tryAutoIndex(local_path);
+    }
+}
+
+void Get::processIndex(std::string fullpath, std::string local_path) {
+    if (existFile(fullpath)) {
+        prepareReadFile(fullpath);
+    } else {
+        tryAutoIndex(local_path);
+    }
+}
+
+void Get::tryAutoIndex(std::string local_path) {
+    if (location_config_.GetAutoIndex() == ON) {
+        autoIndex(local_path);
+    } else {
+        throw status::not_found;
+    }
+}
+
+bool Get::hasIndex(std::string index) { return index != ""; }
 
 bool Get::existFile(std::string path) {
     errno = 0;
     struct stat s;
+
+    // ENOENT以外のエラーはここでは見ない
     if (stat(path.c_str(), &s) == -1 && errno == ENOENT) {
         return false;
     }
     return true;
 }
 
-bool Get::hasIndex(std::string index) { return index != ""; }
-
-void Get::Run() {
-    std::string       path = uri_.GetLocalPath();
-    const struct stat s    = URI::Stat(path);
-
-    std::string index = location_config_.GetIndex();
-
-    if (S_ISDIR(s.st_mode)) {
-        if (hasIndex(index)) {
-            std::string fullpath = path + index;
-            if (existFile(fullpath)) {
-                prepareReadFile(fullpath);
-            } else {
-                if (location_config_.GetAutoIndex() == ON) {
-                    autoIndex(path);
-                } else {
-                    throw status::not_found;
-                }
-            }
-        } else {
-            if (location_config_.GetAutoIndex() == ON) {
-                autoIndex(path);
-            } else {
-                throw status::not_found;
-            }
-        }
-    } else {
-        prepareReadFile(path);
-    }
+void Get::prepareSendResponse(std::string content) {
+    HTTPResponse      resp;
+    std::stringstream size;
+    size << content.size();
+    resp.AppendHeader("Content-Length", size.str());
+    resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
+    resp.SetBody(content);
+    next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
-IOEvent* Get::NextEvent() { return next_event_; }
+void Get::prepareReadFile(std::string path) {
+    int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
+    if (fd == -1) {
+        perror("open");
+        if (errno == EACCES) {
+            throw status::forbidden;
+        }
+        throw status::server_error;
+    }
+    next_event_ = new ReadFile(stream_, fd);
+}
+
+// ####### autoindexの実装 ########
 
 // n - name.size() 個のspaceを返す
 std::string Get::spaces(std::string name, int n) {
@@ -105,15 +143,27 @@ std::string Get::spaces(std::string name, int n) {
     return spaces;
 }
 
+void Get::complementSlash(std::string& path) {
+    if (std::string(1, path.back()) != "/") {
+        path = path + "/";
+    }
+}
+
 // <a href="src/">src/</a>
-std::string Get::aElement(struct dirent* ent) {
+std::string Get::aElement(struct dirent* ent, std::string path) {
     std::stringstream ss;
     std::string       name = ent->d_name;
     if (ent->d_type == DT_DIR) {
         name = name + "/";
     }
+    if (std::string(1, path.back()) != "/") {
+        path = path + "/";
+    }
+    if (std::string("../") == name) {
+        path = "";
+    }
 
-    ss << "<a href=\"" << name;
+    ss << "<a href=\"" << path << name;
     ss << "\">" << name << "</a>" << spaces(name, 50);
 
     return ss.str();
@@ -145,11 +195,8 @@ std::string Get::fileSize(struct stat* s) {
 }
 
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
-    std::string slash;
-    if (std::string(1, path.back()) != "/") {
-        slash = "/";
-    }
-    const std::string fullpath = "." + path + slash + std::string(ent->d_name);
+    complementSlash(path);
+    const std::string fullpath = "." + path + std::string(ent->d_name);
     struct stat       s        = URI::Stat(fullpath);
 
     return timeStamp(&s.st_mtime) + fileSize(&s);
@@ -165,6 +212,7 @@ void Get::autoIndex(std::string path) {
         }
         throw status::server_error;
     }
+
     // "."を削除
     path = path.substr(1);
     std::stringstream ss;
@@ -178,7 +226,7 @@ void Get::autoIndex(std::string path) {
             continue;
         }
 
-        ss << aElement(ent);
+        ss << aElement(ent, path);
         if (std::string("..") != ent->d_name) {
             ss << fileInfo(ent, path);
         }
@@ -193,26 +241,3 @@ void Get::autoIndex(std::string path) {
 
     prepareSendResponse(ss.str());
 }
-
-void Get::prepareSendResponse(std::string content) {
-    HTTPResponse      resp;
-    std::stringstream size;
-    size << content.size();
-    resp.AppendHeader("Content-Length", size.str());
-    resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
-    resp.SetBody(content);
-    next_event_ = new SendResponse(stream_, resp.ConvertToStr());
-}
-
-void Get::prepareReadFile(std::string path) {
-    int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
-    if (fd == -1) {
-        perror("open");
-        if (errno == EACCES) {
-            throw status::forbidden;
-        }
-        throw status::server_error;
-    }
-    next_event_ = new ReadFile(stream_, fd);
-}
-

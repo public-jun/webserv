@@ -16,16 +16,22 @@ public:
     static const std::string CRLF;
 
 private:
+    void processDir(std::string index, std::string path);
+    void processIndex(std::string fullpath, std::string location_path);
+    void tryAutoIndex(std::string path);
+    void prepareReadFile(std::string path);
+    void prepareSendResponse(std::string content);
+    bool existFile(std::string path);
+    bool hasIndex(std::string index);
+    void complementSlash(std::string& path);
+
+    // autoindex
     void        autoIndex(std::string path);
-    void        prepareReadFile(std::string path);
-    void        prepareSendResponse(std::string content);
-    std::string aElement(struct dirent* ent);
+    std::string aElement(struct dirent* ent, std::string path);
     std::string fileInfo(struct dirent* ent, std::string path);
     std::string spaces(std::string name, int n);
     std::string timeStamp(time_t* time);
     std::string fileSize(struct stat* s);
-    bool        existFile(std::string path);
-    bool        hasIndex(std::string index);
 
     StreamSocket          stream_;
     IOEvent*              next_event_;
