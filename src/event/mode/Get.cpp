@@ -37,7 +37,7 @@ IOEvent* Get::NextEvent() { return next_event_; }
 
 // n - name.size() 個のspaceを返す
 std::string Get::spaces(std::string name, int n) {
-    if (std::string::size_type(n) < name.size()) {
+    if (static_cast<std::string::size_type>(n) < name.size()) {
         return "";
     }
     int         size = n - name.size();
