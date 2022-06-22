@@ -92,7 +92,6 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
         slash = "/";
     }
     std::string fullpath = "." + path + slash + name;
-    std::cout << "path: " << fullpath << std::endl;
 
     struct stat s          = URI::Stat(fullpath);
     std::string time_stamp = timeStamp(&s.st_mtime);
@@ -102,12 +101,6 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
 }
 
 void Get::autoIndex(std::string path) {
-    std::stringstream ss;
-    ss << "<html>" << CRLF << "<head>" << CRLF << "<title>"
-       << "Index of " << path << "</title>" << CRLF << "</head>" << CRLF
-       << "<body>" << CRLF << "<h1> Index of " << path << "</h1>" << CRLF
-       << "<hr>" << CRLF << "<pre>" << CRLF;
-
     errno    = 0;
     DIR* dir = opendir(path.c_str());
     if (dir == NULL) {
@@ -119,6 +112,12 @@ void Get::autoIndex(std::string path) {
     }
     // "."を削除
     path = path.substr(1);
+    std::stringstream ss;
+    ss << "<html>" << CRLF << "<head>" << CRLF << "<title>"
+       << "Index of " << path << "</title>" << CRLF << "</head>" << CRLF
+       << "<body>" << CRLF << "<h1> Index of " << path << "</h1>" << CRLF
+       << "<hr>" << CRLF << "<pre>" << CRLF;
+
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
         if (std::string(".") == ent->d_name) {
