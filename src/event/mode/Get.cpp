@@ -31,52 +31,54 @@ void Get::Run() {
     }
 }
 
+IOEvent* Get::NextEvent() { return next_event_; }
+
 // n - name.size() 個のspaceを返す
 std::string Get::spaces(std::string name, int n) {
-    // TODO: マイナスになったばあい
+    if (std::string::size_type(n) < name.size()) {
+        return "";
+    }
     int         size = n - name.size();
     std::string spaces(size, ' ');
     return spaces;
 }
 
-IOEvent* Get::NextEvent() { return next_event_; }
-
-// TODO:
-// - "."削除
-// - "ファイルのタイムスタンプ表示"
-// - "ファイルサイズ表示"
+// <a href="src/">src/</a>
 std::string Get::aElement(struct dirent* ent) {
     std::stringstream ss;
     std::string       name = ent->d_name;
     if (ent->d_type == DT_DIR) {
-        /* ss << "/"; */
         name = name + "/";
     }
 
     ss << "<a href=\"" << name;
-    ss << "\">" << name << "</a>";
+    ss << "\">" << name << "</a>" << spaces(name, 50);
 
     return ss.str();
 }
 
+// "19-Jun-2022 11:46"
 std::string Get::timeStamp(time_t* time) {
     struct tm*        tm      = localtime(time);
     const std::string month[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
     std::stringstream ss;
-    ss << tm->tm_mday << "-" << month[tm->tm_mon] << "-" << 1900 + tm->tm_year
-       << " " << tm->tm_hour << ":" << std::setfill('0') << std::setw(2)
-       << tm->tm_min;
+    ss << std::setfill('0') << std::setw(2) << tm->tm_mday << "-"
+       << month[tm->tm_mon] << "-" << 1900 + tm->tm_year << " " << tm->tm_hour
+       << ":" << std::setw(2) << tm->tm_min;
     return ss.str();
 }
 
 std::string Get::fileSize(struct stat* s) {
+    std::string size;
     if (S_ISDIR(s->st_mode)) {
-        return "-";
+        size = "-";
+    } else {
+        std::stringstream ss;
+        ss << s->st_size;
+        size = ss.str();
     }
-    std::stringstream ss;
-    ss << s->st_size;
-    return ss.str();
+    return spaces(size, 35) + size;
 }
 
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
@@ -90,8 +92,7 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
 
     std::string time_stamp = timeStamp(&s.st_mtime);
 
-    ss << spaces(name, 50) << time_stamp << spaces(time_stamp, 35)
-       << fileSize(&s);
+    ss << time_stamp << fileSize(&s);
     return ss.str();
 }
 
@@ -123,7 +124,11 @@ void Get::autoIndex(std::string path) {
             continue;
         }
 
-        ss << aElement(ent) << fileInfo(ent, path) << "\r\n";
+        ss << aElement(ent);
+        if (std::string("..") != ent->d_name) {
+            ss << fileInfo(ent, path);
+        }
+        ss << "\r\n";
     }
     ss << "</pre>\r\n"
        << "<hr>\r\n"
