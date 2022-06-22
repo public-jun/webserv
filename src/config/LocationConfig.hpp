@@ -24,6 +24,7 @@ public:
     void SetRoot(std::string root);
     void SetCgiExtensions(std::string cgi_extension);
     void SetReturn(int status_code, std::string url);
+    void SetUploadPath(std::string upload_path);
 
     std::string                 GetTarget() const;
     std::vector<std::string>    GetAllowedMethods() const;
@@ -33,6 +34,7 @@ public:
     std::string                 GetRoot() const;
     std::vector<std::string>    GetCgiExtensions() const;
     std::pair<int, std::string> GetReturn() const;
+    std::string                 GetUploadPath() const;
 
 private:
     std::string                 target_;
@@ -43,6 +45,7 @@ private:
     std::string                 root_;
     std::vector<std::string>    cgi_extensions_;
     std::pair<int, std::string> return_;
+    std::string                 upload_path_;
 };
 
 #endif

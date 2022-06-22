@@ -54,6 +54,8 @@ private:
     static void setupCgiExtensions(str_vec_itr     it[2],
                                    LocationConfig& location_config);
     static void setupReturn(str_vec_itr it[2], LocationConfig& location_config);
+    static void setupUploadPath(str_vec_itr     it[2],
+                                LocationConfig& location_config);
 };
 
 template <class T>
@@ -68,9 +70,14 @@ template <class T>
 void ConfigParser::setupAllowedMethod(str_vec_itr it[2], T& target) {
     str_vec_itr allowed_method =
         std::find(it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(ALLWD_MTHD));
-    if (allowed_method != it[END])
+    if (allowed_method != it[END]) {
         while (*++allowed_method != ";")
             target.SetAllowedMethods(*allowed_method);
+    } else {
+        target.SetAllowedMethods("GET");
+        target.SetAllowedMethods("POST");
+        target.SetAllowedMethods("DELETE");
+    }
 }
 
 template <class T>

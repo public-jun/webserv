@@ -250,14 +250,56 @@ bool ConfigValidator::isValidReturn(str_vec_itr begin) {
 bool ConfigValidator::isValidListen(str_vec_itr begin) {
     if (*begin != Config::DERECTIVE_NAMES.at(LSTN))
         return (true);
-    try {
-        if (!isDigit(*++begin))
+    if (!isDigit(*++begin)) {
+        if (!isValidHostAndPort(*begin))
             return (false);
-        int listen = strtol((*begin).c_str(), NULL, 10);
-        if (!(0 <= listen && listen <= Config::MAX_PORT_NUM))
+    } else {
+        if (!isValidPort(*begin))
             return (false);
-    } catch (...) { return (false); }
+    }
     return (true);
+}
+
+bool ConfigValidator::isValidHostAndPort(const std::string& target) {
+    size_t index = target.find(":");
+    if (index == std::string::npos)
+        return (false);
+    std::string host = target.substr(0, index);
+    std::string port = target.substr(index + 1);
+    if (!isValidPort(port))
+        return (false);
+    if (!isValidHost(host))
+        return (false);
+    return (true);
+}
+
+bool ConfigValidator::isValidHost(const std::string& host) {
+    size_t      offset = 0;
+    std::string addr;
+    size_t      period_index;
+
+    if (std::count(host.begin(), host.end(), '.') != 3)
+        return (false);
+    while ((period_index = host.find(".", offset)) != std::string::npos) {
+        addr = host.substr(offset, period_index - offset);
+        if (!isDigit(addr) || !isValidAddr(addr))
+            return (false);
+        offset = period_index + 1;
+    }
+    addr = host.substr(offset);
+    if (!isDigit(addr) || !isValidAddr(addr))
+        return (false);
+    return (true);
+}
+
+bool ConfigValidator::isValidPort(const std::string& target) {
+    int port = strtol(target.c_str(), NULL, 10);
+    return (0 <= port && port <= Config::MAX_PORT_NUM);
+}
+
+bool ConfigValidator::isValidAddr(const std::string& target) {
+    int addr = strtol(target.c_str(), NULL, 10);
+    return (0 <= addr && addr <= 255);
 }
 
 bool ConfigValidator::isDigit(const std::string& str) {

@@ -55,6 +55,10 @@ private:
     static bool     isValidAutoIndex(str_vec_itr begin);
     static bool     isValidReturn(str_vec_itr begin);
     static bool     isValidListen(str_vec_itr begin);
+    static bool     isValidHostAndPort(const std::string& target);
+    static bool     isValidHost(const std::string& host);
+    static bool     isValidPort(const std::string& target);
+    static bool     isValidAddr(const std::string& target);
     static bool     isDigit(const std::string& str);
 };
 
