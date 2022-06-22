@@ -1,6 +1,7 @@
 #include "Get.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "LocationConfig.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
 #include "URI.hpp"
@@ -18,16 +19,75 @@
 
 const std::string Get::CRLF = "\r\n";
 
-Get::Get(StreamSocket stream, URI& uri) : stream_(stream), uri_(uri) {}
+Get::Get(StreamSocket stream, URI& uri)
+    : stream_(stream), uri_(uri), location_config_(uri_.GetLocationConfig()) {}
 
 Get::~Get() {}
 
+// ディレクトリかどうか
+// - ディレクトリの場合:
+//     location_configにindexがあるか
+//     - ある場合:
+//       そのファイルが存在するか
+//       - ある場合:
+//         prepareReadFile
+//
+//       - ない場合:
+//         autoindexがONか確認:
+//         - ONの場合
+//           autoIndex
+//
+//         - OFFの場合
+//           throw 404
+//
+//     - ない場合:
+//       autoIndexがONか確認:
+//       - ONの場合
+//         autoIndex
+//
+//       - OFFの場合
+//         throw 404
+//
+// - ファイルの場合:
+//   prepareReadFile
+//
+
+bool Get::existFile(std::string path) {
+    errno = 0;
+    struct stat s;
+    if (stat(path.c_str(), &s) == -1 && errno == ENOENT) {
+        return false;
+    }
+    return true;
+}
+
+bool Get::hasIndex(std::string index) { return index != ""; }
+
 void Get::Run() {
-    const std::string& path = uri_.GetLocalPath();
-    const struct stat  s    = uri_.Stat(path);
+    std::string       path = uri_.GetLocalPath();
+    const struct stat s    = URI::Stat(path);
+
+    std::string index = location_config_.GetIndex();
 
     if (S_ISDIR(s.st_mode)) {
-        autoIndex(path);
+        if (hasIndex(index)) {
+            std::string fullpath = path + index;
+            if (existFile(fullpath)) {
+                prepareReadFile(fullpath);
+            } else {
+                if (location_config_.GetAutoIndex() == ON) {
+                    autoIndex(path);
+                } else {
+                    throw status::not_found;
+                }
+            }
+        } else {
+            if (location_config_.GetAutoIndex() == ON) {
+                autoIndex(path);
+            } else {
+                throw status::not_found;
+            }
+        }
     } else {
         prepareReadFile(path);
     }

@@ -24,10 +24,13 @@ private:
     std::string spaces(std::string name, int n);
     std::string timeStamp(time_t* time);
     std::string fileSize(struct stat* s);
+    bool        existFile(std::string path);
+    bool        hasIndex(std::string index);
 
-    StreamSocket stream_;
-    IOEvent*     next_event_;
-    URI&         uri_;
+    StreamSocket          stream_;
+    IOEvent*              next_event_;
+    URI&                  uri_;
+    const LocationConfig& location_config_;
 };
 
 #endif // GET_HPP
