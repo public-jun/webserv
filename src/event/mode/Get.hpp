@@ -13,9 +13,12 @@ public:
     void     Run();
     IOEvent* NextEvent();
 
+    static const std::string CRLF;
+
 private:
     void        autoIndex(std::string path);
     void        prepareReadFile(std::string path);
+    void        prepareSendResponse(std::string content);
     std::string aElement(struct dirent* ent);
     std::string fileInfo(struct dirent* ent, std::string path);
     std::string spaces(std::string name, int n);

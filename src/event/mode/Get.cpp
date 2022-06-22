@@ -16,6 +16,8 @@
 #include <string>
 #include <sys/stat.h>
 
+const std::string Get::CRLF = "\r\n";
+
 Get::Get(StreamSocket stream, URI& uri) : stream_(stream), uri_(uri) {}
 
 Get::~Get() {}
@@ -88,8 +90,7 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
     std::string fullpath = "." + path + "/" + name;
     std::cout << "path: " << fullpath << std::endl;
 
-    struct stat s = URI::Stat(fullpath);
-
+    struct stat s          = URI::Stat(fullpath);
     std::string time_stamp = timeStamp(&s.st_mtime);
 
     ss << time_stamp << fileSize(&s);
@@ -97,6 +98,12 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
 }
 
 void Get::autoIndex(std::string path) {
+    std::stringstream ss;
+    ss << "<html>" << CRLF << "<head>" << CRLF << "<title>"
+       << "Index of " << path << "</title>" << CRLF << "</head>" << CRLF
+       << "<body>" << CRLF << "<h1> Index of " << path << "</h1>" << CRLF
+       << "<hr>" << CRLF << "<pre>" << CRLF;
+
     errno    = 0;
     DIR* dir = opendir(path.c_str());
     if (dir == NULL) {
@@ -106,18 +113,8 @@ void Get::autoIndex(std::string path) {
         }
         throw status::server_error;
     }
+    // "."を削除
     path = path.substr(1);
-
-    std::stringstream ss;
-    ss << "<html>\r\n"
-       << "<head>\r\n"
-       << "<title>"
-       << "Index of " << path << "</title>\r\n"
-       << "</head>\r\n"
-       << "<body>\r\n"
-       << "<h1> Index of " << path << "</h1>\r\n"
-       << "<hr>\r\n"
-       << "<pre>\r\n";
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
         if (std::string(".") == ent->d_name) {
@@ -128,22 +125,24 @@ void Get::autoIndex(std::string path) {
         if (std::string("..") != ent->d_name) {
             ss << fileInfo(ent, path);
         }
-        ss << "\r\n";
+        ss << CRLF;
     }
-    ss << "</pre>\r\n"
-       << "<hr>\r\n"
-       << "</body>\r\n"
-       << "</html>\r\n";
     if (errno == EBADF) {
         perror("readdir");
         throw status::server_error;
     }
+    ss << "</pre>" << CRLF << "<hr>" << CRLF << "</body>" << CRLF << "</html>"
+       << CRLF;
 
+    prepareSendResponse(ss.str());
+}
+
+void Get::prepareSendResponse(std::string content) {
     HTTPResponse      resp;
-    std::string       content = ss.str();
     std::stringstream size;
     size << content.size();
     resp.AppendHeader("Content-Length", size.str());
+    resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
     resp.SetBody(content);
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
