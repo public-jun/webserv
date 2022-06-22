@@ -71,6 +71,7 @@ std::string Get::timeStamp(time_t* time) {
     return ss.str();
 }
 
+// 最小フィールド幅35のファイルサイズを返す
 std::string Get::fileSize(struct stat* s) {
     std::string size;
     if (S_ISDIR(s->st_mode)) {
@@ -84,20 +85,14 @@ std::string Get::fileSize(struct stat* s) {
 }
 
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
-    std::stringstream ss;
-
-    std::string name = ent->d_name;
     std::string slash;
     if (std::string(1, path.back()) != "/") {
         slash = "/";
     }
-    std::string fullpath = "." + path + slash + name;
+    const std::string fullpath = "." + path + slash + std::string(ent->d_name);
+    struct stat       s        = URI::Stat(fullpath);
 
-    struct stat s          = URI::Stat(fullpath);
-    std::string time_stamp = timeStamp(&s.st_mtime);
-
-    ss << time_stamp << fileSize(&s);
-    return ss.str();
+    return timeStamp(&s.st_mtime) + fileSize(&s);
 }
 
 void Get::autoIndex(std::string path) {
@@ -117,7 +112,6 @@ void Get::autoIndex(std::string path) {
        << "Index of " << path << "</title>" << CRLF << "</head>" << CRLF
        << "<body>" << CRLF << "<h1> Index of " << path << "</h1>" << CRLF
        << "<hr>" << CRLF << "<pre>" << CRLF;
-
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
         if (std::string(".") == ent->d_name) {
