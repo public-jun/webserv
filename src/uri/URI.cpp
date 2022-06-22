@@ -31,7 +31,7 @@ const LocationConfig&           URI::GetLocationConfig() const {
 const std::string& URI::GetLocalPath() const { return local_path_; }
 
 // ラッパー関数を集めたところに入れたい
-struct stat URI::Stat(const std::string path) const {
+struct stat URI::Stat(const std::string path) {
     struct stat s;
     errno = 0;
 
