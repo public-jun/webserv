@@ -66,8 +66,8 @@ std::string Get::timeStamp(time_t* time) {
                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(2) << tm->tm_mday << "-"
-       << month[tm->tm_mon] << "-" << 1900 + tm->tm_year << " " << tm->tm_hour
-       << ":" << std::setw(2) << tm->tm_min;
+       << month[tm->tm_mon] << "-" << 1900 + tm->tm_year << " " << std::setw(2)
+       << tm->tm_hour << ":" << std::setw(2) << tm->tm_min;
     return ss.str();
 }
 
@@ -86,8 +86,12 @@ std::string Get::fileSize(struct stat* s) {
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
     std::stringstream ss;
 
-    std::string name     = ent->d_name;
-    std::string fullpath = "." + path + "/" + name;
+    std::string name = ent->d_name;
+    std::string slash;
+    if (std::string(1, path.back()) != "/") {
+        slash = "/";
+    }
+    std::string fullpath = "." + path + slash + name;
     std::cout << "path: " << fullpath << std::endl;
 
     struct stat s          = URI::Stat(fullpath);
