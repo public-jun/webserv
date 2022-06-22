@@ -162,17 +162,34 @@ void URI::findLocationConfig() {
 }
 
 void URI::storeLocalPath() {
+    if (location_config_.GetAlias() != "") {
+        local_path_ = applyAliasDirective(location_config_.GetAlias());
+    } else if (location_config_.GetRoot() != "") {
+        local_path_ = applyRootDirective(location_config_.GetRoot());
+    } else if (server_config_.GetRoot() != "") {
+        local_path_ = applyRootDirective(server_config_.GetRoot());
+    } else {
+        throw status::bad_request;
+    }
+}
+
+std::string URI::applyAliasDirective(std::string alias_dir) {
+    if (*alias_dir.rbegin() != '/') {
+        alias_dir += "/";
+    }
+
     std::string location_target_dir = location_config_.GetTarget();
     if (*location_target_dir.rbegin() != '/') {
         location_target_dir += "/";
     }
+    return alias_dir + decode_path_.substr(location_target_dir.length());
+}
 
-    // local_path_を設定する
-    std::string alias = location_config_.GetAlias();
-    if (*alias.rbegin() != '/') {
-        alias += "/";
+std::string URI::applyRootDirective(std::string root_dir) {
+    if (*root_dir.rbegin() != '/') {
+        root_dir += "/";
     }
-    local_path_ = alias + decode_path_.substr(location_target_dir.length());
+    return root_dir + decode_path_.substr(1);
 }
 
 // URLエンコーディングをデコードする

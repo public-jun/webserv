@@ -25,13 +25,18 @@ protected:
         std::vector<const ServerConfig>::const_iterator s_it =
             virtual_server_configs.begin();
 
-        multi_location = *s_it;
-        s_it++;
-        stat_test_conf = *s_it;
+        multi_location = *s_it++;
+        stat_test_conf = *s_it++;
+        cgi_conf       = *s_it++;
+        default_conf   = *s_it++;
+        mix_path_conf  = *s_it++;
     }
 
     ServerConfig multi_location;
     ServerConfig stat_test_conf;
+    ServerConfig cgi_conf;
+    ServerConfig default_conf;
+    ServerConfig mix_path_conf;
 };
 
 TEST_F(URITest, splitURI) {
@@ -307,5 +312,49 @@ TEST_F(URITest, DecodeURI) {
 
         EXPECT_EQ("/あいう/あいう", uri.GetDecodePath());
         EXPECT_EQ("%E3%81%82%E3%81%84%E3%81%86", uri.GetQuery());
+    }
+}
+
+TEST_F(URITest, MixURI) {
+    {
+        URI uri(mix_path_conf, "/a/1");
+        uri.Init();
+
+        EXPECT_EQ("./A/1", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(mix_path_conf, "/a/aa/1/2");
+        uri.Init();
+
+        EXPECT_EQ("./A/AA/1/2", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(mix_path_conf, "/b/1");
+        uri.Init();
+
+        EXPECT_EQ("./B/b/1", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(mix_path_conf, "/b/1");
+        uri.Init();
+
+        EXPECT_EQ("./B/b/1", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(mix_path_conf, "/c/1/2");
+        uri.Init();
+
+        EXPECT_EQ("./C/CC/1/2", uri.GetLocalPath());
+    }
+
+    {
+        URI uri(mix_path_conf, "/d/1");
+        uri.Init();
+
+        EXPECT_EQ("./default/d/1", uri.GetLocalPath());
     }
 }
