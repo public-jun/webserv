@@ -197,7 +197,9 @@ void might_set_body(HTTPParser::State& state, const std::string& buf,
     }
 }
 
-bool needs_parse_body(const std::string& method) { return method != "GET"; }
+bool needs_parse_body(const std::string& method) {
+    return method != "GET" && method != "DELETE";
+}
 
 bool has_done_header_line(const std::string& line) { return line == ""; }
 

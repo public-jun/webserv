@@ -40,3 +40,4 @@ tester
 compile_commands.json
 *.dSYM
 .cache/*
+upload_files
