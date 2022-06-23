@@ -25,7 +25,7 @@ public:
     const std::vector<std::string>& GetArgs() const;
     const LocationConfig&           GetLocationConfig() const;
     const std::string&              GetLocalPath() const;
-    struct stat                     Stat(const std::string path) const;
+    static struct stat              Stat(const std::string path);
 
 private:
     URI();
