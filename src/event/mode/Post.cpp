@@ -2,7 +2,7 @@
 #include <iostream>
 
 Post::Post(StreamSocket stream, HTTPRequest req, URI& uri)
-    : IOEvent(POST), stream_(stream), uri_(uri), req_(req) {}
+    : stream_(stream), uri_(uri), req_(req) {}
 
 Post::~Post() {}
 
@@ -18,10 +18,6 @@ void Post::Run() {
     if (fd_ < 0)
         throw status::server_error;
 }
-
-void Post::Register() {}
-
-void Post::Unregister() {}
 
 IOEvent* Post::RegisterNext() {
     IOEvent* write_file = new WriteFile(stream_, fd_, req_);

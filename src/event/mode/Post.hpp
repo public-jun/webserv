@@ -20,16 +20,13 @@
 #include <time.h>
 #include <unistd.h>
 
-class Post : public IOEvent {
+class Post {
 public:
     Post(StreamSocket stream, HTTPRequest req, URI& uri);
     virtual ~Post();
 
     virtual void     Run();
-    virtual void     Register();
-    virtual void     Unregister();
     virtual IOEvent* RegisterNext();
-    void             openFile();
 
 private:
     StreamSocket stream_;
