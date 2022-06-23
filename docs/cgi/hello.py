@@ -2,6 +2,9 @@
 import os
 import sys
 
+print('Content-type: text/html; charset=utf-8')
+print('')
+
 print('----Args----')
 args = sys.argv
 for arg in args:

@@ -5,9 +5,12 @@
 #include <sstream>
 #include <unistd.h>
 
+#include "CGIResponse.hpp"
+#include "CGIResponseParser.hpp"
 #include "EventRegister.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
@@ -16,7 +19,8 @@ const std::size_t ReadCGI::BUF_SIZE = 2048;
 
 ReadCGI::ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req)
     : IOEvent(fd_read_from_cgi, READ_CGI), stream_(stream), req_(req),
-      is_finish_(false), resp_(HTTPResponse()) {}
+      is_finish_(false), cgi_resp_(CGIResponse()), resp_(HTTPResponse()),
+      cgi_parser_(cgi_resp_) {}
 
 ReadCGI::~ReadCGI() {
     int fd = polled_fd_;
@@ -32,29 +36,25 @@ void ReadCGI::Run() {
 
     int read_size = read(fd_from_cgi, buf, BUF_SIZE);
     if (read_size < 0) {
-        throw SysError("read", errno);
-    } else if (read_size == 0) {
-        is_finish_ = true;
-    } else {
-        cgi_output_.append(buf, read_size);
+        throw std::make_pair(stream_, status::server_error);
     }
-}
 
+    try {
+        cgi_parser_(std::string(buf, read_size), read_size);
+    } catch (status::code code) { throw std::make_pair(stream_, code); }
+}
 void ReadCGI::Register() { EventRegister::Instance().AddReadEvent(this); }
 
 void ReadCGI::Unregister() { EventRegister::Instance().DelReadEvent(this); }
 
 IOEvent* ReadCGI::RegisterNext() {
-    if (!is_finish_) {
+    if (cgi_parser_.GetPhase() != CGIResponseParser::DONE) {
         return this;
     }
 
-    // response 作成
-    std::stringstream ss;
-    ss << cgi_output_.size() << std::flush;
-    resp_.AppendHeader("Content-Length", ss.str());
-    resp_.SetBody(cgi_output_);
-    resp_.AppendHeader("Server", "Webserv/1.0.0");
+    // cgi_resp_.LogInfo();
+    cgi_resp_.GenerateHTTPResponse(resp_);
+
     resp_.SetVersion(req_.GetVersion());
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
