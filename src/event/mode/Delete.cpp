@@ -2,13 +2,9 @@
 #include <iostream>
 
 Delete::Delete(StreamSocket stream, URI& uri)
-    : IOEvent(DELETE), stream_(stream), uri_(uri), resp_(HTTPResponse()) {}
+    : stream_(stream), uri_(uri), resp_(HTTPResponse()) {}
 
 Delete::~Delete() {}
-
-void Delete::Register() {}
-
-void Delete::Unregister() {}
 
 void Delete::Run() {
     std::string        target_path = uri_.GetLocalPath();
