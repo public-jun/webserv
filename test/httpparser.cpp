@@ -350,6 +350,48 @@ TEST(HTTPParser, EmptyKey) {
     }
 }
 
+TEST(HTTPParser, ChunkedBodyNotCRLFAfterSize) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Content-Encoding: chunked\r\n"
+                   "\r\n"
+                   "7"
+                   "Mozilla\r\n"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
+}
+
+TEST(HTTPParser, ChunkedBodyNotCRLFAfterdata) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Content-Encoding: chunked\r\n"
+                   "\r\n"
+                   "7\r\n"
+                   "Mozilla"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
+}
+
 // =======================
 // == OTHER STATUS CASE ==
 
