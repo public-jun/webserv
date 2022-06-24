@@ -16,9 +16,9 @@ WriteFile::~WriteFile() {
 }
 
 void WriteFile::Run() {
-    std::string content_ = req_.GetBody();
-    int         size     = write(polled_fd_, content_.c_str(), content_.size());
-    if (size < 0 || static_cast<size_t>(size) != content_.size())
+    std::string content = req_.GetBody();
+    int         size     = write(polled_fd_, content.c_str(), content.size());
+    if (size < 0 || static_cast<size_t>(size) != content.size())
         throw SysError("write", errno);
 }
 

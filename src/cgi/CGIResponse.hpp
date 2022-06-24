@@ -12,7 +12,6 @@ public:
     CGIResponse();
     ~CGIResponse();
 
-    void LogInfo();
 
     void SetStatusCode(int status);
     void SetBody(std::string body);
@@ -25,6 +24,7 @@ public:
     const std::string& GetBody() const;
 
     void GenerateHTTPResponse(HTTPResponse& http_resp);
+    void PrintInfo();
 
 private:
     int                                status_code_;

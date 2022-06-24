@@ -10,21 +10,6 @@ CGIResponse::CGIResponse() : status_code_(200) {}
 
 CGIResponse::~CGIResponse() {}
 
-void CGIResponse::LogInfo() {
-    typedef std::map<std::string, std::string>::const_iterator const_iterator;
-
-    std::cout << "====== CGI Response ======" << std::endl;
-
-    std::cout << "======    HEADER    ======" << std::endl;
-    for (const_iterator it = header_.begin(); it != header_.end(); it++) {
-        std::cout << it->first << ":" << it->second << std::endl;
-    }
-    std::cout << "======  HEADER END  ======" << std::endl;
-
-    std::cout << "======     BODY     ======" << std::endl;
-    std::cout << body_ << std::endl;
-    std::cout << "======   BODY END   ======" << std::endl;
-}
 
 void CGIResponse::SetStatusCode(int status) { status_code_ = status; }
 
@@ -69,4 +54,20 @@ void CGIResponse::GenerateHTTPResponse(HTTPResponse& http_resp) {
     }
     http_resp.SetStatusCode(status_code_);
     http_resp.SetBody(body_);
+}
+
+void CGIResponse::PrintInfo() {
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+
+    std::cout << "====== CGI Response ======" << std::endl;
+
+    std::cout << "======    HEADER    ======" << std::endl;
+    for (const_iterator it = header_.begin(); it != header_.end(); it++) {
+        std::cout << it->first << ":" << it->second << std::endl;
+    }
+    std::cout << "======  HEADER END  ======" << std::endl;
+
+    std::cout << "======     BODY     ======" << std::endl;
+    std::cout << body_ << std::endl;
+    std::cout << "======   BODY END   ======" << std::endl;
 }

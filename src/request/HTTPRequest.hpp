@@ -29,6 +29,8 @@ public:
     static const std::string            CRLF;
     static const std::string::size_type CRLF_SIZE;
 
+    void PrintInfo() const;
+
 private:
     std::string                        method_;
     std::string                        request_target_;
