@@ -52,7 +52,7 @@ IOEvent* ReadCGI::RegisterNext() {
         return this;
     }
 
-    // cgi_resp_.LogInfo();
+    cgi_resp_.LogInfo();
     cgi_resp_.GenerateHTTPResponse(resp_);
 
     resp_.SetVersion(req_.GetVersion());
