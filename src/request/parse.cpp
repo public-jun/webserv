@@ -5,6 +5,10 @@
 #include <sstream>
 
 namespace {
+
+static const std::string            crlf      = "\r\n";
+static const std::string::size_type crlf_size = crlf.size();
+
 void throw_code_badrequest(const std::string err_message = "bad request") {
     std::cerr << err_message << std::endl;
     throw status::bad_request;
@@ -186,8 +190,9 @@ unsigned long str_to_ulong(const std::string& str) {
     return value;
 }
 
-void might_set_body(HTTPParser::State& state, const std::string& buf,
-                    unsigned long content_length) {
+void might_set_body_with_content_length(HTTPParser::State& state,
+                                        const std::string& buf,
+                                        unsigned long      content_length) {
     if (buf.size() >= content_length) {
         state.Request().SetBody(std::string(buf, 0, content_length));
         state.Phase() = HTTPParser::DONE;
@@ -203,8 +208,101 @@ bool has_done_header_line(const std::string& line) { return line == ""; }
 void validate_after_parse_header(HTTPRequest& req) {
     validate_host(req);
     validate_version_not_suppoted(req.GetVersion());
+    // TODO:
+    // validate_transfer_encoding();
 }
 
+bool exist_last_chunk(const std::string& buf) {
+    const std::string      last_chunk = "0" + crlf + crlf;
+    std::string::size_type pos        = buf.find(last_chunk);
+    if (pos == std::string::npos) {
+        return false;
+    }
+    return true;
+}
+
+/*
+
+4.1.3. チャンク化の復号法
+
+チャンク化転送符号法を復号する処理は、次の疑似コードで表現できる：
+
+    長さ :← 0
+    本体 :← 空
+
+    WHILE 無条件：
+        ［ chunk-size, chunk-ext （もしあれば）, CRLF ］を読み取る
+        IF［ chunk-size ＝ 0 ） ］ ：BREAK
+        ［ chunk-data, CRLF ］を読み取る
+        本体 に chunk-data を付加する
+        長さ ← 長さ + chunk-size
+
+    WHILE 無条件：
+        f :← 次のトレイラフィールドを読み取った結果
+        IF［ f は空である ］ ：BREAK
+        IF［ f はトレイラ節内に送信することが許容されている ］
+：既存のヘッダ節に f を付加する Content-Length のヘッダ値 ← 長さ
+    Transfer-Encoding から "chunked" を除去する
+    既存のヘッダ節から Trailer を除去する
+    RETURN 本体
+
+*/
+
+std::string parse_chunked_body(std::string buf) {
+    std::string body;
+
+    for (;;) {
+        std::string::size_type pos = buf.find(crlf);
+        if (pos == std::string::npos) {
+            //
+        }
+        unsigned long chunk_size = str_to_ulong(buf.substr(0, pos));
+        if (chunk_size == 0) {
+            break;
+        }
+        buf                      = buf.substr(pos + crlf_size);
+        std::string chunked_data = buf.substr(0, chunk_size);
+        body                     = body + chunked_data;
+        // chunked_dataの後ろにcrlfがなかったら？
+        buf = buf.substr(chunk_size + crlf_size);
+    }
+    std::cout << "body: " << body << std::endl;
+
+    return body;
+}
+
+/*
+
+chunked-body   = *chunk
+                 last-chunk
+                 trailer-part
+                 CRLF
+
+chunk          = chunk-size [ chunk-ext ] CRLF
+                 chunk-data CRLF
+chunk-size     = 1*HEXDIG
+last-chunk     = 1*("0") [ chunk-ext ] CRLF
+
+chunk-data     = 1*OCTET ; 長さ chunk-size のオクテット列
+
+Example:
+
+7\r\n
+Mozilla\r\n
+9\r\n
+Developer\r\n
+7\r\n
+Network\r\n
+0\r\n
+\r\n
+
+*/
+void might_set_chunked_body(HTTPParser::State& state, std::string& buf) {
+    if (exist_last_chunk(buf)) {
+        std::string body = parse_chunked_body(buf);
+        state.Request().SetBody(body);
+    }
+}
 } // namespace
 
 namespace HTTPParser {
@@ -244,10 +342,14 @@ void update_state(State& state, const std::string new_buf) {
                     phase = DONE;
                     return;
                 }
+                if (req.GetHeaderValue("content-encoding") == "chunked") {
+                    might_set_chunked_body(state, buf);
+                } else {
+                    might_set_body_with_content_length(
+                        state, buf,
+                        str_to_ulong(req.GetHeaderValue("content-length")));
+                }
 
-                might_set_body(
-                    state, buf,
-                    str_to_ulong(req.GetHeaderValue("content-length")));
                 return;
 
             case DONE:

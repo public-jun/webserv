@@ -50,6 +50,31 @@ TEST(HTTPParser, ParseBody) {
     EXPECT_EQ("hoge", req.GetBody());
 }
 
+TEST(HTTPParser, ParseChunkedBody) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Content-Encoding: chunked\r\n"
+                   "\r\n"
+                   "7\r\n"
+                   "Mozilla\r\n"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    HTTPParser::update_state(state, message);
+
+    EXPECT_EQ(200, req.GetStatus());
+    EXPECT_EQ("Mozilla"
+              "Developer"
+              "Network",
+              req.GetBody());
+}
+
 TEST(HTTPParser, ParsePart1) {
     vector<string> m;
     m.push_back("GE");
