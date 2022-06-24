@@ -95,7 +95,7 @@ void validate_version(const std::string& version) {
 }
 
 void validate_host(const HTTPRequest& req) {
-    if (req.GetHeaderValue("Host").empty()) {
+    if (req.GetHeaderValue("host").empty()) {
         throw_code_badrequest("empty host");
     }
 }
@@ -129,11 +129,8 @@ void parse_header_line(HTTPRequest& req, const std::string& line) {
 
     validate_token(key);
 
-    // example: HOST -> Host
+    // example: HOST -> host
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-    if (key.size() >= 1) {
-        key[0] = std::toupper(key[0]);
-    }
 
     value = trim_space(value);
     if (value.find_first_of(HTTPRequest::CRLF) != value.npos) {
@@ -247,9 +244,10 @@ void update_state(State& state, const std::string new_buf) {
                     phase = DONE;
                     return;
                 }
+
                 might_set_body(
                     state, buf,
-                    str_to_ulong(req.GetHeaderValue("Content-length")));
+                    str_to_ulong(req.GetHeaderValue("content-length")));
                 return;
 
             case DONE:

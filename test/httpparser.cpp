@@ -20,7 +20,7 @@ TEST(HTTPParser, ParseAllAtOnce) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -34,7 +34,7 @@ TEST(HTTPParser, EmptyVersion) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -65,7 +65,7 @@ TEST(HTTPParser, ParsePart1) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -85,7 +85,7 @@ TEST(HTTPParser, ParsePart2) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -96,7 +96,7 @@ TEST(HTTPParser, HeaderValueTrimSpace) {
     HTTPParser::update_state(state, message);
 
     EXPECT_EQ(200, req.GetStatus());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
 
 TEST(HTTPParser, NormalizeHeaderKey) {
@@ -106,7 +106,7 @@ TEST(HTTPParser, NormalizeHeaderKey) {
     HTTPParser::update_state(state, message);
 
     EXPECT_EQ(200, req.GetStatus());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
 
 TEST(HTTPParser, PhaseFirstLine) {
@@ -157,7 +157,7 @@ TEST(HTTPParser, LowercaseMethod) {
 }
 
 TEST(HTTPParser, VersionNotExistName) {
-    string            message = "GET / /1.1\r\nHost: localhost\r\n\r\n";
+    string            message = "GET / /2.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
 
