@@ -8,6 +8,7 @@
 #include "IOEvent.hpp"
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
+#include "URI.hpp"
 
 class RecvRequest : public IOEvent {
 public:
@@ -27,6 +28,12 @@ private:
 private:
     RecvRequest();
     IOEvent* prepareResponse();
+
+    void validateRequest(const URI& uri);
+    void validateBodySize();
+    void validateMethod(const URI& uri);
+    bool isDigit(std::string str);
+
     // RecvRequestに必要な入力
     StreamSocket stream_;
 
