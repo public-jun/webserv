@@ -95,7 +95,7 @@ IOEvent* RecvRequest::prepareResponse() {
             new_event->Register();
             return new_event;
         } else {
-            Post post(stream_, req_);
+            Post post(stream_, req_, uri);
 
             post.Run();
             this->Unregister();
