@@ -1,12 +1,7 @@
 // #include "EventAction.hpp"
 #include "EventExecutor.hpp"
 #include "EventRegister.hpp"
-#include "ListeningSocket.hpp"
-
-#include "AcceptConn.hpp"
-#include "Config.hpp"
-#include "ConfigParser.hpp"
-#include "IOEvent.hpp"
+#include "Supervisor.hpp"
 #include <unistd.h>
 #include <vector>
 
@@ -16,43 +11,15 @@ int main(int argc, char** argv) {
     try {
         if (argc != 2)
             throw(std::runtime_error("invalid number of arguments"));
+        Supervisor::Instance().InitServer(argv[1]);
+
         EventExecutor executor;
         executor.Init();
-
-        std::string config_file_path = argv[1];
-        ConfigParser::ParseConfigFile(config_file_path);
-        std::map<int, std::vector<const ServerConfig> > server_configs =
-            Config::Instance()->GetServerConfigs();
-
-        std::map<int, std::vector<const ServerConfig> >::const_iterator it_end =
-            server_configs.end();
-
-        std::vector<ListeningSocket> listeners;
-        for (std::map<int, std::vector<const ServerConfig> >::const_iterator
-                 it = server_configs.begin();
-             it != it_end; it++) {
-
-            int                                    port    = it->first;
-            const std::vector<const ServerConfig>& configs = it->second;
-
-            ListeningSocket ls(configs);
-            ls.Bind("127.0.0.1", port);
-            ls.Listen();
-            listeners.push_back(ls);
-
-            IOEvent* event = new AcceptConn(ls);
-            event->Register();
-        }
-
         while (true) {
             executor.ProcessEvent();
         }
 
-        // 全てのListeningSocketをclose
-        for (std::vector<ListeningSocket>::iterator it = listeners.begin();
-             it != listeners.end(); it++) {
-            it->Close();
-        }
+        Supervisor::Instance().ShutDownServer();
         executor.ShutDown();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
