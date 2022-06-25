@@ -50,7 +50,7 @@ TEST(HTTPParser, ParseBody) {
     EXPECT_EQ("hoge", req.GetBody());
 }
 
-TEST(HTTPParser, ParseChunkedBody) {
+TEST(HTTPParser, ChunkedBody) {
     string message("POST / HTTP/1.1\r\n"
                    "Host: localhost\r\n"
                    "Content-Encoding: chunked\r\n"

@@ -221,50 +221,36 @@ bool exist_last_chunk(const std::string& buf) {
     return true;
 }
 
-/*
-
-4.1.3. チャンク化の復号法
-
-チャンク化転送符号法を復号する処理は、次の疑似コードで表現できる：
-
-    長さ :← 0
-    本体 :← 空
-
-    WHILE 無条件：
-        ［ chunk-size, chunk-ext （もしあれば）, CRLF ］を読み取る
-        IF［ chunk-size ＝ 0 ） ］ ：BREAK
-        ［ chunk-data, CRLF ］を読み取る
-        本体 に chunk-data を付加する
-        長さ ← 長さ + chunk-size
-
-    WHILE 無条件：
-        f :← 次のトレイラフィールドを読み取った結果
-        IF［ f は空である ］ ：BREAK
-        IF［ f はトレイラ節内に送信することが許容されている ］
-：既存のヘッダ節に f を付加する Content-Length のヘッダ値 ← 長さ
-    Transfer-Encoding から "chunked" を除去する
-    既存のヘッダ節から Trailer を除去する
-    RETURN 本体
-
-*/
-
 std::string parse_chunked_body(std::string buf) {
     std::string body;
 
     for (;;) {
         std::string::size_type pos = buf.find(crlf);
-        if (pos == std::string::npos) {
-            //
+        // chunk_sizeが全て数字か
+        std::string s_chunk_size = buf.substr(0, pos);
+        if (!isdigit(s_chunk_size)) {
+            std::cerr << "chunk size is not digit" << std::endl;
+            throw status::bad_request;
         }
-        unsigned long chunk_size = str_to_ulong(buf.substr(0, pos));
+        unsigned long chunk_size = str_to_ulong(s_chunk_size);
         if (chunk_size == 0) {
             break;
         }
-        buf                      = buf.substr(pos + crlf_size);
+        buf = buf.substr(pos + crlf_size);
+        // chunk_size分の文字列があるか
+        if (buf.size() < chunk_size) {
+            std::cerr << "not exist chunked_data for chunk_size" << std::endl;
+            throw status::bad_request;
+        }
         std::string chunked_data = buf.substr(0, chunk_size);
         body                     = body + chunked_data;
-        // chunked_dataの後ろにcrlfがなかったら？
-        buf = buf.substr(chunk_size + crlf_size);
+        // chunked_dataの後ろにcrlfがあるか
+        buf = buf.substr(chunk_size);
+        if (buf.size() >= crlf_size && buf.substr(0, crlf_size) != crlf) {
+            std::cout << "not exist crlf after chunked_data" << std::endl;
+            throw status::bad_request;
+        }
+        buf = buf.substr(crlf_size);
     }
     std::cout << "body: " << body << std::endl;
 
