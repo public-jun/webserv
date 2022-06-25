@@ -249,10 +249,10 @@ TEST_F(URITest, statLocalPath) {
     }
 
     {
-        URI uri(stat_test_conf, "/a/b/cgi/hello.py");
+        URI uri(stat_test_conf, "/a/b/cgi/python/formtest.py");
         uri.Init();
 
-        EXPECT_EQ("./docs/cgi/hello.py", uri.GetLocalPath());
+        EXPECT_EQ("./docs/cgi/python/formtest.py", uri.GetLocalPath());
         EXPECT_TRUE(S_ISREG(uri.Stat(uri.GetLocalPath()).st_mode));
     }
 
