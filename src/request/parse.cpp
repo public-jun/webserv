@@ -110,6 +110,12 @@ void validate_version_not_suppoted(const std::string& version) {
     }
 }
 
+void validate_transfer_encoding(const std::string& encoding) {
+    if (encoding != "" || encoding != "chunked") {
+        throw status::unsupported_media_type;
+    }
+}
+
 // 前後のスペースをtrim
 std::string trim_space(const std::string& str,
                        const std::string  trim_char_set = " ") {
@@ -208,8 +214,7 @@ bool has_done_header_line(const std::string& line) { return line == ""; }
 void validate_after_parse_header(HTTPRequest& req) {
     validate_host(req);
     validate_version_not_suppoted(req.GetVersion());
-    // TODO:
-    // validate_transfer_encoding();
+    validate_transfer_encoding(req.GetHeaderValue("transfer-encoding"));
 }
 
 bool exist_last_chunk(const std::string& buf) {
