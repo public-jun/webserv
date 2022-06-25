@@ -165,7 +165,7 @@ void ConfigParser::setupMaxClientBodySize(str_vec_itr   it[2],
     std::string size = (*max_client_body_size).substr(0, len - 1);
     std::string unit = (*max_client_body_size).substr(len - 1, 1);
 
-    int mag = (unit == "K" || unit == "k") ? 1000 : 1000000;
+    int mag = (unit == "K" || unit == "k") ? 1000 : 1000 * 1000;
     server_config.SetMaxClientBodySize(strtol(size.c_str(), NULL, 10) * mag);
 }
 

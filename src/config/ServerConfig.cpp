@@ -2,7 +2,7 @@
 
 ServerConfig::ServerConfig() {
     this->port_                 = -1;
-    this->max_client_body_size_ = 1000000;
+    this->max_client_body_size_ = 1 * 1000 * 1000;
     this->root_                 = "./";
 }
 
@@ -34,7 +34,6 @@ void ServerConfig::SetServerName(std::string server_name) {
 }
 
 void ServerConfig::SetMaxClientBodySize(unsigned int max_client_body_size) {
-    std::cout << "max_client_body_size :" << max_client_body_size << std::endl;
     this->max_client_body_size_ = max_client_body_size;
 }
 

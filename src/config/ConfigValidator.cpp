@@ -317,8 +317,8 @@ bool ConfigValidator::isValidMaxClientBodySize(str_vec_itr begin) {
         return (false);
     if (unit.length() != 1 || units.find(unit) == std::string::npos)
         return (false);
-    int mag = (unit == "K" || unit == "k") ? 1000 : 1000000;
-    if (strtol(size.c_str(), NULL, 10) * mag >= 1000000000)
+    int mag = (unit == "K" || unit == "k") ? 1000 : 1000 * 1000;
+    if (strtol(size.c_str(), NULL, 10) * mag > 1000 * 1000 * 1000)
         return (false);
     return (true);
 }
