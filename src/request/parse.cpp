@@ -17,9 +17,9 @@ void validate_token(const std::string& token) {
     if (token.empty()) {
         throw status::bad_request;
     }
-    const std::string special = "!#$%&'*+-.^_`|~";
-    for (std::string::const_iterator it = token.begin(); it != token.end();
-         it++) {
+    const std::string           special = "!#$%&'*+-.^_`|~";
+    std::string::const_iterator end     = token.end();
+    for (std::string::const_iterator it = token.begin(); it != end; it++) {
         if (!std::isalnum(*it) && special.find(*it) == special.npos) {
             throw status::bad_request;
         }
@@ -29,8 +29,8 @@ void validate_token(const std::string& token) {
 void validate_method(const std::string& method) {
     validate_token(method);
 
-    for (std::string::const_iterator it = method.begin(); it != method.end();
-         it++) {
+    std::string::const_iterator end = method.end();
+    for (std::string::const_iterator it = method.begin(); it != end; it++) {
         if (!std::isupper(*it) && *it != '_' && *it != '-') {
             throw status::bad_request;
         }
@@ -44,7 +44,8 @@ void validate_request_target(const std::string& request_target) {
 }
 
 bool isdigit(const std::string& str) {
-    for (std::string::const_iterator it = str.begin(); it != str.end(); it++) {
+    std::string::const_iterator end = str.end();
+    for (std::string::const_iterator it = str.begin(); it != end; it++) {
         if (!std::isdigit(*it)) {
             return false;
         }
