@@ -108,7 +108,7 @@ std::vector<std::string> CGI::makeEnvs() {
     oss << req_.GetBody().size() << std::flush;
     env_map["CONTENT_LENGTH"] = oss.str();
     oss.str("");
-    env_map["CONTENT_TYPE"]      = req_.GetHeaderValue("Content-Type");
+    env_map["CONTENT_TYPE"]      = req_.GetHeaderValue("Content-type");
     env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
     env_map["PATH_INFO"]         = uri_.GetRawPath();
     env_map["PATH_TRANSLATED"]   = uri_.GetLocalPath();
