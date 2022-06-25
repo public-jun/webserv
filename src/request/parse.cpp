@@ -270,11 +270,9 @@ chunk          = chunk-size [ chunk-ext ] CRLF
                  chunk-data CRLF
 chunk-size     = 1*HEXDIG
 last-chunk     = 1*("0") [ chunk-ext ] CRLF
-
 chunk-data     = 1*OCTET ; 長さ chunk-size のオクテット列
 
-Example:
-
+Example Body:
 7\r\n
 Mozilla\r\n
 9\r\n
@@ -291,6 +289,7 @@ void might_set_chunked_body(HTTPParser::State& state, std::string& buf) {
         state.Request().SetBody(body);
     }
 }
+
 } // namespace
 
 namespace HTTPParser {
