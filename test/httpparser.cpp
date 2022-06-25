@@ -53,7 +53,7 @@ TEST(HTTPParser, ParseBody) {
 TEST(HTTPParser, ChunkedBody) {
     string message("POST / HTTP/1.1\r\n"
                    "Host: localhost\r\n"
-                   "Content-Encoding: chunked\r\n"
+                   "Transfer-Encoding: chunked\r\n"
                    "\r\n"
                    "7\r\n"
                    "Mozilla\r\n"
@@ -353,7 +353,7 @@ TEST(HTTPParser, EmptyKey) {
 TEST(HTTPParser, ChunkedBodyNotCRLFAfterSize) {
     string message("POST / HTTP/1.1\r\n"
                    "Host: localhost\r\n"
-                   "Content-Encoding: chunked\r\n"
+                   "Transfer-Encoding: chunked\r\n"
                    "\r\n"
                    "7"
                    "Mozilla\r\n"
@@ -374,7 +374,7 @@ TEST(HTTPParser, ChunkedBodyNotCRLFAfterSize) {
 TEST(HTTPParser, ChunkedBodyNotCRLFAfterdata) {
     string message("POST / HTTP/1.1\r\n"
                    "Host: localhost\r\n"
-                   "Content-Encoding: chunked\r\n"
+                   "Transfer-Encoding: chunked\r\n"
                    "\r\n"
                    "7\r\n"
                    "Mozilla"
@@ -399,10 +399,36 @@ TEST(HTTPParser, VersionNotSupported) {
     string            message = "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
+
     try {
         HTTPParser::update_state(state, message);
     } catch (status::code code) {
         //
         EXPECT_EQ(status::version_not_suppoted, code);
+    }
+}
+
+TEST(HTTPParser, UnsupportedMediaType) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: gzip, chunked\r\n"
+                   "\r\n"
+                   "7\r\n"
+                   "Mozilla"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::unsupported_media_type, code);
     }
 }

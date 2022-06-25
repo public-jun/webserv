@@ -111,7 +111,7 @@ void validate_version_not_suppoted(const std::string& version) {
 }
 
 void validate_transfer_encoding(const std::string& encoding) {
-    if (encoding != "" || encoding != "chunked") {
+    if (encoding != "" && encoding != "chunked") {
         throw status::unsupported_media_type;
     }
 }
@@ -341,7 +341,7 @@ void update_state(State& state, const std::string new_buf) {
                     phase = DONE;
                     return;
                 }
-                if (req.GetHeaderValue("content-encoding") == "chunked") {
+                if (req.GetHeaderValue("transfer-encoding") == "chunked") {
                     might_set_chunked_body(state, buf);
                 } else {
                     might_set_body_with_content_length(
