@@ -253,8 +253,8 @@ std::string parse_chunked_body(std::string buf) {
 
         buf                      = buf.substr(pos + crlf_size);
         std::string chunked_data = try_parse_chunked_data(buf, chunk_size);
-        body                     = body + chunked_data;
-        buf                      = buf.substr(chunk_size + crlf_size);
+        body.append(chunked_data, 0, chunk_size);
+        buf = buf.substr(chunk_size + crlf_size);
     }
     return body;
 }
