@@ -29,8 +29,6 @@ private:
     RecvRequest();
     IOEvent* prepareResponse();
 
-    bool isDigit(std::string str);
-
     // RecvRequestに必要な入力
     StreamSocket stream_;
 

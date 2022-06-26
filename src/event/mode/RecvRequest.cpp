@@ -66,29 +66,6 @@ IOEvent* RecvRequest::RegisterNext() {
     return NULL;
 }
 
-bool RecvRequest::isDigit(std::string str) {
-    std::string::iterator end = str.end();
-    for (std::string::iterator it = str.begin(); it != end; it++) {
-        if (!std::isdigit(*it)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-unsigned long str_to_ulong(const std::string& str) {
-    const char*   p = str.c_str();
-    char*         end;
-    unsigned long value = std::strtoul(p, &end, 10);
-    if (p == end) {
-        throw std::invalid_argument("str_to_ulong");
-    }
-    if (errno == ERANGE) {
-        throw std::out_of_range("str_to_ulong");
-    }
-    return value;
-}
-
 IOEvent* RecvRequest::prepareResponse() {
     IOEvent* new_event = NULL;
 
