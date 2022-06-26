@@ -1,15 +1,15 @@
-#include "Supervisor.hpp"
+#include "Server.hpp"
 
-Supervisor::Supervisor() {}
+Server::Server() {}
 
-Supervisor::~Supervisor() {}
+Server::~Server() {}
 
-void Supervisor::InitServer(std::string config_file_path) {
+void Server::InitServer(std::string config_file_path) {
     ConfigParser::ParseConfigFile(config_file_path);
     initListeners();
 }
 
-void Supervisor::initListeners() {
+void Server::initListeners() {
     server_config_map server_config_map =
         Config::Instance()->GetServerConfigs();
     server_config_map::const_iterator it_end = server_config_map.end();
@@ -20,8 +20,8 @@ void Supervisor::initListeners() {
     }
 }
 
-void Supervisor::initListeningSockets(int                      port,
-                             const server_config_vec& server_configs) {
+void Server::initListeningSockets(int                      port,
+                                  const server_config_vec& server_configs) {
     server_config_vec::const_iterator it = server_configs.begin();
     while (it != server_configs.end()) {
         std::string host = it->GetHost();
@@ -31,8 +31,8 @@ void Supervisor::initListeningSockets(int                      port,
     }
 }
 
-void Supervisor::initListeningSocket(const server_config_vec& server_configs,
-                            std::string host, int port) {
+void Server::initListeningSocket(const server_config_vec& server_configs,
+                                 std::string host, int port) {
     ListeningSocket ls(server_configs);
     ls.Bind(host, port);
     ls.Listen();
@@ -42,9 +42,9 @@ void Supervisor::initListeningSocket(const server_config_vec& server_configs,
     registered_events_.push_back(event);
 }
 
-bool Supervisor::isHostDuplicated(server_config_vec::const_iterator it,
-                                  const server_config_vec&          configs,
-                                  std::string                       host) {
+bool Server::isHostDuplicated(server_config_vec::const_iterator it,
+                              const server_config_vec&          configs,
+                              std::string                       host) {
     server_config_vec::const_iterator checker = configs.begin();
     while (checker != it) {
         if (checker->GetHost() == host)
@@ -54,7 +54,7 @@ bool Supervisor::isHostDuplicated(server_config_vec::const_iterator it,
     return (false);
 }
 
-void Supervisor::ShutDownServer() {
+void Server::ShutDownServer() {
     for (std::vector<ListeningSocket>::iterator it = listeners_.begin();
          it != listeners_.end(); it++) {
         it->Close();
