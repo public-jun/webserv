@@ -226,21 +226,20 @@ std::string try_parse_chunked_data(std::string buf, unsigned long chunk_size) {
     return chunked_data;
 }
 
-bool try_has_last_chunk(std::string buf) {
-    const std::string::size_type buf_size = buf.size();
+bool try_is_last_chunk(std::string last_chunk) {
+    const std::string::size_type chunk_size = last_chunk.size();
 
-    if (buf_size > crlf_size) {
-        std::cout << "last chunk size is too large" << std::endl;
+    if (chunk_size > crlf_size) {
+        std::cerr << "last chunk size is too large" << std::endl;
         throw status::bad_request;
     }
-    if (buf_size < crlf_size) {
-        std::cout << "yet enough buf" << std::endl;
+    if (chunk_size < crlf_size) {
         return false;
     }
-    if (buf == crlf) {
+    if (last_chunk == crlf) {
         return true;
     }
-    std::cout << "buf doesn't match last_chunk" << std::endl;
+    std::cerr << "buf doesn't match last_chunk" << std::endl;
     throw status::bad_request;
 }
 
@@ -256,9 +255,11 @@ void parse_chunked_body(HTTPParser::State& state) {
         unsigned long chunk_size =
             try_parse_chunk_size(buf.substr(0, crlf_pos));
         // size0の場合、終端まであるか
-        if (chunk_size == 0 &&
-            try_has_last_chunk(buf.substr(crlf_pos + crlf_size))) {
-            state.Request().SetBody(body);
+        if (chunk_size == 0) {
+            if (try_is_last_chunk(buf.substr(crlf_pos + crlf_size))) {
+                state.Request().SetBody(body);
+                state.Phase() = HTTPParser::DONE;
+            }
             return;
         }
         // size+crlf_size以上のdataがあるか

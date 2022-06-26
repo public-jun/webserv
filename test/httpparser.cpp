@@ -72,6 +72,7 @@ TEST(HTTPParser, ChunkedBody) {
               "Developer"
               "Network",
               req.GetBody());
+    EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
 TEST(HTTPParser, ChunkedBodyIncludeLastChunk) {
@@ -89,6 +90,7 @@ TEST(HTTPParser, ChunkedBodyIncludeLastChunk) {
     HTTPParser::update_state(state, message);
 
     EXPECT_EQ("0\r\n\r\n", req.GetBody());
+    EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
 TEST(HTTPParser, ParsePart1) {
@@ -387,7 +389,7 @@ TEST(HTTPParser, ChunkedBodyNotCRLFAfterSize) {
     } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
 }
 
-TEST(HTTPParser, ChunkedBodyNotCRLFAfterdata) {
+TEST(HTTPParser, ChunkedBodyNotCRLFAfterData) {
     string message("POST / HTTP/1.1\r\n"
                    "Host: localhost\r\n"
                    "Transfer-Encoding: chunked\r\n"
