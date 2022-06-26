@@ -59,3 +59,22 @@ void HTTPRequest::SetHeader(const std::string key, const std::string value) {
 }
 
 void HTTPRequest::SetBody(const std::string body) { body_ = body; }
+
+void HTTPRequest::PrintInfo() const {
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    std::cout << "====== HTTP Request ======" << std::endl;
+    std::cout << "======  First Line  ======" << std::endl;
+    std::cout << "Method: [" << method_ << "]" << std::endl;
+    std::cout << "Target: [" << request_target_ << "]" << std::endl;
+    std::cout << "Version: [" << HTTPVersion_ << "]" << std::endl;
+    std::cout << "======    Header    ======" << std::endl;
+    for (const_iterator it = headers_.begin(); it != headers_.end(); it++) {
+        std::cout << it->first << ": [" << it->second << "]" << std::endl;
+    }
+    std::cout << "======  Header END  ======" << std::endl;
+
+    std::cout << "======     BODY     ======" << std::endl;
+    std::cout << body_ << std::endl;
+    std::cout << "======   BODY END   ======" << std::endl;
+    std::cout << "===== HTTP Request END =====\n\n" << std::endl;
+}
