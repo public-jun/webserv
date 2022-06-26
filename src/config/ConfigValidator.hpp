@@ -20,6 +20,7 @@
 #define ERR_MSG_INVLD_ALWD_MTHD "invalid allowed method"
 #define ERR_MSG_INVLD_AUTO_INDEX "invalid auto index"
 #define ERR_MSG_INVLD_RTRN "invalid return"
+#define ERR_MSG_INVLD_MX_CLNT_BDY_SZ "invalid max client body size"
 #define ERR_MSG_DPLCTD_LCTN "duplicated location"
 
 class ConfigValidator {
@@ -59,6 +60,7 @@ private:
     static bool     isValidHost(const std::string& host);
     static bool     isValidPort(const std::string& target);
     static bool     isValidAddr(const std::string& target);
+    static bool     isValidMaxClientBodySize(str_vec_itr begin);
     static bool     isDigit(const std::string& str);
 };
 
