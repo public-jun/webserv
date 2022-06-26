@@ -8,13 +8,13 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
+    EventExecutor executor;
+    executor.Init();
     try {
         if (argc != 2)
             throw(std::runtime_error("invalid number of arguments"));
         Server::Instance().InitServer(argv[1]);
 
-        EventExecutor executor;
-        executor.Init();
         while (true) {
             executor.ProcessEvent();
         }
