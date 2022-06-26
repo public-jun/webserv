@@ -19,10 +19,11 @@ int main(int argc, char** argv) {
             executor.ProcessEvent();
         }
 
-        Server::Instance().ShutDownServer();
         executor.ShutDown();
+        Server::Instance().ShutDownServer();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        executor.ShutDown();
         Server::Instance().ShutDownServer();
         return 1;
     }
