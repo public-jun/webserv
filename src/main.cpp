@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
         executor.ShutDown();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        Server::Instance().ShutDownServer();
         return 1;
     }
 
