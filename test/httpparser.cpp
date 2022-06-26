@@ -68,11 +68,27 @@ TEST(HTTPParser, ChunkedBody) {
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("Mozilla"
               "Developer"
               "Network",
               req.GetBody());
+}
+
+TEST(HTTPParser, ChunkedBodyIncludeLastChunk) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: chunked\r\n"
+                   "\r\n"
+                   "5\r\n"
+                   "0\r\n\r\n\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    HTTPParser::update_state(state, message);
+
+    EXPECT_EQ("0\r\n\r\n", req.GetBody());
 }
 
 TEST(HTTPParser, ParsePart1) {
