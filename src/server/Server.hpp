@@ -7,6 +7,7 @@
 #include "IOEvent.hpp"
 #include "ListeningSocket.hpp"
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 class Server {

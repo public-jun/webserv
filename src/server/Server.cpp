@@ -61,6 +61,7 @@ void Server::ShutDownServer() {
     }
     for (std::vector<IOEvent*>::iterator it = registered_events_.begin();
          it != registered_events_.end(); it++) {
-        (*it)->Unregister();
+        close((*it)->GetPolledFd());
+        delete (*it);
     }
 }
