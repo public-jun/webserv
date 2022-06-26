@@ -206,15 +206,6 @@ void validate_after_parse_header(HTTPRequest& req) {
     validate_transfer_encoding(req.GetHeaderValue("transfer-encoding"));
 }
 
-bool exist_last_chunk(const std::string& buf) {
-    const std::string      last_chunk = "0" + crlf + crlf;
-    std::string::size_type pos        = buf.find(last_chunk);
-    if (pos == std::string::npos) {
-        return false;
-    }
-    return true;
-}
-
 unsigned long try_parse_chunk_size(std::string size) {
     // chunk_sizeが全て数字か
     if (!isdigit(size)) {
@@ -225,12 +216,6 @@ unsigned long try_parse_chunk_size(std::string size) {
 }
 
 std::string try_parse_chunked_data(std::string buf, unsigned long chunk_size) {
-    // chunk_size分の文字列があるか
-    if (buf.size() < chunk_size) {
-        std::cerr << "[ERROR] not exist chunked_data for chunk_size"
-                  << std::endl;
-        throw status::bad_request;
-    }
     std::string chunked_data = buf.substr(0, chunk_size);
     // chunked_dataの後ろにCRLFがあるか
     if (buf.substr(chunk_size).size() >= crlf_size &&
@@ -241,22 +226,51 @@ std::string try_parse_chunked_data(std::string buf, unsigned long chunk_size) {
     return chunked_data;
 }
 
-std::string parse_chunked_body(std::string buf) {
-    std::string body;
+bool try_has_last_chunk(std::string buf) {
+    const std::string::size_type buf_size = buf.size();
+
+    if (buf_size > crlf_size) {
+        std::cout << "last chunk size is too large" << std::endl;
+        throw status::bad_request;
+    }
+    if (buf_size < crlf_size) {
+        std::cout << "yet enough buf" << std::endl;
+        return false;
+    }
+    if (buf == crlf) {
+        return true;
+    }
+    std::cout << "buf doesn't match last_chunk" << std::endl;
+    throw status::bad_request;
+}
+
+void parse_chunked_body(HTTPParser::State& state) {
+    std::string& body = state.BodyBuf();
+    std::string& buf  = state.Buf();
 
     for (;;) {
-        std::string::size_type pos = buf.find(crlf);
-        unsigned long chunk_size   = try_parse_chunk_size(buf.substr(0, pos));
-        if (chunk_size == 0) {
-            break;
+        std::string::size_type crlf_pos = buf.find(crlf);
+        if (crlf_pos == std::string::npos) {
+            return;
         }
-
-        buf                      = buf.substr(pos + crlf_size);
-        std::string chunked_data = try_parse_chunked_data(buf, chunk_size);
+        unsigned long chunk_size =
+            try_parse_chunk_size(buf.substr(0, crlf_pos));
+        // size0の場合、終端まであるか
+        if (chunk_size == 0 &&
+            try_has_last_chunk(buf.substr(crlf_pos + crlf_size))) {
+            state.Request().SetBody(body);
+            return;
+        }
+        // size+crlf_size以上のdataがあるか
+        if (buf.substr(crlf_pos + crlf_size).size() < chunk_size + crlf_size) {
+            return;
+        }
+        std::string chunked_data = try_parse_chunked_data(
+            buf.substr(crlf_pos + crlf_size), chunk_size);
+        // buf更新
         body.append(chunked_data, 0, chunk_size);
-        buf = buf.substr(chunk_size + crlf_size);
+        buf = buf.substr(crlf_pos + crlf_size + chunk_size + crlf_size);
     }
-    return body;
 }
 
 /*
@@ -283,11 +297,8 @@ Network\r\n
 \r\n
 
 */
-void might_set_chunked_body(HTTPParser::State& state, std::string& buf) {
-    if (exist_last_chunk(buf)) {
-        std::string body = parse_chunked_body(buf);
-        state.Request().SetBody(body);
-    }
+void might_set_chunked_body(HTTPParser::State& state) {
+    parse_chunked_body(state);
 }
 
 } // namespace
@@ -330,7 +341,7 @@ void update_state(State& state, const std::string new_buf) {
                     return;
                 }
                 if (req.GetHeaderValue("transfer-encoding") == "chunked") {
-                    might_set_chunked_body(state, buf);
+                    might_set_chunked_body(state);
                 } else {
                     might_set_body_with_content_length(
                         state, buf,
