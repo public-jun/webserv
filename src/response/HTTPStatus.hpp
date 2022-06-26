@@ -14,6 +14,7 @@ const code not_found                = 404;
 const code method_not_allowed       = 405;
 const code request_entity_too_large = 413;
 const code uri_too_long             = 414;
+const code unsupported_media_type   = 415;
 const code server_error             = 500;
 const code version_not_suppoted     = 505;
 } // namespace status

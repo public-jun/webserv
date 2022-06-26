@@ -20,7 +20,7 @@ TEST(HTTPParser, ParseAllAtOnce) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -34,7 +34,7 @@ TEST(HTTPParser, EmptyVersion) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -48,6 +48,49 @@ TEST(HTTPParser, ParseBody) {
     EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("POST", req.GetMethod());
     EXPECT_EQ("hoge", req.GetBody());
+}
+
+TEST(HTTPParser, ChunkedBody) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: chunked\r\n"
+                   "\r\n"
+                   "7\r\n"
+                   "Mozilla\r\n"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    HTTPParser::update_state(state, message);
+
+    EXPECT_EQ("Mozilla"
+              "Developer"
+              "Network",
+              req.GetBody());
+    EXPECT_EQ(HTTPParser::DONE, state.Phase());
+}
+
+TEST(HTTPParser, ChunkedBodyIncludeLastChunk) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: chunked\r\n"
+                   "\r\n"
+                   "5\r\n"
+                   "0\r\n\r\n\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    HTTPParser::update_state(state, message);
+
+    EXPECT_EQ("0\r\n\r\n", req.GetBody());
+    EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
 TEST(HTTPParser, ParsePart1) {
@@ -65,7 +108,7 @@ TEST(HTTPParser, ParsePart1) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -85,7 +128,7 @@ TEST(HTTPParser, ParsePart2) {
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
 }
 
@@ -96,7 +139,7 @@ TEST(HTTPParser, HeaderValueTrimSpace) {
     HTTPParser::update_state(state, message);
 
     EXPECT_EQ(200, req.GetStatus());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
 
 TEST(HTTPParser, NormalizeHeaderKey) {
@@ -106,7 +149,7 @@ TEST(HTTPParser, NormalizeHeaderKey) {
     HTTPParser::update_state(state, message);
 
     EXPECT_EQ(200, req.GetStatus());
-    EXPECT_EQ("localhost", req.GetHeaderValue("Host"));
+    EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
 
 TEST(HTTPParser, PhaseFirstLine) {
@@ -157,7 +200,7 @@ TEST(HTTPParser, LowercaseMethod) {
 }
 
 TEST(HTTPParser, VersionNotExistName) {
-    string            message = "GET / /1.1\r\nHost: localhost\r\n\r\n";
+    string            message = "GET / /2.1\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
 
@@ -325,6 +368,48 @@ TEST(HTTPParser, EmptyKey) {
     }
 }
 
+TEST(HTTPParser, ChunkedBodyNotCRLFAfterSize) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: chunked\r\n"
+                   "\r\n"
+                   "7"
+                   "Mozilla\r\n"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
+}
+
+TEST(HTTPParser, ChunkedBodyNotCRLFAfterData) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: chunked\r\n"
+                   "\r\n"
+                   "7\r\n"
+                   "Mozilla"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
+}
+
 // =======================
 // == OTHER STATUS CASE ==
 
@@ -332,10 +417,36 @@ TEST(HTTPParser, VersionNotSupported) {
     string            message = "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;
     HTTPParser::State state(req);
+
     try {
         HTTPParser::update_state(state, message);
     } catch (status::code code) {
         //
         EXPECT_EQ(status::version_not_suppoted, code);
+    }
+}
+
+TEST(HTTPParser, UnsupportedMediaType) {
+    string message("POST / HTTP/1.1\r\n"
+                   "Host: localhost\r\n"
+                   "Transfer-Encoding: gzip, chunked\r\n"
+                   "\r\n"
+                   "7\r\n"
+                   "Mozilla"
+                   "9\r\n"
+                   "Developer\r\n"
+                   "7\r\n"
+                   "Network\r\n"
+                   "0\r\n"
+                   "\r\n");
+
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) {
+        //
+        EXPECT_EQ(status::unsupported_media_type, code);
     }
 }

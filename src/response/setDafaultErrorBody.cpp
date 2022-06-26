@@ -23,6 +23,7 @@ std::string error_html(std::string message) {
 
 std::map<status::code, std::string> HTTPResponse::setDefaultErrorBody() {
     std::map<status::code, std::string> body;
+
     body[status::bad_request]        = error_html("400 Bad Request");
     body[status::forbidden]          = error_html("403 Forbidden");
     body[status::not_found]          = error_html("404 Not Found");
@@ -30,6 +31,8 @@ std::map<status::code, std::string> HTTPResponse::setDefaultErrorBody() {
     body[status::request_entity_too_large] =
         error_html("413 Request Entity Too Long");
     body[status::uri_too_long] = error_html("414 URI Too Long");
+    body[status::unsupported_media_type] =
+        error_html("415 Unsupported Media Type");
     body[status::server_error] = error_html("500 Internal Server Error");
     body[status::version_not_suppoted] =
         error_html("505 HTTP Version Not Supported");
