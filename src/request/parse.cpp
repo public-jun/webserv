@@ -197,9 +197,7 @@ void might_set_body_with_content_length(HTTPParser::State& state,
     }
 }
 
-bool needs_parse_body(const std::string& method) {
-    return method != "GET" && method != "DELETE";
-}
+bool needs_parse_body(const std::string& method) { return method == "POST"; }
 
 bool has_done_header_line(const std::string& line) { return line == ""; }
 
@@ -380,6 +378,8 @@ void update_state(State& state, const std::string new_buf) {
                 }
                 if (req.GetHeaderValue("transfer-encoding") == "chunked") {
                     might_set_chunked_body(state);
+                } else if (req.GetHeaderValue("content-length") == "") {
+                    throw status::bad_request;
                 } else {
                     might_set_body_with_content_length(
                         state, buf,
