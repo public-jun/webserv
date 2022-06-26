@@ -1,7 +1,9 @@
 #ifndef HTTPPARSER_HPP
 #define HTTPPARSER_HPP
 #include "HTTPRequest.hpp"
+#include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
+#include "URI.hpp"
 #include "mode/SendResponse.hpp"
 #include <string>
 
@@ -43,6 +45,8 @@ private:
 };
 
 void update_state(State& state, const std::string buf);
+
+void validate_request(const URI& uri, const HTTPRequest& req);
 
 } // namespace HTTPParser
 

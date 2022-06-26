@@ -29,9 +29,6 @@ private:
     RecvRequest();
     IOEvent* prepareResponse();
 
-    void validateRequest(const URI& uri);
-    void validateBodySize();
-    void validateMethod(const URI& uri);
     bool isDigit(std::string str);
 
     // RecvRequestに必要な入力

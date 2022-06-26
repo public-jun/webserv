@@ -44,7 +44,6 @@ void RecvRequest::Run() {
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
-        // parseエラーが起きた場合
         throw std::make_pair(stream_, code);
         // EventExecutor::onEventでcatch
     }
@@ -90,74 +89,6 @@ unsigned long str_to_ulong(const std::string& str) {
     return value;
 }
 
-// 10m
-void RecvRequest::validateBodySize() {
-    std::map<std::string, unsigned long> size;
-    size.insert(std::make_pair("k", 1000));
-    size.insert(std::make_pair("K", 1000));
-    size.insert(std::make_pair("m", 1000000));
-    size.insert(std::make_pair("M", 1000000));
-
-    const unsigned long body_size = req_.GetBody().size();
-    std::cout << "size: " << body_size << std::endl;
-
-    std::string max_size = searchServerConfig().GetMaxClientBodySize();
-
-    std::string::size_type unit_pos = max_size.find_first_of("kKmM");
-    if (unit_pos == std::string::npos || unit_pos == 0) {
-        throw status::server_error;
-    }
-
-    std::string digit = max_size.substr(0, unit_pos);
-    std::string unit  = max_size.substr(unit_pos);
-    if (unit.size() > 1) {
-        // TODO
-        throw status::bad_request;
-    }
-
-    std::cout << "unit: " << unit << std::endl;
-    if (!isDigit(digit)) {
-        throw status::server_error;
-    }
-    unsigned long ul_digit = str_to_ulong(digit);
-    std::cout << "ul_digit: " << ul_digit << std::endl;
-    std::cout << "size: " << ul_digit * size[unit] << std::endl;
-
-    if (body_size > ul_digit * size[unit]) {
-        // TODO:
-        throw status::bad_request;
-    }
-    // unit
-    // m k
-    // M K
-}
-
-void RecvRequest::validateMethod(const URI& uri) {
-    std::string method = req_.GetMethod();
-    std::cout << "method: " << method << std::endl;
-
-    std::vector<std::string> server_methods =
-        searchServerConfig().GetAllowedMethods();
-    std::vector<std::string> location_methods =
-        uri.GetLocationConfig().GetAllowedMethods();
-    // 1. location_methods
-    // 2. server_methods
-    // 3. default_methods
-    if (!location_methods.empty()) {
-        std::vector<std::string>::iterator it =
-            std::find(location_methods.begin(), location_methods.end(), method);
-        if (it == location_methods.end()) {}
-    } else if (!server_methods.empty()) {
-    }
-}
-// location configが空 -> server configを適用
-// server configが空 -> デフォルトの値を適用
-
-void RecvRequest::validateRequest(const URI& uri) {
-    validateBodySize();
-    validateMethod(uri);
-}
-
 IOEvent* RecvRequest::prepareResponse() {
     IOEvent* new_event = NULL;
 
@@ -165,7 +96,7 @@ IOEvent* RecvRequest::prepareResponse() {
     URI uri(searchServerConfig(), req_.GetRequestTarget());
     uri.Init();
 
-    validateRequest(uri);
+    HTTPParser::validate_request(uri, req_);
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
