@@ -28,6 +28,8 @@ std::map<status::code, std::string> HTTPResponse::setDefaultErrorBody() {
     body[status::not_found]   = apply_to_template_body("404 Not Found");
     body[status::method_not_allowed] =
         apply_to_template_body("405 Not Allowed");
+    body[status::unsupported_media_type] =
+        apply_to_template_body("415 Unsupported Media Type");
     body[status::server_error] =
         apply_to_template_body("500 Internal Server Error");
     body[status::version_not_suppoted] =

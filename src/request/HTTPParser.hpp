@@ -5,8 +5,6 @@
 #include "mode/SendResponse.hpp"
 #include <string>
 
-// TODO: 例外クラス実装、GETメソッド実装
-
 namespace HTTPParser {
 enum Phase { FIRST_LINE, HEADER_LINE, BODY, DONE };
 
@@ -33,14 +31,15 @@ public:
     State(HTTPRequest& req);
 
     std::string& Buf();
+    std::string& BodyBuf();
     Phase&       Phase();
     HTTPRequest& Request();
 
 private:
     std::string  buf_;
+    std::string  body_buf_;
     enum Phase   phase_;
     HTTPRequest& req_;
-    /* std::size_t  size_; //初期化する */
 };
 
 void update_state(State& state, const std::string buf);

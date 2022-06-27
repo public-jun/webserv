@@ -18,7 +18,7 @@ public:
     void SetHost(std::string host);
     void SetPort(int port);
     void SetServerName(std::string server_name);
-    void SetMaxClientBodySize(std::string client_max_body_size);
+    void SetMaxClientBodySize(unsigned int client_max_body_size);
     void SetErrorPage(int status_code, std::string location);
     void SetIndex(std::string index);
     void SetRoot(std::string root);
@@ -28,7 +28,7 @@ public:
     std::string                GetHost() const;
     int                        GetPort() const;
     std::string                GetServerName() const;
-    std::string                GetMaxClientBodySize() const;
+    unsigned int               GetMaxClientBodySize() const;
     std::map<int, std::string> GetErrorPage() const;
     std::string                GetIndex() const;
     std::string                GetRoot() const;
@@ -40,7 +40,7 @@ private:
     std::string                                       host_;
     int                                               port_;
     std::string                                       server_name_;
-    std::string                                       max_client_body_size_;
+    unsigned int                                      max_client_body_size_;
     std::map<int, std::string>                        error_page_;
     std::string                                       index_;
     std::string                                       root_;
