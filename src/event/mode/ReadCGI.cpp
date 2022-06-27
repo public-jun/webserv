@@ -52,14 +52,16 @@ IOEvent* ReadCGI::RegisterNext() {
         return this;
     }
 
-    // cgi_resp_.LogInfo();
+    IOEvent* new_event = NULL;
+    cgi_resp_.PrintInfo();
     cgi_resp_.GenerateHTTPResponse(resp_);
 
     resp_.SetVersion(req_.GetVersion());
+    resp_.AppendHeader("Server", "Webserv/1.0.0");
 
-    IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
+    new_event = new SendResponse(stream_, resp_.ConvertToStr());
 
     this->Unregister();
-    send_response->Register();
-    return send_response;
+    new_event->Register();
+    return new_event;
 }

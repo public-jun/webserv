@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -20,7 +21,7 @@ CGIResponseParser::CGIResponseParser(CGIResponse& resp)
 CGIResponseParser::~CGIResponseParser() {}
 
 bool CGIResponseParser::splitToLine(std::string& buf, std::string& line,
-                                      std::string& nl) {
+                                    std::string& nl) {
     std::string::size_type line_end_pos = buf.find(LF);
     if (line_end_pos == std::string::npos) {
         return false;
@@ -39,7 +40,7 @@ bool CGIResponseParser::splitToLine(std::string& buf, std::string& line,
 }
 
 bool CGIResponseParser::canParseLine(std::string& buf, std::string& line,
-                                       std::string& nl) {
+                                     std::string& nl) {
     return splitToLine(buf, line, nl);
 }
 
@@ -57,8 +58,9 @@ void CGIResponseParser::validateToken(const std::string& token) {
     }
 }
 
-std::string CGIResponseParser::trimSpace(const std::string& str,
-                                       const std::string  trim_char_set = " ") {
+std::string
+CGIResponseParser::trimSpace(const std::string& str,
+                             const std::string  trim_char_set = " ") {
     std::string            result;
     std::string::size_type left = str.find_first_not_of(trim_char_set);
 
@@ -146,6 +148,87 @@ CGIResponseParser::mightSetContentLenBody(const std::string& buf,
     return BODY;
 }
 
+bool CGIResponseParser::isDocumentResponse(const CGIResponse& cgi_resp) const {
+    // locationがある場合、DocumentResponseではない
+    if (cgi_resp.GetHeaderValue("location") != "") {
+        return false;
+    }
+
+    // Content-Typeの指定は必須
+    if (cgi_resp.GetHeaderValue("content-type") == "") {
+        return false;
+    }
+
+    return true;
+}
+
+bool CGIResponseParser::isClientRedirResponse(
+    const CGIResponse& cgi_resp) const {
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    // Locationは必須
+    std::string absoluteURL = cgi_resp.GetHeaderValue("location");
+    if (absoluteURL == "") {
+        return false;
+    }
+
+    // TODO absoluteURLをvalidate
+
+    const std::map<std::string, std::string>& header = cgi_resp.GetHeader();
+    for (const_iterator it = header.begin(); it != header.end(); it++) {
+        if ((it->first == "location") ||
+            (it->first.length() > 6 && it->first.substr(0, 6) == "x-cgi-")) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool CGIResponseParser::isClientRedirDocumentResponse(
+    const CGIResponse& cgi_resp) const {
+
+    // location && status && content-type 全て必須
+    for (std::vector<std::string>::const_iterator it = MUST_CGI_FIELD.begin();
+         it != MUST_CGI_FIELD.end(); it++) {
+
+        if (cgi_resp.GetHeaderValue(*it) == "") {
+            return false;
+        }
+    }
+
+    std::string absoluteURL = cgi_resp.GetHeaderValue("location");
+    // TODO absoluteURLをvalidate
+
+    return true;
+}
+
+void CGIResponseParser::selectResponse() {
+
+    // Document Response
+    if (isDocumentResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::DOCUMENT_RES);
+        return;
+    }
+
+    // Client Redir
+    if (isClientRedirResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::CLIENT_REDIR_RES);
+        cgi_resp_.SetStatusCode(status::found);
+        return;
+    }
+
+    // Client Redir Document
+    if (isClientRedirDocumentResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::CLIENT_REDIR_DOC_RES);
+        cgi_resp_.SetStatusCode(status::found);
+        return;
+    }
+
+    throw status::bad_request;
+}
+
 void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
     try {
         left_buf_.append(new_buf.c_str(), new_buf.size());
@@ -179,6 +262,7 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
                     cgi_resp_.SetBody(left_buf_);
                     phase_ = DONE;
                 }
+                selectResponse();
                 return;
 
             case DONE:

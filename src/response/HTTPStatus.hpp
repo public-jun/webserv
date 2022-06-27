@@ -8,6 +8,7 @@ typedef int code;
 const code ok                       = 200;
 const code created                  = 201;
 const code no_content               = 204;
+const code found                    = 302;
 const code bad_request              = 400;
 const code forbidden                = 403;
 const code not_found                = 404;
