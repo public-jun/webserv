@@ -86,9 +86,6 @@ CGIResponseParser::parseHeaderLine(const std::string& line) {
     validateToken(key);
 
     std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-    if (key.size() >= 1) {
-        key[0] = std::toupper(key[0]);
-    }
 
     value = trimSpace(value);
     if (value.find_first_of(LF) != value.npos) {
@@ -119,7 +116,7 @@ void CGIResponseParser::validateAfterParseHeader() {
 }
 
 bool CGIResponseParser::hasContentLen() {
-    if (cgi_resp_.GetHeaderValue("Content-length") == "") {
+    if (cgi_resp_.GetHeaderValue("content-length") == "") {
         return false;
     } else {
         return true;
@@ -176,7 +173,7 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
                     // content len
                     phase_ = mightSetContentLenBody(
                         left_buf_,
-                        strToUlong(cgi_resp_.GetHeaderValue("Content-length")));
+                        strToUlong(cgi_resp_.GetHeaderValue("content-length")));
                 } else if (read_size == 0) {
                     // EOF
                     cgi_resp_.SetBody(left_buf_);
@@ -193,8 +190,8 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
 
 std::vector<std::string> CGIResponseParser::setMustCGIField() {
     std::vector<std::string> result;
-    result.push_back("Content-type");
-    result.push_back("Location");
-    result.push_back("Status");
+    result.push_back("content-type");
+    result.push_back("location");
+    result.push_back("status");
     return result;
 }
