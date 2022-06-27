@@ -8,6 +8,7 @@
 #include "IOEvent.hpp"
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
+#include "URI.hpp"
 
 class RecvRequest : public IOEvent {
 public:
@@ -27,6 +28,7 @@ private:
 private:
     RecvRequest();
     IOEvent* prepareResponse();
+
     // RecvRequestに必要な入力
     StreamSocket stream_;
 

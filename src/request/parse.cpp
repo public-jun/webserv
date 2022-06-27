@@ -1,6 +1,9 @@
 #include "HTTPParser.hpp"
+#include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "ServerConfig.hpp"
+#include "URI.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -194,9 +197,7 @@ void might_set_body_with_content_length(HTTPParser::State& state,
     }
 }
 
-bool needs_parse_body(const std::string& method) {
-    return method != "GET" && method != "DELETE";
-}
+bool needs_parse_body(const std::string& method) { return method == "POST"; }
 
 bool has_done_header_line(const std::string& line) { return line == ""; }
 
@@ -302,9 +303,43 @@ void might_set_chunked_body(HTTPParser::State& state) {
     parse_chunked_body(state);
 }
 
+void try_find_method(const std::vector<std::string> methods,
+                     const std::string&             method) {
+    const std::vector<std::string>::const_iterator it =
+        std::find(methods.begin(), methods.end(), method);
+    if (it == methods.end()) {
+        throw status::method_not_allowed;
+    }
+}
+
+void validate_body_size(const std::string& body, ServerConfig server_config) {
+    if (body.size() > server_config.GetMaxClientBodySize()) {
+        throw status::request_entity_too_large;
+    }
+}
+
+// location configが空 -> server configを採用
+void validate_allowed_method(const URI& uri, const std::string& method) {
+
+    const std::vector<std::string>& location_methods =
+        uri.GetLocationConfig().GetAllowedMethods();
+
+    if (!location_methods.empty()) {
+        try_find_method(location_methods, method);
+    } else {
+        try_find_method(uri.GetServerConfig().GetAllowedMethods(), method);
+    }
+}
+
 } // namespace
 
 namespace HTTPParser {
+
+void validate_request(const URI& uri, const HTTPRequest& req) {
+    validate_body_size(req.GetBody(), uri.GetServerConfig());
+    validate_allowed_method(uri, req.GetMethod());
+}
+
 void update_state(State& state, const std::string new_buf) {
     HTTPRequest& req   = state.Request();
     std::string& buf   = state.Buf();
@@ -343,6 +378,8 @@ void update_state(State& state, const std::string new_buf) {
                 }
                 if (req.GetHeaderValue("transfer-encoding") == "chunked") {
                     might_set_chunked_body(state);
+                } else if (req.GetHeaderValue("content-length") == "") {
+                    throw status::bad_request;
                 } else {
                     might_set_body_with_content_length(
                         state, buf,

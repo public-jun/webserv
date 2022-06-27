@@ -2,6 +2,7 @@
 
 #include <cerrno>
 #include <iostream>
+#include <map>
 #include <unistd.h>
 
 #include "CGI.hpp"
@@ -10,6 +11,7 @@
 #include "Get.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "LocationConfig.hpp"
 #include "Post.hpp"
 #include "ReadCGI.hpp"
 #include "ReadFile.hpp"
@@ -21,6 +23,7 @@
 
 #include <iostream>
 #include <utility>
+#include <vector>
 
 const size_t RecvRequest::BUF_SIZE = 2048;
 
@@ -41,7 +44,6 @@ void RecvRequest::Run() {
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
-        // parseエラーが起きた場合
         throw std::make_pair(stream_, code);
         // EventExecutor::onEventでcatch
     }
@@ -70,6 +72,8 @@ IOEvent* RecvRequest::prepareResponse() {
     // URI クラス作成
     URI uri(searchServerConfig(), req_.GetRequestTarget());
     uri.Init();
+
+    HTTPParser::validate_request(uri, req_);
 
     if (req_.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
