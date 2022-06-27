@@ -12,5 +12,5 @@ TEST(CGIResponseParser, SplitLine) {
 
     parser(msg, msg.size());
     parser("",  0);
-    EXPECT_EQ("text/html", resp.GetHeaderValue("Content-type"));
+    EXPECT_EQ("text/html", resp.GetHeaderValue("content-type"));
 }

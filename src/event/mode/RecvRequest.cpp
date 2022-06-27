@@ -126,7 +126,7 @@ const ServerConfig RecvRequest::searchServerConfig() {
     const const_iterator it_end = config_list.end();
 
     for (; it != it_end; it++) {
-        if (it->GetServerName() == req_.GetHeaderValue("Host")) {
+        if (it->GetServerName() == req_.GetHeaderValue("host")) {
             return *it;
         }
     }
