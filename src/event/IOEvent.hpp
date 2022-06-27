@@ -8,8 +8,8 @@ public:
         RECV_REQUEST,
         SEND_RESPONSE,
         READ_FILE,
+        WRITE_FILE,
         DELETE,
-        POST,
         READ_CGI,
         WRITE_CGI,
     };
