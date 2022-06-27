@@ -9,6 +9,9 @@
 
 #define DEFAULT_CONF_PATH "./config/default.conf"
 
+typedef std::vector<const ServerConfig>  server_config_vec;
+typedef std::map<int, server_config_vec> server_config_map;
+
 class Config {
 public:
     static Config*                                     Instance();
@@ -29,8 +32,8 @@ protected:
     Config& operator=(const Config& src);
 
 private:
-    static Config*                                         instance_;
-    static std::map<int, std::vector<const ServerConfig> > server_configs_;
+    static Config*                                     instance_;
+    static server_config_map                           server_configs_;
     static const std::map<const EDrctvCd, std::string> createDerectiveNames();
     static const std::map<const EDrctvCd, std::vector<std::string> >
                                           createDerectiveMap();
