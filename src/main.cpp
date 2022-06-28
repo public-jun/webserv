@@ -1,5 +1,4 @@
 // #include "EventAction.hpp"
-#include "EventExecutor.hpp"
 #include "EventRegister.hpp"
 #include "Server.hpp"
 #include <unistd.h>
@@ -8,25 +7,21 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
-    EventExecutor executor;
-    executor.Init();
+    int exit_cd = 0;
     try {
         if (argc != 2)
             throw(std::runtime_error("invalid number of arguments"));
         Server::Instance().InitServer(argv[1]);
 
         while (true) {
-            executor.ProcessEvent();
+            EventExecutor::Instance().ProcessEvent();
         }
-
-        executor.ShutDown();
-        Server::Instance().ShutDownServer();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
-        executor.ShutDown();
-        Server::Instance().ShutDownServer();
-        return 1;
+        exit_cd = 1;
     }
-
-    return 0;
+    try {
+        Server::Instance().ShutDownServer();
+    } catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
+    return exit_cd;
 }

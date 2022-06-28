@@ -4,6 +4,7 @@
 #include "AcceptConn.hpp"
 #include "Config.hpp"
 #include "ConfigParser.hpp"
+#include "EventExecutor.hpp"
 #include "IOEvent.hpp"
 #include "ListeningSocket.hpp"
 #include <string>

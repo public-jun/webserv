@@ -8,8 +8,10 @@
 
 class EventExecutor {
 public:
-    EventExecutor();
-    ~EventExecutor();
+    static EventExecutor& Instance() {
+        static EventExecutor instance;
+        return instance;
+    }
 
     void Init();
     void ShutDown();
@@ -17,6 +19,8 @@ public:
     void ProcessEvent();
 
 private:
+    EventExecutor();
+    ~EventExecutor();
     void onEvent(std::vector<struct kevent> event_vec, int event_size);
     void doEvent(IOEvent* event);
     void nextEvent(IOEvent* event);

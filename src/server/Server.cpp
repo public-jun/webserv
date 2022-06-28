@@ -6,6 +6,7 @@ Server::~Server() {}
 
 void Server::InitServer(std::string config_file_path) {
     ConfigParser::ParseConfigFile(config_file_path);
+    EventExecutor::Instance().Init();
     initListeners();
 }
 
@@ -55,6 +56,7 @@ bool Server::isHostDuplicated(server_config_vec::const_iterator it,
 }
 
 void Server::ShutDownServer() {
+    EventExecutor::Instance().ShutDown();
     for (std::vector<ListeningSocket>::iterator it = listeners_.begin();
          it != listeners_.end(); it++) {
         it->Close();
