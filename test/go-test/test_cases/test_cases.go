@@ -1,6 +1,7 @@
 package test_cases
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -16,6 +17,16 @@ const (
 	reset = "\033[39m"
 )
 
+// 長さ1001の文字列生成
+func string1001() string {
+	var s string
+	for i := 0; i < 1001; i++ {
+		s += "a"
+	}
+	return s
+}
+
+// エラーケース
 func Error() {
 	log.Printf("%sRUN Error Test%s", blue, reset)
 	defer log.Printf("%sEND Error Test%s", blue, reset)
@@ -51,6 +62,21 @@ func Error() {
 				return req
 			}(),
 			expectStatus: http.StatusMethodNotAllowed,
+		},
+		{
+			name: "MethodNotAllowed",
+			request: func() *http.Request {
+				port := ":1111"
+				target := ""
+				url := baseURL + port + target
+				body := bytes.NewBufferString(string1001())
+				req, err := http.NewRequest("POST", url, body)
+				if err != nil {
+					panic(fmt.Errorf("NewRequest: %w", err))
+				}
+				return req
+			}(),
+			expectStatus: http.StatusRequestEntityTooLarge,
 		},
 	}
 
