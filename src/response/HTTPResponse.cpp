@@ -74,7 +74,7 @@ void HTTPResponse::PrintInfo() const {
     std::cout << "======     BODY     ======" << std::endl;
     std::cout << "body size: " << body_.size() << std::endl;
     std::cout << "======   BODY END   ======" << std::endl;
-    std::cout << "===== HTTP Request END =====\n\n" << std::endl;
+    std::cout << "===== HTTP Response END =====\n" << std::endl;
 #else
     std::cout << status_code_ << " " << body_.size() << std::endl;
 #endif

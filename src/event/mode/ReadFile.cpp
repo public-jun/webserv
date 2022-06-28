@@ -62,6 +62,10 @@ IOEvent* ReadFile::RegisterNext() {
     resp_.AppendHeader("Server", "Webserv/1.0.0");
     resp_.PrintInfo();
 
+#ifdef WS_DEBUG
+    std::cout << "================\n" << std::endl;
+#endif
+
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
     this->Unregister();
