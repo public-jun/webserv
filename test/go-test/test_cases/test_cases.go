@@ -64,7 +64,7 @@ func Error() {
 			expectStatus: http.StatusMethodNotAllowed,
 		},
 		{
-			name: "MethodNotAllowed",
+			name: "RequestEntityTooLarge",
 			request: func() *http.Request {
 				port := ":1111"
 				target := ""
