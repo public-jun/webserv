@@ -49,6 +49,11 @@ tidy: ## Run clang-tidy
 tidy-fix: ## Run clang-tidy --fix
 	clang-tidy $(SRCS) --fix -- $(INCLUDE)
 
+.PHONY: debug
+debug: CXXFLAGS += -fsanitize=address -D WS_DEBUG=1
+debug: re ## Debug mode rebuild
+
+
 ################# google test ####################
 
 gtest: $(OBJS) ## Create tester
