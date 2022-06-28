@@ -1,6 +1,7 @@
 #include "ReadFile.hpp"
 
 #include <cerrno>
+#include <cstdio>
 #include <fcntl.h>
 #include <iostream>
 #include <sstream>
@@ -35,9 +36,17 @@ void ReadFile::Run() {
     char buf[BUF_SIZE];
     int  fd = polled_fd_;
 
-    int read_size = read(fd, buf, BUF_SIZE);
+    ssize_t read_size = read(fd, buf, BUF_SIZE);
     // TODO: エラー処理
+    if (read_size == -1) {
+        perror("read");
+        return;
+    }
     file_content_.append(buf, read_size);
+
+#ifdef WS_DEBUG
+    std::cout << "=== ReadFile ===" << std::endl;
+#endif
 }
 
 void ReadFile::Register() { EventRegister::Instance().AddReadEvent(this); }
@@ -51,6 +60,7 @@ IOEvent* ReadFile::RegisterNext() {
     resp_.AppendHeader("Content-Length", ss.str());
     resp_.SetBody(file_content_);
     resp_.AppendHeader("Server", "Webserv/1.0.0");
+    resp_.PrintInfo();
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
