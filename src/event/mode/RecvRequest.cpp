@@ -57,6 +57,7 @@ IOEvent* RecvRequest::RegisterNext() {
     if (state_.Phase() != HTTPParser::DONE) {
         return this;
     }
+    std::cout << req_.GetMethod() << " " << req_.GetRequestTarget() << " " << req_.GetVersion() << std::endl;
 
     // methodによって次のイベントが分岐
     try {
