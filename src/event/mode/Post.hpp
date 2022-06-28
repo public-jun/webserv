@@ -5,7 +5,6 @@
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
-#include "IOEvent.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
 #include "SysError.hpp"

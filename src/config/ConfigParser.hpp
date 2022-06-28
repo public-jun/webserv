@@ -74,6 +74,8 @@ void ConfigParser::setupAllowedMethod(str_vec_itr it[2], T& target) {
         while (*++allowed_method != ";")
             target.SetAllowedMethods(*allowed_method);
     } else {
+        if (typeid(target) == typeid(LocationConfig))
+            return;
         target.SetAllowedMethods("GET");
         target.SetAllowedMethods("POST");
         target.SetAllowedMethods("DELETE");

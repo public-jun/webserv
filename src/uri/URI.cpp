@@ -40,7 +40,7 @@ struct stat URI::Stat(const std::string path) {
         case ENOENT:
             throw status::not_found;
         case ENAMETOOLONG:
-            throw status::request_uri_too_long;
+            throw status::uri_too_long;
         default:
             throw status::server_error;
         }

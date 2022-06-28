@@ -12,3 +12,4 @@
 #include "httpparser.cpp"
 #include "response.cpp"
 #include "uri_test.cpp"
+#include "cgi_response_parser_test.cpp"

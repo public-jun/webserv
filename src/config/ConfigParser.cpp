@@ -159,8 +159,14 @@ void ConfigParser::setupMaxClientBodySize(str_vec_itr   it[2],
                                           ServerConfig& server_config) {
     str_vec_itr max_client_body_size = std::find(
         it[BEGIN], it[END], Config::DERECTIVE_NAMES.at(MX_CLNT_BDY_SZ));
-    if (max_client_body_size != it[END])
-        server_config.SetMaxClientBodySize(*++max_client_body_size);
+    if (max_client_body_size == it[END])
+        return;
+    int         len  = (*++max_client_body_size).length();
+    std::string size = (*max_client_body_size).substr(0, len - 1);
+    std::string unit = (*max_client_body_size).substr(len - 1, 1);
+
+    int mag = (unit == "K" || unit == "k") ? 1000 : 1000 * 1000;
+    server_config.SetMaxClientBodySize(strtol(size.c_str(), NULL, 10) * mag);
 }
 
 void ConfigParser::setupErrorPage(str_vec_itr   it[2],

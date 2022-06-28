@@ -103,6 +103,8 @@ void ConfigValidator::scanDerective(str_vec_itr       it[2],
             throw(std::runtime_error(ERR_MSG_INVLD_AUTO_INDEX));
         if (!isValidReturn(it[BEGIN]))
             throw(std::runtime_error(ERR_MSG_INVLD_RTRN));
+        if (!isValidMaxClientBodySize(it[BEGIN]))
+            throw(std::runtime_error(ERR_MSG_INVLD_MX_CLNT_BDY_SZ));
         if (!isLocationDuplicated(it[BEGIN], it[END]))
             throw(std::runtime_error(ERR_MSG_DPLCTD_LCTN));
     }
@@ -300,6 +302,25 @@ bool ConfigValidator::isValidPort(const std::string& target) {
 bool ConfigValidator::isValidAddr(const std::string& target) {
     int addr = strtol(target.c_str(), NULL, 10);
     return (0 <= addr && addr <= 255);
+}
+
+bool ConfigValidator::isValidMaxClientBodySize(str_vec_itr begin) {
+    if (*begin != Config::DERECTIVE_NAMES.at(MX_CLNT_BDY_SZ))
+        return (true);
+    int len = (*++begin).length();
+    if (len < 2)
+        return (false);
+    std::string units = "kKmM";
+    std::string size  = (*begin).substr(0, len - 1);
+    std::string unit  = (*begin).substr(len - 1, 1);
+    if (!isDigit(size))
+        return (false);
+    if (unit.length() != 1 || units.find(unit) == std::string::npos)
+        return (false);
+    int mag = (unit == "K" || unit == "k") ? 1000 : 1000 * 1000;
+    if (strtol(size.c_str(), NULL, 10) * mag > 1000 * 1000 * 1000)
+        return (false);
+    return (true);
 }
 
 bool ConfigValidator::isDigit(const std::string& str) {

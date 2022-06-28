@@ -1,61 +1,30 @@
 // #include "EventAction.hpp"
 #include "EventExecutor.hpp"
 #include "EventRegister.hpp"
-#include "ListeningSocket.hpp"
-
-#include "AcceptConn.hpp"
-#include "Config.hpp"
-#include "ConfigParser.hpp"
-#include "IOEvent.hpp"
+#include "Server.hpp"
 #include <unistd.h>
 #include <vector>
 
 #include <iostream>
 
 int main(int argc, char** argv) {
+    EventExecutor executor;
+    executor.Init();
     try {
         if (argc != 2)
             throw(std::runtime_error("invalid number of arguments"));
-        EventExecutor executor;
-        executor.Init();
-
-        std::string config_file_path = argv[1];
-        ConfigParser::ParseConfigFile(config_file_path);
-        std::map<int, std::vector<const ServerConfig> > server_configs =
-            Config::Instance()->GetServerConfigs();
-
-        std::map<int, std::vector<const ServerConfig> >::const_iterator it_end =
-            server_configs.end();
-
-        std::vector<ListeningSocket> listeners;
-        for (std::map<int, std::vector<const ServerConfig> >::const_iterator
-                 it = server_configs.begin();
-             it != it_end; it++) {
-
-            int                                    port    = it->first;
-            const std::vector<const ServerConfig>& configs = it->second;
-
-            ListeningSocket ls(configs);
-            ls.Bind("127.0.0.1", port);
-            ls.Listen();
-            listeners.push_back(ls);
-
-            IOEvent* event = new AcceptConn(ls);
-            event->Register();
-        }
+        Server::Instance().InitServer(argv[1]);
 
         while (true) {
             executor.ProcessEvent();
         }
 
-        // 全てのListeningSocketをclose
-        for (std::vector<ListeningSocket>::iterator it = listeners.begin();
-             it != listeners.end(); it++) {
-            it->Close();
-        }
         executor.ShutDown();
+        Server::Instance().ShutDownServer();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        executor.ShutDown();
+        Server::Instance().ShutDownServer();
         return 1;
     }
 
