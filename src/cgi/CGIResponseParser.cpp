@@ -202,8 +202,7 @@ bool CGIResponseParser::isClientRedirResponse(
     const std::map<std::string, std::string>& header = cgi_resp.GetHeader();
     for (const_iterator it = header.begin(); it != header.end(); it++) {
         // locationもしくはx-cgi-が接頭語についているフィールドを判定する
-        if ((it->first == "location") ||
-            (it->first.length() > 6 && it->first.substr(0, 6) == "x-cgi-")) {
+        if ((it->first == "location") || it->first.find("x-cgi-") == 0) {
             continue;
         } else {
             return false;
