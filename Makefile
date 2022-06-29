@@ -69,3 +69,9 @@ gtestlist: gtest ## Show google test list
 PHONY: help
 help: ## Display this help screen
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' "Makefile" | awk -F ' ##' '{printf "$(BLUE)%-20s$(RESET) %s\n", $$1, $$2}'
+
+################# Go test ####################
+
+.PHONY:
+go-test:
+	@$(MAKE) run -C $(TESTDIR)/go-test
