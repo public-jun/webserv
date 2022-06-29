@@ -46,14 +46,14 @@ bool CGIResponseParser::canParseLine(std::string& buf, std::string& line,
 
 void CGIResponseParser::validateToken(const std::string& token) {
     if (token.empty()) {
-        throw status::bad_request;
+        throw status::bad_gateway;
     }
 
     const std::string special = "!#$%&'*+-.^_`|~";
     for (std::string::const_iterator it = token.begin(); it != token.end();
          it++) {
         if (!std::isalnum(*it) && special.find(*it) == special.npos) {
-            throw status::bad_request;
+            throw status::bad_gateway;
         }
     }
 }
@@ -91,7 +91,7 @@ CGIResponseParser::parseHeaderLine(const std::string& line) {
 
     value = trimSpace(value);
     if (value.find_first_of(LF) != value.npos) {
-        throw status::bad_request;
+            throw status::bad_gateway;
     }
 
     return std::make_pair(key, value);
@@ -113,7 +113,7 @@ bool CGIResponseParser::hasAtLeastOneCgiField() {
 
 void CGIResponseParser::validateAfterParseHeader() {
     if (!hasAtLeastOneCgiField()) {
-        throw status::bad_request;
+        throw status::bad_gateway;
     }
 }
 
@@ -267,8 +267,9 @@ void CGIResponseParser::selectResponse() {
         }
         return;
     }
+    std::cout << "bad gateway" << std::endl;
 
-    throw status::bad_request;
+    throw status::bad_gateway;
 }
 
 void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
