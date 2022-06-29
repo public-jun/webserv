@@ -91,7 +91,7 @@ CGIResponseParser::parseHeaderLine(const std::string& line) {
 
     value = trimSpace(value);
     if (value.find_first_of(LF) != value.npos) {
-            throw status::bad_gateway;
+        throw status::bad_gateway;
     }
 
     return std::make_pair(key, value);
