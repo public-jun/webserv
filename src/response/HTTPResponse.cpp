@@ -14,6 +14,7 @@ std::map<int, std::string> make_status_text() {
     status_text[status::method_not_allowed]     = "Method Not Allowed";
     status_text[status::unsupported_media_type] = "Unsupported Methid Type";
     status_text[status::server_error]           = "Internal Server Error";
+    status_text[status::bad_gateway]            = "Bad Gateway";
     status_text[status::version_not_suppoted]   = "HTTP Version Not Supported";
     return status_text;
 }
