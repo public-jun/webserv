@@ -33,6 +33,19 @@ void Server::initListeningSockets(int                      port,
 
 void Server::initListeningSocket(const server_config_vec& server_configs,
                                  std::string host, int port) {
+    std::stringstream sstream;
+    sstream << port;
+    std::string     string_port = sstream.str();
+    struct addrinfo hints       = {};
+
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags    = AI_PASSIVE | AI_ADDRCONFIG | AI_NUMERICSERV;
+    hints.ai_family   = PF_INET;
+
+    struct addrinfo* addr_list;
+
+    getaddrinfo(host.c_str(), string_port.c_str(), &hints, &addr_list);
+
     ListeningSocket ls(server_configs);
     ls.Bind(host, port);
     ls.Listen();

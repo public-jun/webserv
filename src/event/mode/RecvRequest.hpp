@@ -9,6 +9,8 @@
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
 #include "URI.hpp"
+#include <arpa/inet.h>
+#include <netdb.h>
 
 class RecvRequest : public IOEvent {
 public:
@@ -24,6 +26,7 @@ public:
 
 private:
     const ServerConfig searchServerConfig();
+    std::string        getAddrByHostName(std::string host_name);
 
 private:
     RecvRequest();
