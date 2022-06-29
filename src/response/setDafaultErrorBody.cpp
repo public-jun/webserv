@@ -34,6 +34,7 @@ std::map<status::code, std::string> HTTPResponse::setDefaultErrorBody() {
     body[status::unsupported_media_type] =
         error_html("415 Unsupported Media Type");
     body[status::server_error] = error_html("500 Internal Server Error");
+    body[status::bad_gateway]  = error_html("502 Bad Gateway");
     body[status::version_not_suppoted] =
         error_html("505 HTTP Version Not Supported");
 
