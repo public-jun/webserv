@@ -22,7 +22,7 @@ public:
 
     static IOEvent*          PrepareResponse(const HTTPRequest&  req,
                                              const StreamSocket& stream);
-    static const ServerConfig searchServerConfig(const HTTPRequest&  req,
+    static const ServerConfig SearchServerConfig(const HTTPRequest&  req,
                                           const StreamSocket& stream);
     static const std::size_t BUF_SIZE;
 

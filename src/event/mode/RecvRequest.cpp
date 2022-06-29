@@ -72,7 +72,7 @@ IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
     IOEvent* new_event = NULL;
 
     // URI クラス作成
-    URI uri(searchServerConfig(req, stream), req.GetRequestTarget());
+    URI uri(SearchServerConfig(req, stream), req.GetRequestTarget());
     uri.Init();
 
     HTTPParser::validate_request(uri, req);
@@ -118,7 +118,7 @@ IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
     return NULL;
 }
 
-const ServerConfig RecvRequest::searchServerConfig(const HTTPRequest&  req,
+const ServerConfig RecvRequest::SearchServerConfig(const HTTPRequest&  req,
                                                    const StreamSocket& stream) {
     typedef std::vector<const ServerConfig>::const_iterator const_iterator;
 
