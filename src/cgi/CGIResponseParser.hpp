@@ -40,6 +40,7 @@ private:
                                          unsigned long      content_length);
 
     bool isDocumentResponse(const CGIResponse& cgi_resp) const;
+    bool isLocalRedirResponse(const CGIResponse& cgi_resp) const;
     bool isClientRedirResponse(const CGIResponse& cgi_resp) const;
     bool isClientRedirDocumentResponse(const CGIResponse& cgi_resp) const;
 

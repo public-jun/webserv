@@ -162,12 +162,38 @@ bool CGIResponseParser::isDocumentResponse(const CGIResponse& cgi_resp) const {
     return true;
 }
 
+bool CGIResponseParser::isLocalRedirResponse(
+    const CGIResponse& cgi_resp) const {
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    // Location以外は指定できない
+
+    const const_iterator it_end = cgi_resp.GetHeader().end();
+    for (const_iterator it = cgi_resp.GetHeader().begin(); it != it_end; it++) {
+        if (it->first != "location") {
+            return false;
+        }
+    }
+
+    // Locationは必須
+    std::string absolute_path = cgi_resp.GetHeaderValue("location");
+    if (absolute_path == "") {
+        return false;
+    }
+
+    // TODO absolute_pathをvalidate
+    if (*absolute_path.begin() != '/') {
+        return false;
+    }
+
+    return true;
+}
+
 bool CGIResponseParser::isClientRedirResponse(
     const CGIResponse& cgi_resp) const {
     typedef std::map<std::string, std::string>::const_iterator const_iterator;
     // Locationは必須
-    std::string absoluteURL = cgi_resp.GetHeaderValue("location");
-    if (absoluteURL == "") {
+    std::string absolute_url = cgi_resp.GetHeaderValue("location");
+    if (absolute_url == "") {
         return false;
     }
 
@@ -212,17 +238,33 @@ void CGIResponseParser::selectResponse() {
         return;
     }
 
+    // Local Redir
+    if (isLocalRedirResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::LOCAL_REDIR_RES);
+        return;
+    }
+
     // Client Redir
     if (isClientRedirResponse(cgi_resp_)) {
         cgi_resp_.SetResponseType(CGIResponse::CLIENT_REDIR_RES);
-        cgi_resp_.SetStatusCode(status::found);
+        std::string status = cgi_resp_.GetHeaderValue("status");
+        if (status == "") {
+            cgi_resp_.SetStatusCode(status::found);
+        } else {
+            cgi_resp_.SetStatusCode(strToUlong(status));
+        }
         return;
     }
 
     // Client Redir Document
     if (isClientRedirDocumentResponse(cgi_resp_)) {
         cgi_resp_.SetResponseType(CGIResponse::CLIENT_REDIR_DOC_RES);
-        cgi_resp_.SetStatusCode(status::found);
+        std::string status = cgi_resp_.GetHeaderValue("status");
+        if (status == "") {
+            cgi_resp_.SetStatusCode(status::found);
+        } else {
+            cgi_resp_.SetStatusCode(strToUlong(status));
+        }
         return;
     }
 

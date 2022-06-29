@@ -11,6 +11,7 @@
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "RecvRequest.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
@@ -53,15 +54,24 @@ IOEvent* ReadCGI::RegisterNext() {
     }
 
     IOEvent* new_event = NULL;
-    cgi_resp_.PrintInfo();
-    cgi_resp_.GenerateHTTPResponse(resp_);
+    // cgi_resp_.PrintInfo();
 
-    resp_.SetVersion(req_.GetVersion());
-    resp_.AppendHeader("Server", "Webserv/1.0.0");
+    if (cgi_resp_.GetResponseType() == CGIResponse::LOCAL_REDIR_RES) {
+        req_.SetMethod("GET");
+        req_.SetRequestTarget(cgi_resp_.GetHeaderValue("location"));
+        req_.SetBody("");
+        // req_.PrintInfo();
+        new_event = RecvRequest::PrepareResponse(req_, stream_);
+    } else {
+        cgi_resp_.GenerateHTTPResponse(resp_);
 
-    new_event = new SendResponse(stream_, resp_.ConvertToStr());
+        resp_.SetVersion(req_.GetVersion());
+        resp_.AppendHeader("Server", "Webserv/1.0.0");
+
+        new_event = new SendResponse(stream_, resp_.ConvertToStr());
+        new_event->Register();
+    }
 
     this->Unregister();
-    new_event->Register();
     return new_event;
 }
