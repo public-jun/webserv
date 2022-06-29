@@ -20,7 +20,6 @@
 test/google_test
 
 # Fortran module files
-*.mod
 *.smod
 
 # Compiled Static libraries
@@ -35,6 +34,7 @@ test/google_test
 *.app
 webserv
 tester
+webserv_tester
 
 #others
 compile_commands.json
