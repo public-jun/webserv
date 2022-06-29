@@ -17,6 +17,7 @@ public:
     void AppendHeader(std::string key, std::string value);
 
     std::string ConvertToStr() const;
+    void        PrintInfo() const;
 
     static const std::string DEFAULT_VERSION;
 

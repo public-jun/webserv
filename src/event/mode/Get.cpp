@@ -56,6 +56,10 @@ Get::~Get() {}
 */
 
 void Get::Run() {
+#ifdef WS_DEBUG
+    std::cout << "=== Get ===" << std::endl;
+#endif
+
     std::string       local_path = uri_.GetLocalPath();
     const struct stat s          = URI::Stat(local_path);
 
@@ -66,6 +70,12 @@ void Get::Run() {
     } else {
         prepareReadFile(local_path);
     }
+
+#ifdef WS_DEBUG
+    std::cout << "==========="
+              << "\n"
+              << std::endl;
+#endif
 }
 
 IOEvent* Get::NextEvent() { return next_event_; }
@@ -92,6 +102,14 @@ void Get::tryAutoIndex(std::string local_path) {
     if (location_config_.GetAutoIndex() == ON) {
         autoIndex(local_path);
     } else {
+
+#ifdef WS_DEBUG
+        std::cout << "throw status not found" << std::endl;
+        std::cout << "==========="
+                  << "\n"
+                  << std::endl;
+#endif
+
         throw status::not_found;
     }
 }
@@ -120,6 +138,10 @@ void Get::prepareSendResponse(std::string content) {
 }
 
 void Get::prepareReadFile(std::string path) {
+#ifdef WS_DEBUG
+    std::cout << "prepareReadFile" << std::endl;
+#endif
+
     int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
     if (fd == -1) {
         perror("open");
@@ -203,6 +225,10 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
 }
 
 void Get::autoIndex(std::string path) {
+#ifdef WS_DEBUG
+    std::cout << "autoIndex" << std::endl;
+#endif
+
     errno    = 0;
     DIR* dir = opendir(path.c_str());
     if (dir == NULL) {

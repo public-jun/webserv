@@ -1,5 +1,6 @@
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include <iostream>
 #include <sstream>
 
 const std::string HTTPResponse::DEFAULT_VERSION = "HTTP/1.1";
@@ -55,4 +56,26 @@ std::string HTTPResponse::ConvertToStr() const {
     ss << body_;
 
     return ss.str();
+}
+
+void HTTPResponse::PrintInfo() const {
+#ifdef WS_DEBUG
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    std::cout << "====== HTTP Response ======"
+              << "\n"
+              << "StatusCode: " << status_code_ << "\n"
+              << "======     Header    ======"
+              << "\n";
+    for (const_iterator it = headers_.begin(); it != headers_.end(); it++) {
+        std::cout << it->first << ": [" << it->second << "]" << std::endl;
+    }
+    std::cout << "======  Header END  ======" << std::endl;
+
+    std::cout << "======     BODY     ======" << std::endl;
+    std::cout << "body size: " << body_.size() << std::endl;
+    std::cout << "======   BODY END   ======" << std::endl;
+    std::cout << "===== HTTP Response END =====\n" << std::endl;
+#else
+    std::cout << status_code_ << " " << body_.size() << std::endl;
+#endif
 }

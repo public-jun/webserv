@@ -16,7 +16,6 @@ TEST(HTTPParser, ParseAllAtOnce) {
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
@@ -30,7 +29,6 @@ TEST(HTTPParser, EmptyVersion) {
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
@@ -45,7 +43,6 @@ TEST(HTTPParser, ParseBody) {
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("POST", req.GetMethod());
     EXPECT_EQ("hoge", req.GetBody());
 }
@@ -104,7 +101,6 @@ TEST(HTTPParser, ParsePart1) {
         HTTPParser::update_state(state, *it);
     }
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
@@ -124,7 +120,6 @@ TEST(HTTPParser, ParsePart2) {
         HTTPParser::update_state(state, *it);
     }
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
     EXPECT_EQ("HTTP/1.1", req.GetVersion());
@@ -138,7 +133,6 @@ TEST(HTTPParser, HeaderValueTrimSpace) {
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
 
@@ -148,7 +142,6 @@ TEST(HTTPParser, NormalizeHeaderKey) {
     HTTPParser::State state(req);
     HTTPParser::update_state(state, message);
 
-    EXPECT_EQ(200, req.GetStatus());
     EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
 
