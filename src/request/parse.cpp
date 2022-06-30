@@ -340,7 +340,10 @@ void validate_request(const URI& uri, const HTTPRequest& req) {
     validate_allowed_method(uri, req.GetMethod());
 }
 
-void update_state(State& state, const std::string new_buf) {
+void update_state(State& state, const std::string new_buf, int recv_size,
+                  intptr_t offset) {
+    (void)recv_size;
+    (void)offset;
     HTTPRequest& req   = state.Request();
     std::string& buf   = state.Buf();
     Phase&       phase = state.Phase();

@@ -31,7 +31,7 @@ ReadCGI::~ReadCGI() {
     }
 }
 
-void ReadCGI::Run() {
+void ReadCGI::Run(intptr_t offset) {
     char buf[BUF_SIZE];
     int  fd_from_cgi = polled_fd_;
 
@@ -41,7 +41,7 @@ void ReadCGI::Run() {
     }
 
     try {
-        cgi_parser_(std::string(buf, read_size), read_size);
+        cgi_parser_(std::string(buf, read_size), read_size, offset);
     } catch (status::code code) { throw std::make_pair(stream_, code); }
 }
 void ReadCGI::Register() { EventRegister::Instance().AddReadEvent(this); }

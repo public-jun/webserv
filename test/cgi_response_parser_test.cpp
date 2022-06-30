@@ -10,7 +10,7 @@ TEST(CGIResponseParser, SplitLine) {
     CGIResponse       resp;
     CGIResponseParser parser(resp);
 
-    parser(msg, msg.size());
-    parser("",  0);
+    parser(msg, msg.size(), msg.size());
+    parser("",  0, 0);
     EXPECT_EQ("text/html", resp.GetHeaderValue("content-type"));
 }

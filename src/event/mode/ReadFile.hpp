@@ -13,7 +13,7 @@ public:
     ReadFile(StreamSocket stream, int fd);
     virtual ~ReadFile();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
@@ -25,6 +25,7 @@ private:
     // ReadFile に必要な入力
     StreamSocket stream_;
     HTTPRequest  req_;
+    bool         finish_;
 
     // ReadFile によってできる出力
     std::string  file_content_;

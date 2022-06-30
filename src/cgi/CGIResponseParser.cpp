@@ -272,7 +272,8 @@ void CGIResponseParser::selectResponse() {
     throw status::bad_gateway;
 }
 
-void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
+void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size,
+                                   intptr_t offset) {
     try {
         left_buf_.append(new_buf.c_str(), new_buf.size());
 
@@ -300,13 +301,17 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
                     phase_ = mightSetContentLenBody(
                         left_buf_,
                         strToUlong(cgi_resp_.GetHeaderValue("content-length")));
-                } else if (read_size == 0) {
+                    selectResponse();
+                    break;
+                } else if (read_size == 0 || read_size == offset) {
                     // EOF
                     cgi_resp_.SetBody(left_buf_);
                     phase_ = DONE;
+                    selectResponse();
+                    break;
+                } else {
+                    return;
                 }
-                selectResponse();
-                return;
 
             case DONE:
                 return;

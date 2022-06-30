@@ -14,7 +14,7 @@ TEST(HTTPParser, ParseAllAtOnce) {
     string      message("GET index.html HTTP/1.1\r\nHost: localhost\r\n\r\n");
     HTTPRequest req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
@@ -27,7 +27,7 @@ TEST(HTTPParser, EmptyVersion) {
     string            message("GET index.html \r\nHost: localhost\r\n\r\n");
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("GET", req.GetMethod());
     EXPECT_EQ("index.html", req.GetRequestTarget());
@@ -41,7 +41,7 @@ TEST(HTTPParser, ParseBody) {
                              "4\r\n\r\nhoge");
     HTTPRequest req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("POST", req.GetMethod());
     EXPECT_EQ("hoge", req.GetBody());
@@ -63,7 +63,7 @@ TEST(HTTPParser, ChunkedBody) {
 
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("Mozilla"
               "Developer"
@@ -84,7 +84,7 @@ TEST(HTTPParser, ChunkedBodyIncludeLastChunk) {
 
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("0\r\n\r\n", req.GetBody());
     EXPECT_EQ(HTTPParser::DONE, state.Phase());
@@ -98,7 +98,7 @@ TEST(HTTPParser, ParsePart1) {
     HTTPRequest       req;
     HTTPParser::State state(req);
     for (vector<string>::iterator it = m.begin(); it != m.end(); it++) {
-        HTTPParser::update_state(state, *it);
+        HTTPParser::update_state(state, *it, it->size(), it->size());
     }
 
     EXPECT_EQ("GET", req.GetMethod());
@@ -117,7 +117,7 @@ TEST(HTTPParser, ParsePart2) {
     HTTPRequest       req;
     HTTPParser::State state(req);
     for (vector<string>::iterator it = m.begin(); it != m.end(); it++) {
-        HTTPParser::update_state(state, *it);
+        HTTPParser::update_state(state, *it, it->size(), it->size());
     }
 
     EXPECT_EQ("GET", req.GetMethod());
@@ -131,7 +131,7 @@ TEST(HTTPParser, HeaderValueTrimSpace) {
     string      message("GET / HTTP/1.1\r\nHost:    localhost   \r\n\r\n");
     HTTPRequest req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
@@ -140,7 +140,7 @@ TEST(HTTPParser, NormalizeHeaderKey) {
     string            message("GET / HTTP/1.1\r\nHOST:localhost\r\n\r\n");
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ("localhost", req.GetHeaderValue("host"));
 }
@@ -149,7 +149,7 @@ TEST(HTTPParser, PhaseFirstLine) {
     string            message("GET / ");
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ(HTTPParser::FIRST_LINE, state.Phase());
 }
@@ -158,7 +158,7 @@ TEST(HTTPParser, PhaseHeaderLine) {
     string            message("GET / HTTP/1.1\r\nHost:localhost\r\n");
     HTTPRequest       req;
     HTTPParser::State state(req);
-    HTTPParser::update_state(state, message);
+    HTTPParser::update_state(state, message, message.size(), message.size());
 
     EXPECT_EQ(HTTPParser::HEADER_LINE, state.Phase());
 }
@@ -172,7 +172,8 @@ TEST(HTTPParser, EmptyMethod) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -185,7 +186,8 @@ TEST(HTTPParser, LowercaseMethod) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -198,7 +200,8 @@ TEST(HTTPParser, VersionNotExistName) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -211,7 +214,8 @@ TEST(HTTPParser, VersionLowerCase) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -224,7 +228,8 @@ TEST(HTTPParser, VersionMultipleDot) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -237,7 +242,8 @@ TEST(HTTPParser, VersionEndWithDot) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -250,7 +256,8 @@ TEST(HTTPParser, VersionStartWithDot) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -263,7 +270,8 @@ TEST(HTTPParser, VersionOnlyName) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -276,7 +284,8 @@ TEST(HTTPParser, VersionNotExistSlash) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -289,7 +298,8 @@ TEST(HTTPParser, VersionNotExistdot) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -302,7 +312,8 @@ TEST(HTTPParser, NoHost) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -315,7 +326,8 @@ TEST(HTTPParser, ValueContainCR) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -328,7 +340,8 @@ TEST(HTTPParser, ValueContainLF) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -341,7 +354,8 @@ TEST(HTTPParser, KeyIncludeSpace) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -354,7 +368,8 @@ TEST(HTTPParser, EmptyKey) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::bad_request, code);
@@ -378,7 +393,8 @@ TEST(HTTPParser, ChunkedBodyNotCRLFAfterSize) {
     HTTPRequest       req;
     HTTPParser::State state(req);
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
 }
 
@@ -399,7 +415,8 @@ TEST(HTTPParser, ChunkedBodyNotCRLFAfterData) {
     HTTPRequest       req;
     HTTPParser::State state(req);
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) { EXPECT_EQ(status::bad_request, code); }
 }
 
@@ -412,7 +429,8 @@ TEST(HTTPParser, VersionNotSupported) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::version_not_suppoted, code);
@@ -437,7 +455,8 @@ TEST(HTTPParser, UnsupportedMediaType) {
     HTTPParser::State state(req);
 
     try {
-        HTTPParser::update_state(state, message);
+        HTTPParser::update_state(state, message, message.size(),
+                                 message.size());
     } catch (status::code code) {
         //
         EXPECT_EQ(status::unsupported_media_type, code);
