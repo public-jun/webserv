@@ -21,7 +21,6 @@ public:
     void SetRequestTarget(const std::string uri);
     void SetMethod(const std::string method);
     void SetHTTPVersion(const std::string version);
-    void SetStatus(const int status);
     void SetHeader(const std::string key, const std::string value);
     void SetBody(const std::string);
 
@@ -36,9 +35,7 @@ private:
     std::string                        request_target_;
     std::string                        HTTPVersion_;
     std::string                        body_;
-    const std::string                  row_;
     std::map<std::string, std::string> headers_;
-    int                                status_;
 };
 
 #endif

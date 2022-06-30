@@ -1,5 +1,6 @@
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include <iostream>
 #include <sstream>
 
 const std::string HTTPResponse::DEFAULT_VERSION = "HTTP/1.1";
@@ -7,12 +8,14 @@ const std::string HTTPResponse::DEFAULT_VERSION = "HTTP/1.1";
 std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
     status_text[status::ok]                     = "OK";
+    status_text[status::found]                  = "Found";
     status_text[status::bad_request]            = "Bad Request";
     status_text[status::forbidden]              = "Forbidden";
     status_text[status::not_found]              = "Not Found";
     status_text[status::method_not_allowed]     = "Method Not Allowed";
     status_text[status::unsupported_media_type] = "Unsupported Methid Type";
     status_text[status::server_error]           = "Internal Server Error";
+    status_text[status::bad_gateway]            = "Bad Gateway";
     status_text[status::version_not_suppoted]   = "HTTP Version Not Supported";
     return status_text;
 }
@@ -55,4 +58,26 @@ std::string HTTPResponse::ConvertToStr() const {
     ss << body_;
 
     return ss.str();
+}
+
+void HTTPResponse::PrintInfo() const {
+#ifdef WS_DEBUG
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    std::cout << "====== HTTP Response ======"
+              << "\n"
+              << "StatusCode: " << status_code_ << "\n"
+              << "======     Header    ======"
+              << "\n";
+    for (const_iterator it = headers_.begin(); it != headers_.end(); it++) {
+        std::cout << it->first << ": [" << it->second << "]" << std::endl;
+    }
+    std::cout << "======  Header END  ======" << std::endl;
+
+    std::cout << "======     BODY     ======" << std::endl;
+    std::cout << "body size: " << body_.size() << std::endl;
+    std::cout << "======   BODY END   ======" << std::endl;
+    std::cout << "===== HTTP Response END =====\n" << std::endl;
+#else
+    std::cout << status_code_ << " " << body_.size() << std::endl;
+#endif
 }

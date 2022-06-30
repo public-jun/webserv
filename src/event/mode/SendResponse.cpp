@@ -26,6 +26,14 @@ void SendResponse::Run() {
     if (ret < 0) {
         throw SysError("send", errno);
     }
+#ifdef WS_DEBUG
+    std::cout << "=== SendResponse ==="
+              << "\n"
+              << "stream fd: " << stream_.GetSocketFd() << "\n"
+              << "===================="
+              << "\n"
+              << std::endl;
+#endif
 }
 
 void SendResponse::Register() { EventRegister::Instance().AddWriteEvent(this); }
