@@ -41,3 +41,5 @@ IOEvent* AcceptConn::RegisterNext() {
     recv_request->Register();
     return recv_request;
 }
+
+void AcceptConn::Close() {}

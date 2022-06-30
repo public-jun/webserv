@@ -22,13 +22,7 @@ ReadCGI::ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req)
       is_finish_(false), cgi_resp_(CGIResponse()), resp_(HTTPResponse()),
       cgi_parser_(cgi_resp_) {}
 
-ReadCGI::~ReadCGI() {
-    int fd = polled_fd_;
-    if (fd != -1) {
-        close(fd);
-        polled_fd_ = -1;
-    }
-}
+ReadCGI::~ReadCGI() {}
 
 void ReadCGI::Run() {
     char buf[BUF_SIZE];
@@ -62,4 +56,11 @@ IOEvent* ReadCGI::RegisterNext() {
     this->Unregister();
     send_response->Register();
     return send_response;
+}
+
+void ReadCGI::Close() {
+    if (polled_fd_ != -1) {
+        close(polled_fd_);
+        polled_fd_ = -1;
+    }
 }

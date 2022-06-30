@@ -15,6 +15,7 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
+    virtual void     Close();
 
 private:
     SendResponse();

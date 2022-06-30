@@ -79,6 +79,7 @@ void EventExecutor::nextEvent(IOEvent* event) {
     IOEvent* next_event = event->RegisterNext();
     if (event->GetIOEventMode() != IOEvent::ACCEPT_CONNECTION &&
         next_event != event) {
+        event->Close();
         delete event;
     }
 }

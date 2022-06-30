@@ -8,16 +8,11 @@
 WriteFile::WriteFile(StreamSocket stream, int fd, HTTPRequest req)
     : IOEvent(fd, WRITE_FILE), stream_(stream), req_(req) {}
 
-WriteFile::~WriteFile() {
-    if (polled_fd_ != -1) {
-        close(polled_fd_);
-        polled_fd_ = -1;
-    }
-}
+WriteFile::~WriteFile() {}
 
 void WriteFile::Run() {
     std::string content = req_.GetBody();
-    int         size     = write(polled_fd_, content.c_str(), content.size());
+    int         size    = write(polled_fd_, content.c_str(), content.size());
     if (size < 0 || static_cast<size_t>(size) != content.size())
         throw SysError("write", errno);
 }
@@ -36,4 +31,11 @@ IOEvent* WriteFile::RegisterNext() {
     send_response->Register();
 
     return send_response;
+}
+
+void WriteFile::Close() {
+    if (polled_fd_ != -1) {
+        close(polled_fd_);
+        polled_fd_ = -1;
+    }
 }

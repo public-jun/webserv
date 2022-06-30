@@ -66,6 +66,8 @@ IOEvent* RecvRequest::RegisterNext() {
     return NULL;
 }
 
+void RecvRequest::Close() {}
+
 IOEvent* RecvRequest::prepareResponse() {
     IOEvent* new_event = NULL;
 

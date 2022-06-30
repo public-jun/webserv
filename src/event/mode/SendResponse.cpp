@@ -19,11 +19,7 @@ SendResponse::SendResponse(StreamSocket stream, std::string buf)
     : IOEvent(stream.GetSocketFd(), SEND_RESPONSE), stream_(stream),
       all_buf_(buf) {}
 
-SendResponse::~SendResponse() {
-    if (stream_.GetSocketFd() == -1) {
-        close(stream_.GetSocketFd());
-    }
-}
+SendResponse::~SendResponse() {}
 
 void SendResponse::Run() {
     int ret = send(stream_.GetSocketFd(), all_buf_.c_str(), all_buf_.size(), 0);
@@ -46,4 +42,10 @@ IOEvent* SendResponse::RegisterNext() {
     // To Do Keep alive
 
     return NULL;
+}
+
+void SendResponse::Close() {
+    if (stream_.GetSocketFd() == -1) {
+        close(stream_.GetSocketFd());
+    }
 }

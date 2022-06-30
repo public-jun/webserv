@@ -19,6 +19,7 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
+    virtual void     Close();
 
     static const std::size_t BUF_SIZE;
 
@@ -27,9 +28,9 @@ private:
 
 private:
     // ReadCGIに必要な入力
-    StreamSocket      stream_;
-    HTTPRequest       req_;
-    bool              is_finish_;
+    StreamSocket stream_;
+    HTTPRequest  req_;
+    bool         is_finish_;
     CGIResponse  cgi_resp_;
 
     // ReadCGIによってできる出力
@@ -37,7 +38,7 @@ private:
     // ReadCGIに必要な入力
     CGIResponseParser cgi_parser_;
     // ReadCGIによってできる出力
-    std::string  cgi_output_;
+    std::string cgi_output_;
 };
 
 #endif

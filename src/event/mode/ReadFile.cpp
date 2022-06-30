@@ -23,13 +23,7 @@ ReadFile::ReadFile(StreamSocket stream, int fd)
 ReadFile::ReadFile()
     : IOEvent(READ_FILE), stream_(StreamSocket()), resp_(HTTPResponse()) {}
 
-ReadFile::~ReadFile() {
-    int fd = polled_fd_;
-    if (fd != -1) {
-        close(fd);
-        polled_fd_ = -1;
-    }
-}
+ReadFile::~ReadFile() {}
 
 void ReadFile::Run() {
     char buf[BUF_SIZE];
@@ -58,4 +52,11 @@ IOEvent* ReadFile::RegisterNext() {
     send_response->Register();
 
     return send_response;
+}
+
+void ReadFile::Close() {
+    if (polled_fd_ != -1) {
+        close(polled_fd_);
+        polled_fd_ = -1;
+    }
 }
