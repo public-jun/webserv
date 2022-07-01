@@ -8,7 +8,7 @@ SendError::SendError(StreamSocket& stream, status::code code)
 
 SendError::~SendError() {}
 
-void SendError::Run() {}
+void SendError::Run(intptr_t offset) { UNUSED(offset); }
 
 void SendError::Register() {}
 

@@ -19,22 +19,27 @@
 const std::size_t ReadFile::BUF_SIZE = 2048;
 
 ReadFile::ReadFile(StreamSocket stream, int fd)
-    : IOEvent(fd, READ_FILE), stream_(stream) {}
+    : IOEvent(fd, READ_FILE), stream_(stream), finish_(false) {}
 
 ReadFile::ReadFile()
-    : IOEvent(READ_FILE), stream_(StreamSocket()), resp_(HTTPResponse()) {}
+    : IOEvent(READ_FILE), stream_(StreamSocket()), finish_(false),
+      resp_(HTTPResponse()) {}
 
 ReadFile::~ReadFile() {}
 
-void ReadFile::Run() {
+void ReadFile::Run(intptr_t offset) {
     char buf[BUF_SIZE];
     int  fd = polled_fd_;
 
-    ssize_t read_size = read(fd, buf, BUF_SIZE);
+    int read_size = read(fd, buf, BUF_SIZE);
     // TODO: エラー処理
     if (read_size == -1) {
         perror("read");
         throw status::server_error;
+    }
+
+    if (read_size == 0 || read_size == offset) {
+        finish_ = true;
     }
     file_content_.append(buf, read_size);
 
@@ -48,6 +53,9 @@ void ReadFile::Register() { EventRegister::Instance().AddReadEvent(this); }
 void ReadFile::Unregister() { EventRegister::Instance().DelReadEvent(this); }
 
 IOEvent* ReadFile::RegisterNext() {
+    if (!finish_) {
+        return this;
+    }
     // response 作成
     std::stringstream ss;
     ss << file_content_.size() << std::flush;

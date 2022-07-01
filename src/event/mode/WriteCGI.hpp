@@ -11,7 +11,7 @@ public:
     WriteCGI(class CGI cgi, StreamSocket stream, HTTPRequest req);
     virtual ~WriteCGI();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();

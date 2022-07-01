@@ -10,7 +10,7 @@ public:
     SendError(StreamSocket& stream, status::code);
     virtual ~SendError();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();

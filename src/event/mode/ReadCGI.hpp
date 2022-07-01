@@ -15,7 +15,7 @@ public:
     ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req);
     virtual ~ReadCGI();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();

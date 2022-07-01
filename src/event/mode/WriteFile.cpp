@@ -10,7 +10,8 @@ WriteFile::WriteFile(StreamSocket stream, int fd, HTTPRequest req)
 
 WriteFile::~WriteFile() {}
 
-void WriteFile::Run() {
+void WriteFile::Run(intptr_t offset) {
+    UNUSED(offset);
     std::string content = req_.GetBody();
     int         size    = write(polled_fd_, content.c_str(), content.size());
     if (size < 0 || static_cast<size_t>(size) != content.size())
