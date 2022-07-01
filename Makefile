@@ -6,7 +6,6 @@ CXXFLAGS  := -Wall -Wextra -Werror -std=c++98
 SRCSDIR   := ./src
 OBJDIR    := ./obj
 DPSDIR    := ./dps
-TESTDIR   := ./test
 INCDIR    := $(shell find $(SRCSDIR) -maxdepth 2 -type d)
 
 INCLUDE := $(addprefix -I, $(INCDIR))
@@ -56,14 +55,16 @@ debug: re ## Debug mode rebuild
 
 ################# google test ####################
 
+GOOGLETESTDIR := ./test/google_test
+
 .PHONY: gtest
 gtest: $(OBJS) ## Create tester
-	@$(MAKE) -C $(TESTDIR) gtest
-	@mv $(TESTDIR)/tester ./
+	@$(MAKE) -C $(GOOGLETESTDIR) gtest
+	@mv $(GOOGLETESTDIR)/tester ./
 
 .PHONY: gtestclean
 gtestclean: ## Clean google test object file
-	@$(MAKE) -C $(TESTDIR) clean
+	@$(MAKE) -C $(GOOGLETESTDIR) clean
 
 BLUE  := \033[34m
 RESET := \033[39m
@@ -79,5 +80,7 @@ help: ## Display this help screen
 
 ################# Go test ####################
 
+GOTESTDIR := ./test/go_test
+
 .PHONY:
-	@$(MAKE) run -C $(TESTDIR)/go_test
+	@$(MAKE) run -C $(GOTESTDIR)
