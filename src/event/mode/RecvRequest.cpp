@@ -130,13 +130,7 @@ const ServerConfig RecvRequest::searchServerConfig() {
         std::string host_name = host.substr(0, host.find(":"));
         std::string addr      = getAddrByHostName(host_name);
 
-        std::cout << "-------------------------" << std::endl;
-        std::cout << "host :" << host << std::endl;
-        std::cout << "config host :" << it->GetHost() << std::endl;
-        std::cout << "host_name :" << host_name << std::endl;
-        std::cout << "addr :" << addr << std::endl;
         if (it->GetServerName() == host_name || it->GetHost() == addr) {
-            std::cout << "一致" << std::endl;
             return *it;
         }
     }
