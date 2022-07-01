@@ -14,7 +14,10 @@ typedef std::map<int, server_config_vec> server_config_map;
 
 class Config {
 public:
-    static Config*                                     Instance();
+    static Config& Instance() {
+        static Config instance;
+        return instance;
+    }
     static const std::string                           DELIMITERS;
     static const int                                   MAX_PORT_NUM;
     static const std::map<const EDrctvCd, std::string> DERECTIVE_NAMES;

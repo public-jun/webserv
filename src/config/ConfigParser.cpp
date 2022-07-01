@@ -1,13 +1,5 @@
 #include "ConfigParser.hpp"
 
-ConfigParser* ConfigParser::instance_ = 0;
-
-ConfigParser* ConfigParser::Instance() {
-    if (instance_ == 0)
-        instance_ = new ConfigParser;
-    return instance_;
-}
-
 ConfigParser::ConfigParser() {}
 
 ConfigParser::ConfigParser(const ConfigParser& src) { *this = src; }

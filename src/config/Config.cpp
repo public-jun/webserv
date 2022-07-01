@@ -1,6 +1,5 @@
 #include "Config.hpp"
 
-Config*                                         Config::instance_    = 0;
 const int                                       Config::MAX_PORT_NUM = 65535;
 const std::string                               Config::DELIMITERS   = " {};";
 std::map<int, std::vector<const ServerConfig> > Config::server_configs_;
@@ -10,12 +9,6 @@ const std::map<const EDrctvCd, std::vector<std::string> >
     Config::DERECTIVE_MAP = Config::createDerectiveMap();
 const std::vector<std::string> Config::ALLOWED_METHODS =
     Config::createAllowedMethodsVec();
-
-Config* Config::Instance() {
-    if (instance_ == 0)
-        instance_ = new Config;
-    return instance_;
-}
 
 Config::Config() {}
 
