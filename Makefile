@@ -80,5 +80,4 @@ help: ## Display this help screen
 ################# Go test ####################
 
 .PHONY:
-go-test:
-	@$(MAKE) run -C $(TESTDIR)/go-test
+	@$(MAKE) run -C $(TESTDIR)/go_test
