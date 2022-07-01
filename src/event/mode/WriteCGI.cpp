@@ -27,7 +27,7 @@ WriteCGI::~WriteCGI() {
 }
 
 void WriteCGI::Run(intptr_t offset) {
-    (void)offset;
+    UNUSED(offset);
     int fd_write_to_cgi = polled_fd_;
     int write_size =
         write(fd_write_to_cgi, req_.GetBody().c_str(), req_.GetBody().size());

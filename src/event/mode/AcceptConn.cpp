@@ -17,7 +17,7 @@ AcceptConn::AcceptConn(ListeningSocket listener)
 AcceptConn::~AcceptConn() {}
 
 void AcceptConn::Run(intptr_t offset) {
-    (void)offset;
+    UNUSED(offset);
     struct sockaddr_in peer_sin;
     int                len, stream_fd;
 

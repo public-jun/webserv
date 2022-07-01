@@ -38,12 +38,12 @@ RecvRequest::RecvRequest(StreamSocket stream)
 RecvRequest::~RecvRequest() {}
 
 void RecvRequest::Run(intptr_t offset) {
+    UNUSED(offset);
     char buf[BUF_SIZE];
     int  recv_size = recv(stream_.GetSocketFd(), buf, BUF_SIZE, 0);
 
     try {
-        HTTPParser::update_state(state_, std::string(buf, recv_size), recv_size,
-                                 offset);
+        HTTPParser::update_state(state_, std::string(buf, recv_size));
     } catch (status::code code) {
         throw std::make_pair(stream_, code);
         // EventExecutor::onEventでcatch

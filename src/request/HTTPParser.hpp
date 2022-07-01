@@ -45,8 +45,7 @@ private:
     HTTPRequest& req_;
 };
 
-void update_state(State& state, const std::string buf, int recv_size,
-                  intptr_t offset);
+void update_state(State& state, const std::string buf);
 
 void validate_request(const URI& uri, const HTTPRequest& req);
 

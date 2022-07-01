@@ -2,6 +2,8 @@
 #define IOEVENT_HPP
 
 #include <sys/event.h>
+
+#define UNUSED(x) ((void)(x))
 class IOEvent {
 public:
     enum IOEventMode {

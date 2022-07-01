@@ -13,7 +13,7 @@ SendBadrequest::SendBadrequest() {}
 
 SendBadrequest::~SendBadrequest() {}
 
-void SendBadrequest::Run(intptr_t offset) { (void)offset; }
+void SendBadrequest::Run(intptr_t offset) { UNUSED(offset); }
 
 // TODO: 要相談
 // parse関数内でthrowするときにstreamをsetするのがめんどい
