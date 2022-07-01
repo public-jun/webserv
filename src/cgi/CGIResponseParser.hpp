@@ -13,7 +13,7 @@ public:
 
     CGIResponseParser(CGIResponse& resp);
     ~CGIResponseParser();
-    void operator()(std::string new_buf, ssize_t read_size);
+    void operator()(std::string new_buf, ssize_t read_size, intptr_t offset);
 
     const Phase&       GetPhase() const { return phase_; }
     const std::string& GetLeftBuf() const { return left_buf_; }
