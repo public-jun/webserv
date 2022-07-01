@@ -18,6 +18,8 @@ public:
 
 private:
     SendResponse();
+    void printLog();
+
     // SendResponseに必要な入力
     StreamSocket stream_;
     std::string  all_buf_;
