@@ -7,9 +7,9 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
-    int exit_cd = EXIT_SUCCESS;
+    int     exit_cd = EXIT_SUCCESS;
+    Server& server  = Server::Instance();
     try {
-        Server& server = Server::Instance();
 
         server.ValidateArgc(argc);
         server.InitServer(argv[1]);
@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
         exit_cd = EXIT_FAILURE;
     }
     try {
-        Server::Instance().ShutDownServer();
+        server.ShutDownServer();
     } catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
     return exit_cd;
 }
