@@ -56,9 +56,7 @@ Get::~Get() {}
 */
 
 void Get::Run() {
-#ifdef WS_DEBUG
-    std::cout << "=== Get ===" << std::endl;
-#endif
+    printLogStart();
 
     std::string       local_path = uri_.GetLocalPath();
     const struct stat s          = URI::Stat(local_path);
@@ -70,12 +68,6 @@ void Get::Run() {
     } else {
         prepareReadFile(local_path);
     }
-
-#ifdef WS_DEBUG
-    std::cout << "==========="
-              << "\n"
-              << std::endl;
-#endif
 }
 
 IOEvent* Get::NextEvent() { return next_event_; }
@@ -102,14 +94,7 @@ void Get::tryAutoIndex(std::string local_path) {
     if (location_config_.GetAutoIndex() == ON) {
         autoIndex(local_path);
     } else {
-
-#ifdef WS_DEBUG
-        std::cout << "throw status not found" << std::endl;
-        std::cout << "==========="
-                  << "\n"
-                  << std::endl;
-#endif
-
+        printLogNotFound();
         throw status::not_found;
     }
 }
@@ -138,9 +123,7 @@ void Get::prepareSendResponse(std::string content) {
 }
 
 void Get::prepareReadFile(std::string path) {
-#ifdef WS_DEBUG
-    std::cout << "prepareReadFile" << std::endl;
-#endif
+    printLogReadFile();
 
     int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
     if (fd == -1) {
@@ -225,9 +208,7 @@ std::string Get::fileInfo(struct dirent* ent, std::string path) {
 }
 
 void Get::autoIndex(std::string path) {
-#ifdef WS_DEBUG
-    std::cout << "autoIndex" << std::endl;
-#endif
+    printLogAutoIndex();
 
     errno    = 0;
     DIR* dir = opendir(path.c_str());
@@ -266,4 +247,40 @@ void Get::autoIndex(std::string path) {
        << CRLF;
 
     prepareSendResponse(ss.str());
+}
+
+// log
+void Get::printLogAutoIndex() {
+#ifdef WS_DEBUG
+    std::cout << "autoIndex" << std::endl;
+#endif
+}
+
+void Get::printLogStart() {
+#ifdef WS_DEBUG
+    std::cout << "=== Get ===" << std::endl;
+#endif
+}
+
+void Get::printLogEnd() {
+#ifdef WS_DEBUG
+    std::cout << "==========="
+              << "\n"
+              << std::endl;
+#endif
+}
+
+void Get::printLogNotFound() {
+#ifdef WS_DEBUG
+    std::cout << "throw status not found" << std::endl;
+    std::cout << "==========="
+              << "\n"
+              << std::endl;
+#endif
+}
+
+void Get::printLogReadFile() {
+#ifdef WS_DEBUG
+    std::cout << "prepareReadFile" << std::endl;
+#endif
 }

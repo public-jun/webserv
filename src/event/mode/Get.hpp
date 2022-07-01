@@ -36,7 +36,9 @@ private:
     // log
     void printLogStart();
     void printLogEnd();
-    void printLog404();
+    void printLogNotFound();
+    void printLogAutoIndex();
+    void printLogReadFile();
 
     StreamSocket          stream_;
     IOEvent*              next_event_;
