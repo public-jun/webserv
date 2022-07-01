@@ -44,26 +44,12 @@ void SendResponse::Unregister() {
 
 IOEvent* SendResponse::RegisterNext() {
     // TODO: keep-alive
-    close(stream_.GetSocketFd());
+    if (close(stream_.GetSocketFd()) == -1) {
+        perror("close");
+    }
     this->Unregister();
-
-    // To Do Keep alive
 
     return NULL;
 }
 
-int SendResponse::Close() {
-    /* int fd = stream_.GetSocketFd(); */
-
-    /* if (fd == -1) { */
-    /*     return 0; */
-    /* } */
-
-    /* if (close(fd) == -1) { */
-    /*     perror("close"); */
-    /*     std::cerr << "fd: " << polled_fd_ << std::endl; */
-    /*     errno = 0; */
-    /*     return -1; */
-    /* } */
-    return 0;
-}
+int SendResponse::Close() { return 0; }
