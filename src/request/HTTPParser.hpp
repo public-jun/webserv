@@ -11,24 +11,6 @@
 namespace HTTPParser {
 enum Phase { FIRST_LINE, HEADER_LINE, BODY, DONE };
 
-class SendError {
-public:
-    void SetStream(StreamSocket stream);
-
-protected:
-    StreamSocket stream_;
-};
-
-class SendBadrequest : public SendError, public IOEvent {
-public:
-    SendBadrequest();
-    SendBadrequest(StreamSocket stream);
-    virtual ~SendBadrequest();
-
-    virtual void     Run(intptr_t offset);
-    virtual IOEvent* RegisterNext();
-};
-
 class State {
 public:
     State(HTTPRequest& req);
