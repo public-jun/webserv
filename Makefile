@@ -7,10 +7,10 @@ SRCSDIR   := ./src
 OBJDIR    := ./obj
 DPSDIR    := ./dps
 TESTDIR   := ./test
-INCDIR    := $(shell find src -maxdepth 2 -type d)
+INCDIR    := $(shell find $(SRCSDIR) -maxdepth 2 -type d)
 
 INCLUDE := $(addprefix -I, $(INCDIR))
-VPATH := $(INCDIR)
+VPATH   := $(INCDIR)
 
 SRCS := $(shell find $(SRCSDIR) -type f -name '*.cpp')
 OBJS := $(patsubst $(SRCSDIR)%,$(OBJDIR)%,$(SRCS:.cpp=.o))
@@ -56,10 +56,12 @@ debug: re ## Debug mode rebuild
 
 ################# google test ####################
 
+.PHONY: gtest
 gtest: $(OBJS) ## Create tester
 	@$(MAKE) -C $(TESTDIR) gtest
 	@mv $(TESTDIR)/tester ./
 
+.PHONY: gtestclean
 gtestclean: ## Clean google test object file
 	@$(MAKE) -C $(TESTDIR) clean
 

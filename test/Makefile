@@ -1,18 +1,9 @@
 ################# google test ####################
 NAME      := tester
 LIBNAME   := libgtest.a
-
-INCLUDE   := -I ../src/event \
-						 -I ../src/event/mode \
-						 -I ../src/exception \
-						 -I ../src/socket \
-						 -I ../src/event/mode \
-						 -I ../src/request \
-						 -I ../src/response \
-						 -I ../src/extended_c \
-						 -I ../src/config \
-						 -I ../src/cgi \
-						 -I ../src/uri
+SRCSDIR   := ../src
+INCDIR    := $(shell find $(SRCSDIR) -maxdepth 2 -type d)
+INCLUDE   := $(addprefix -I, $(INCDIR))
 
 gtestdir  := ./google_test
 gtest     := $(gtestdir)/gtest $(gtestdir)/googletest-release-1.11.0
