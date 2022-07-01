@@ -10,9 +10,12 @@ void Post::Run() {
     std::string base_path = uri_.GetLocationConfig().GetUploadPath();
     if (base_path.substr(base_path.length() - 1) != "/")
         base_path += "/";
-    std::string file_name = generateFileName();
-    std::string file_path = base_path + file_name;
+    std::string        file_name = generateFileName();
+    std::string        file_path = base_path + file_name;
+    const struct stat& stat_buf  = uri_.Stat(base_path);
 
+    if ((stat_buf.st_mode & S_IRWXU) != S_IRWXU)
+        throw status::forbidden;
     fd_ = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK,
                0644);
     if (fd_ < 0)

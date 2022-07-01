@@ -15,7 +15,7 @@ public:
     ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req);
     virtual ~ReadCGI();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
@@ -27,9 +27,9 @@ private:
 
 private:
     // ReadCGIに必要な入力
-    StreamSocket      stream_;
-    HTTPRequest       req_;
-    bool              is_finish_;
+    StreamSocket stream_;
+    HTTPRequest  req_;
+    bool         is_finish_;
     CGIResponse  cgi_resp_;
 
     // ReadCGIによってできる出力
@@ -37,7 +37,7 @@ private:
     // ReadCGIに必要な入力
     CGIResponseParser cgi_parser_;
     // ReadCGIによってできる出力
-    std::string  cgi_output_;
+    std::string cgi_output_;
 };
 
 #endif

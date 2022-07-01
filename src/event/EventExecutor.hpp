@@ -22,7 +22,7 @@ private:
     EventExecutor();
     ~EventExecutor();
     void onEvent(std::vector<struct kevent> event_vec, int event_size);
-    void doEvent(IOEvent* event);
+    void doEvent(IOEvent* event, intptr_t offset);
     void nextEvent(IOEvent* event);
     void errorNextEvent(IOEvent* prev, IOEvent* next);
 

@@ -6,6 +6,7 @@
 #include "URI.hpp"
 #include "mode/SendResponse.hpp"
 #include <string>
+#include <sys/event.h>
 
 namespace HTTPParser {
 enum Phase { FIRST_LINE, HEADER_LINE, BODY, DONE };
@@ -24,7 +25,7 @@ public:
     SendBadrequest(StreamSocket stream);
     virtual ~SendBadrequest();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual IOEvent* RegisterNext();
 };
 

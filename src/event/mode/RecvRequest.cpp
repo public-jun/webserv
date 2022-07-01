@@ -37,7 +37,8 @@ RecvRequest::RecvRequest(StreamSocket stream)
 
 RecvRequest::~RecvRequest() {}
 
-void RecvRequest::Run() {
+void RecvRequest::Run(intptr_t offset) {
+    UNUSED(offset);
     char buf[BUF_SIZE];
     int  recv_size = recv(stream_.GetSocketFd(), buf, BUF_SIZE, 0);
 
@@ -57,76 +58,85 @@ IOEvent* RecvRequest::RegisterNext() {
     if (state_.Phase() != HTTPParser::DONE) {
         return this;
     }
+#ifdef WS_DEBUG
+    req_.PrintInfo();
+#else
+    std::cout << req_.GetMethod() << " " << req_.GetRequestTarget() << " "
+              << req_.GetVersion() << std::endl;
+#endif
 
     // methodによって次のイベントが分岐
     try {
-        IOEvent* new_event = prepareResponse();
+        this->Unregister();
+        IOEvent* new_event = PrepareResponse(req_, stream_);
         return new_event;
     } catch (status::code code) { throw std::make_pair(stream_, code); }
     return NULL;
 }
 
-IOEvent* RecvRequest::prepareResponse() {
+IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
+                                      const StreamSocket& stream) {
     IOEvent* new_event = NULL;
 
     // URI クラス作成
-    URI uri(searchServerConfig(), req_.GetRequestTarget());
+    URI uri(SearchServerConfig(req, stream), req.GetRequestTarget());
     uri.Init();
 
-    HTTPParser::validate_request(uri, req_);
+    HTTPParser::validate_request(uri, req);
 
-    if (req_.GetMethod() == "GET") {
+    if (req.GetMethod() == "GET") {
         // Uriのパスや拡張子によって ReadFile or ReadCGI
         if (CGI::IsCGI(uri, "GET")) {
-            class CGI cgi(uri, req_);
+            class CGI cgi(uri, req);
             cgi.Run();
-            new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
+            new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream, req);
         } else {
-            Get get(stream_, uri);
+            Get get(stream, uri);
             get.Run();
             new_event = get.NextEvent();
         }
 
-        this->Unregister();
+        // this->Unregister();
         new_event->Register();
         return new_event;
-    } else if (req_.GetMethod() == "POST") {
+    } else if (req.GetMethod() == "POST") {
         if (CGI::IsCGI(uri, "POST")) {
-            class CGI cgi(uri, req_);
+            class CGI cgi(uri, req);
             cgi.Run();
-            new_event = new WriteCGI(cgi, stream_, req_);
-            this->Unregister();
+            new_event = new WriteCGI(cgi, stream, req);
+            // this->Unregister();
             new_event->Register();
             return new_event;
         } else {
-            Post post(stream_, req_, uri);
+            Post post(stream, req, uri);
 
             post.Run();
-            this->Unregister();
+            // this->Unregister();
             return post.RegisterNext();
         }
     }
-    if (req_.GetMethod() == "DELETE") {
-        Delete dlt(stream_, uri);
+    if (req.GetMethod() == "DELETE") {
+        Delete dlt(stream, uri);
 
         dlt.Run();
-        this->Unregister();
+        // this->Unregister();
         return dlt.RegisterNext();
     }
     return NULL;
 }
 
-const ServerConfig RecvRequest::searchServerConfig() {
+const ServerConfig RecvRequest::SearchServerConfig(const HTTPRequest&  req,
+                                                   const StreamSocket& stream) {
     typedef std::vector<const ServerConfig>::const_iterator const_iterator;
 
     const std::vector<const ServerConfig> config_list =
-        stream_.GetServerConfig();
+        stream.GetServerConfig();
 
     const_iterator       it     = config_list.begin();
     const const_iterator it_end = config_list.end();
 
     for (; it != it_end; it++) {
-        if (it->GetServerName() == req_.GetHeaderValue("host")) {
+        if (it->GetServerName() == req.GetHeaderValue("host")) {
             return *it;
         }
     }

@@ -65,7 +65,7 @@ void EventExecutor::onEvent(std::vector<struct kevent> event_vec,
         }
 
         try {
-            doEvent(event);
+            doEvent(event, event_vec[i].data);
             nextEvent(event);
         } catch (std::pair<StreamSocket, status::code> err) {
             errorNextEvent(event, new SendError(err.first, err.second));
@@ -73,7 +73,9 @@ void EventExecutor::onEvent(std::vector<struct kevent> event_vec,
     }
 }
 
-void EventExecutor::doEvent(IOEvent* event) { event->Run(); }
+void EventExecutor::doEvent(IOEvent* event, intptr_t offset) {
+    event->Run(offset);
+}
 
 void EventExecutor::nextEvent(IOEvent* event) {
     IOEvent* next_event = event->RegisterNext();

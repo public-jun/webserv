@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -20,7 +21,7 @@ CGIResponseParser::CGIResponseParser(CGIResponse& resp)
 CGIResponseParser::~CGIResponseParser() {}
 
 bool CGIResponseParser::splitToLine(std::string& buf, std::string& line,
-                                      std::string& nl) {
+                                    std::string& nl) {
     std::string::size_type line_end_pos = buf.find(LF);
     if (line_end_pos == std::string::npos) {
         return false;
@@ -39,26 +40,27 @@ bool CGIResponseParser::splitToLine(std::string& buf, std::string& line,
 }
 
 bool CGIResponseParser::canParseLine(std::string& buf, std::string& line,
-                                       std::string& nl) {
+                                     std::string& nl) {
     return splitToLine(buf, line, nl);
 }
 
 void CGIResponseParser::validateToken(const std::string& token) {
     if (token.empty()) {
-        throw status::bad_request;
+        throw status::bad_gateway;
     }
 
     const std::string special = "!#$%&'*+-.^_`|~";
     for (std::string::const_iterator it = token.begin(); it != token.end();
          it++) {
         if (!std::isalnum(*it) && special.find(*it) == special.npos) {
-            throw status::bad_request;
+            throw status::bad_gateway;
         }
     }
 }
 
-std::string CGIResponseParser::trimSpace(const std::string& str,
-                                       const std::string  trim_char_set = " ") {
+std::string
+CGIResponseParser::trimSpace(const std::string& str,
+                             const std::string  trim_char_set = " ") {
     std::string            result;
     std::string::size_type left = str.find_first_not_of(trim_char_set);
 
@@ -89,7 +91,7 @@ CGIResponseParser::parseHeaderLine(const std::string& line) {
 
     value = trimSpace(value);
     if (value.find_first_of(LF) != value.npos) {
-        throw status::bad_request;
+        throw status::bad_gateway;
     }
 
     return std::make_pair(key, value);
@@ -111,7 +113,7 @@ bool CGIResponseParser::hasAtLeastOneCgiField() {
 
 void CGIResponseParser::validateAfterParseHeader() {
     if (!hasAtLeastOneCgiField()) {
-        throw status::bad_request;
+        throw status::bad_gateway;
     }
 }
 
@@ -146,7 +148,132 @@ CGIResponseParser::mightSetContentLenBody(const std::string& buf,
     return BODY;
 }
 
-void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
+bool CGIResponseParser::isDocumentResponse(const CGIResponse& cgi_resp) const {
+    // locationがある場合、DocumentResponseではない
+    if (cgi_resp.GetHeaderValue("location") != "") {
+        return false;
+    }
+
+    // Content-Typeの指定は必須
+    if (cgi_resp.GetHeaderValue("content-type") == "") {
+        return false;
+    }
+
+    return true;
+}
+
+bool CGIResponseParser::isLocalRedirResponse(
+    const CGIResponse& cgi_resp) const {
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    // Location以外は指定できない
+
+    const const_iterator it_end = cgi_resp.GetHeader().end();
+    for (const_iterator it = cgi_resp.GetHeader().begin(); it != it_end; it++) {
+        if (it->first != "location") {
+            return false;
+        }
+    }
+
+    // Locationは必須
+    std::string absolute_path = cgi_resp.GetHeaderValue("location");
+    if (absolute_path == "") {
+        return false;
+    }
+
+    // TODO absolute_pathをvalidate
+    if (*absolute_path.begin() != '/') {
+        return false;
+    }
+
+    return true;
+}
+
+bool CGIResponseParser::isClientRedirResponse(
+    const CGIResponse& cgi_resp) const {
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+    // Locationは必須
+    std::string absolute_url = cgi_resp.GetHeaderValue("location");
+    if (absolute_url == "") {
+        return false;
+    }
+
+    // TODO absoluteURLをvalidate
+
+    const std::map<std::string, std::string>& header = cgi_resp.GetHeader();
+    for (const_iterator it = header.begin(); it != header.end(); it++) {
+        // locationもしくはx-cgi-が接頭語についているフィールドを判定する
+        if ((it->first == "location") || it->first.find("x-cgi-") == 0) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool CGIResponseParser::isClientRedirDocumentResponse(
+    const CGIResponse& cgi_resp) const {
+
+    // location && status && content-type 全て必須
+    for (std::vector<std::string>::const_iterator it = MUST_CGI_FIELD.begin();
+         it != MUST_CGI_FIELD.end(); it++) {
+
+        if (cgi_resp.GetHeaderValue(*it) == "") {
+            return false;
+        }
+    }
+
+    std::string absoluteURL = cgi_resp.GetHeaderValue("location");
+    // TODO absoluteURLをvalidate
+
+    return true;
+}
+
+void CGIResponseParser::selectResponse() {
+
+    // Document Response
+    if (isDocumentResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::DOCUMENT_RES);
+        return;
+    }
+
+    // Local Redir
+    if (isLocalRedirResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::LOCAL_REDIR_RES);
+        return;
+    }
+
+    // Client Redir
+    if (isClientRedirResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::CLIENT_REDIR_RES);
+        std::string status = cgi_resp_.GetHeaderValue("status");
+        if (status == "") {
+            cgi_resp_.SetStatusCode(status::found);
+        } else {
+            cgi_resp_.SetStatusCode(strToUlong(status));
+        }
+        return;
+    }
+
+    // Client Redir Document
+    if (isClientRedirDocumentResponse(cgi_resp_)) {
+        cgi_resp_.SetResponseType(CGIResponse::CLIENT_REDIR_DOC_RES);
+        std::string status = cgi_resp_.GetHeaderValue("status");
+        if (status == "") {
+            cgi_resp_.SetStatusCode(status::found);
+        } else {
+            cgi_resp_.SetStatusCode(strToUlong(status));
+        }
+        return;
+    }
+    std::cout << "bad gateway" << std::endl;
+
+    throw status::bad_gateway;
+}
+
+void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size,
+                                   intptr_t offset) {
     try {
         left_buf_.append(new_buf.c_str(), new_buf.size());
 
@@ -174,12 +301,17 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size) {
                     phase_ = mightSetContentLenBody(
                         left_buf_,
                         strToUlong(cgi_resp_.GetHeaderValue("content-length")));
-                } else if (read_size == 0) {
+                    selectResponse();
+                    break;
+                } else if (read_size == 0 || read_size == offset) {
                     // EOF
                     cgi_resp_.SetBody(left_buf_);
                     phase_ = DONE;
+                    selectResponse();
+                    break;
+                } else {
+                    return;
                 }
-                return;
 
             case DONE:
                 return;

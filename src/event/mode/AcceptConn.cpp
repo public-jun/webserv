@@ -16,7 +16,8 @@ AcceptConn::AcceptConn(ListeningSocket listener)
 
 AcceptConn::~AcceptConn() {}
 
-void AcceptConn::Run() {
+void AcceptConn::Run(intptr_t offset) {
+    UNUSED(offset);
     struct sockaddr_in peer_sin;
     int                len, stream_fd;
 
@@ -29,6 +30,16 @@ void AcceptConn::Run() {
 
     stream_sock_.SetSocketFd(stream_fd);
     stream_sock_.SetAddress(peer_sin);
+
+#ifdef WS_DEBUG
+    std::cout << "=== AcceptConn ==="
+              << "\n"
+              << "listener fd: " << listener_.GetSocketFd() << "\n"
+              << "stream fd  : " << stream_sock_.GetSocketFd() << "\n"
+              << "=================="
+              << "\n"
+              << std::endl;
+#endif
 }
 
 void AcceptConn::Register() { EventRegister::Instance().AddAcceptEvent(this); }

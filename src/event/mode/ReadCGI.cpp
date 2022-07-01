@@ -11,6 +11,7 @@
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "RecvRequest.hpp"
 #include "SendResponse.hpp"
 #include "StreamSocket.hpp"
 #include "SysError.hpp"
@@ -30,7 +31,7 @@ ReadCGI::~ReadCGI() {
     }
 }
 
-void ReadCGI::Run() {
+void ReadCGI::Run(intptr_t offset) {
     char buf[BUF_SIZE];
     int  fd_from_cgi = polled_fd_;
 
@@ -40,7 +41,7 @@ void ReadCGI::Run() {
     }
 
     try {
-        cgi_parser_(std::string(buf, read_size), read_size);
+        cgi_parser_(std::string(buf, read_size), read_size, offset);
     } catch (status::code code) { throw std::make_pair(stream_, code); }
 }
 void ReadCGI::Register() { EventRegister::Instance().AddReadEvent(this); }
@@ -52,14 +53,25 @@ IOEvent* ReadCGI::RegisterNext() {
         return this;
     }
 
-    // cgi_resp_.LogInfo();
-    cgi_resp_.GenerateHTTPResponse(resp_);
+    IOEvent* new_event = NULL;
+    // cgi_resp_.PrintInfo();
 
-    resp_.SetVersion(req_.GetVersion());
+    if (cgi_resp_.GetResponseType() == CGIResponse::LOCAL_REDIR_RES) {
+        req_.SetMethod("GET");
+        req_.SetRequestTarget(cgi_resp_.GetHeaderValue("location"));
+        req_.SetBody("");
+        // req_.PrintInfo();
+        new_event = RecvRequest::PrepareResponse(req_, stream_);
+    } else {
+        cgi_resp_.GenerateHTTPResponse(resp_);
 
-    IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
+        resp_.SetVersion(req_.GetVersion());
+        resp_.AppendHeader("Server", "Webserv/1.0.0");
+
+        new_event = new SendResponse(stream_, resp_.ConvertToStr());
+        new_event->Register();
+    }
 
     this->Unregister();
-    send_response->Register();
-    return send_response;
+    return new_event;
 }
