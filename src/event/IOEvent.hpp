@@ -1,6 +1,9 @@
 #ifndef IOEVENT_HPP
 #define IOEVENT_HPP
 
+#include <sys/event.h>
+
+#define UNUSED(x) ((void)(x))
 class IOEvent {
 public:
     enum IOEventMode {
@@ -20,10 +23,10 @@ public:
     IOEvent(int fd, IOEventMode mode) : polled_fd_(fd), mode_(mode) {}
     virtual ~IOEvent() {}
 
-    virtual void     Run()          = 0;
-    virtual void     Register()     = 0;
-    virtual void     Unregister()   = 0;
-    virtual IOEvent* RegisterNext() = 0;
+    virtual void     Run(intptr_t offset) = 0;
+    virtual void     Register()           = 0;
+    virtual void     Unregister()         = 0;
+    virtual IOEvent* RegisterNext()       = 0;
 
     void SetPolledFd(int fd) { polled_fd_ = fd; }
     int  GetPolledFd() { return polled_fd_; }
