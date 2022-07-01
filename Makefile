@@ -82,5 +82,6 @@ help: ## Display this help screen
 
 GOTESTDIR := ./test/go_test
 
-.PHONY:
+.PHONY: go_test
+go_test:
 	@$(MAKE) run -C $(GOTESTDIR)
