@@ -34,4 +34,4 @@ IOEvent* SendError::RegisterNext() {
     return send_response;
 }
 
-void SendError::Close() {}
+int SendError::Close() { return 0; }

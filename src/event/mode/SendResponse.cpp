@@ -52,8 +52,18 @@ IOEvent* SendResponse::RegisterNext() {
     return NULL;
 }
 
-void SendResponse::Close() {
-    if (stream_.GetSocketFd() == -1) {
-        close(stream_.GetSocketFd());
-    }
+int SendResponse::Close() {
+    /* int fd = stream_.GetSocketFd(); */
+
+    /* if (fd == -1) { */
+    /*     return 0; */
+    /* } */
+
+    /* if (close(fd) == -1) { */
+    /*     perror("close"); */
+    /*     std::cerr << "fd: " << polled_fd_ << std::endl; */
+    /*     errno = 0; */
+    /*     return -1; */
+    /* } */
+    return 0;
 }

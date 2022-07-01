@@ -1,6 +1,7 @@
 #include "ReadCGI.hpp"
 
 #include <cerrno>
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
@@ -70,9 +71,16 @@ IOEvent* ReadCGI::RegisterNext() {
     return new_event;
 }
 
-void ReadCGI::Close() {
-    if (polled_fd_ != -1) {
-        close(polled_fd_);
-        polled_fd_ = -1;
+int ReadCGI::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
     }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }

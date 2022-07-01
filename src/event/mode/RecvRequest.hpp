@@ -19,16 +19,15 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
-    virtual void     Close();
+    virtual int      Close();
 
-    static IOEvent*          PrepareResponse(const HTTPRequest&  req,
-                                             const StreamSocket& stream);
+    static IOEvent*           PrepareResponse(const HTTPRequest&  req,
+                                              const StreamSocket& stream);
     static const ServerConfig SearchServerConfig(const HTTPRequest&  req,
-                                          const StreamSocket& stream);
-    static const std::size_t BUF_SIZE;
+                                                 const StreamSocket& stream);
+    static const std::size_t  BUF_SIZE;
 
 private:
-
 private:
     RecvRequest();
 

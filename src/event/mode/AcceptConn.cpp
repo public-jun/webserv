@@ -52,4 +52,4 @@ IOEvent* AcceptConn::RegisterNext() {
     return recv_request;
 }
 
-void AcceptConn::Close() {}
+int AcceptConn::Close() { return 0; }

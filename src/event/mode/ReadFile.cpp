@@ -34,7 +34,7 @@ void ReadFile::Run() {
     // TODO: エラー処理
     if (read_size == -1) {
         perror("read");
-        return;
+        throw status::server_error;
     }
     file_content_.append(buf, read_size);
 
@@ -68,9 +68,17 @@ IOEvent* ReadFile::RegisterNext() {
     return send_response;
 }
 
-void ReadFile::Close() {
-    if (polled_fd_ != -1) {
-        close(polled_fd_);
-        polled_fd_ = -1;
+int ReadFile::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
     }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        std::cerr << "fd: " << polled_fd_ << std::endl;
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }

@@ -42,9 +42,17 @@ IOEvent* WriteCGI::RegisterNext() {
     return read_cgi;
 }
 
-void WriteCGI::Close() {
-    if (polled_fd_ != -1) {
-        close(polled_fd_);
-        polled_fd_ = -1;
+int WriteCGI::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
     }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        std::cerr << "fd: " << polled_fd_ << std::endl;
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }

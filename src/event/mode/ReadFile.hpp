@@ -17,7 +17,7 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
-    virtual void     Close();
+    virtual int      Close();
 
     static const std::size_t BUF_SIZE;
 

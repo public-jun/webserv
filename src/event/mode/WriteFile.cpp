@@ -33,9 +33,16 @@ IOEvent* WriteFile::RegisterNext() {
     return send_response;
 }
 
-void WriteFile::Close() {
-    if (polled_fd_ != -1) {
-        close(polled_fd_);
-        polled_fd_ = -1;
+int WriteFile::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
     }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }
