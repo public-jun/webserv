@@ -17,12 +17,15 @@ public:
         static Server instance;
         return instance;
     }
+    void ValidateArgc(int argc);
     void InitServer(std::string config_file_path);
+    void Run();
     void ShutDownServer();
 
 private:
     Server();
     ~Server();
+    EventExecutor&               executor_;
     std::vector<ListeningSocket> listeners_;
     std::vector<IOEvent*>        registered_events_;
     void                         initListeners();
