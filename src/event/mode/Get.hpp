@@ -33,6 +33,11 @@ private:
     std::string timeStamp(time_t* time);
     std::string fileSize(struct stat* s);
 
+    // log
+    void printLogStart();
+    void printLogEnd();
+    void printLog404();
+
     StreamSocket          stream_;
     IOEvent*              next_event_;
     URI&                  uri_;
