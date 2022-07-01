@@ -17,20 +17,23 @@ public:
     RecvRequest(StreamSocket stream);
     virtual ~RecvRequest();
 
-    virtual void     Run();
+    virtual void     Run(intptr_t offset);
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
 
-    static const std::size_t BUF_SIZE;
+    static IOEvent*           PrepareResponse(const HTTPRequest&  req,
+                                              const StreamSocket& stream);
+    static const ServerConfig SearchServerConfig(const HTTPRequest&  req,
+                                                 const StreamSocket& stream);
+    static const std::size_t  BUF_SIZE;
 
 private:
     const ServerConfig searchServerConfig();
-    std::string        getAddrByHostName(std::string host_name);
+    static std::string getAddrByHostName(std::string host_name);
 
 private:
     RecvRequest();
-    IOEvent* prepareResponse();
 
     // RecvRequestに必要な入力
     StreamSocket stream_;

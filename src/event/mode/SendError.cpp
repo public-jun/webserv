@@ -8,7 +8,7 @@ SendError::SendError(StreamSocket& stream, status::code code)
 
 SendError::~SendError() {}
 
-void SendError::Run() {}
+void SendError::Run(intptr_t offset) { UNUSED(offset); }
 
 void SendError::Register() {}
 
@@ -27,6 +27,7 @@ IOEvent* SendError::RegisterNext() {
 
     resp.AppendHeader("Content-Length", body_size.str());
     resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
+    resp.PrintInfo();
 
     IOEvent* send_response = new SendResponse(stream_, resp.ConvertToStr());
     EventRegister::Instance().AddWriteEvent(send_response);
