@@ -19,11 +19,7 @@ SendResponse::SendResponse(StreamSocket stream, std::string buf)
     : IOEvent(stream.GetSocketFd(), SEND_RESPONSE), stream_(stream),
       all_buf_(buf) {}
 
-SendResponse::~SendResponse() {
-    if (stream_.GetSocketFd() == -1) {
-        close(stream_.GetSocketFd());
-    }
-}
+SendResponse::~SendResponse() {}
 
 void SendResponse::Run(intptr_t offset) {
     UNUSED(offset);
@@ -49,10 +45,12 @@ void SendResponse::Unregister() {
 
 IOEvent* SendResponse::RegisterNext() {
     // TODO: keep-alive
-    close(stream_.GetSocketFd());
+    if (close(stream_.GetSocketFd()) == -1) {
+        perror("close");
+    }
     this->Unregister();
-
-    // To Do Keep alive
 
     return NULL;
 }
+
+int SendResponse::Close() { return 0; }

@@ -81,6 +81,9 @@ void EventExecutor::nextEvent(IOEvent* event) {
     IOEvent* next_event = event->RegisterNext();
     if (event->GetIOEventMode() != IOEvent::ACCEPT_CONNECTION &&
         next_event != event) {
+        if (event->Close() == -1) {
+            throw status::server_error;
+        }
         delete event;
     }
 }
@@ -88,6 +91,7 @@ void EventExecutor::nextEvent(IOEvent* event) {
 void EventExecutor::errorNextEvent(IOEvent* prev, IOEvent* next) {
     prev->Unregister();
     if (prev->GetIOEventMode() != IOEvent::ACCEPT_CONNECTION) {
+        prev->Close();
         delete prev;
     }
     nextEvent(next);

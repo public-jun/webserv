@@ -74,6 +74,8 @@ IOEvent* RecvRequest::RegisterNext() {
     return NULL;
 }
 
+int RecvRequest::Close() { return 0; }
+
 IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
                                       const StreamSocket& stream) {
     IOEvent* new_event = NULL;
