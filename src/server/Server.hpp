@@ -6,6 +6,9 @@
 #include "ConfigParser.hpp"
 #include "IOEvent.hpp"
 #include "ListeningSocket.hpp"
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sstream>
 #include <string>
 #include <unistd.h>
 #include <vector>
