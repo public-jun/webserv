@@ -21,6 +21,7 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
+    virtual int      Close();
 
     static IOEvent*           PrepareResponse(const HTTPRequest&  req,
                                               const StreamSocket& stream);
@@ -29,7 +30,6 @@ public:
     static const std::size_t  BUF_SIZE;
 
 private:
-    const ServerConfig searchServerConfig();
     static std::string getAddrByHostName(std::string host_name);
 
 private:

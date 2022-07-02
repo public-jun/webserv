@@ -1,11 +1,11 @@
 ################# google test ####################
 NAME      := tester
 LIBNAME   := libgtest.a
-SRCSDIR   := ../src
+SRCSDIR   := ../../src
 INCDIR    := $(shell find $(SRCSDIR) -maxdepth 2 -type d)
 INCLUDE   := $(addprefix -I, $(INCDIR))
 
-gtestdir  := ./google_test
+gtestdir  := ./google_testlib
 gtest     := $(gtestdir)/gtest $(gtestdir)/googletest-release-1.11.0
 
 CXX       := clang++
@@ -13,7 +13,7 @@ CXXFLAGS  := -std=c++11 -I$(gtestdir) $(INCLUDE)
 
 OBJDIR    := ./obj
 
-OBJS      := $(shell find ../obj -name '*.o' -not -name 'main.o')
+OBJS      := $(shell find ../../obj -name '*.o' -not -name 'main.o')
 
 G_SRC :=  gtest.cc \
 					$(gtestdir)/googletest-release-1.11.0/googletest/src/gtest_main.cc \
@@ -40,6 +40,7 @@ gtest: $(gtest) $(G_OBJ)
 clean:
 	$(RM) $(G_OBJ)
 
-.PHONY: cleangtest
-cleangtest:
+.PHONY: fclean
+fclean: clean
+	$(RM) $(NAME)
 	rm -rf $(gtestdir)

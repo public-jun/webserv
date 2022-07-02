@@ -33,3 +33,5 @@ IOEvent* SendError::RegisterNext() {
     EventRegister::Instance().AddWriteEvent(send_response);
     return send_response;
 }
+
+int SendError::Close() { return 0; }

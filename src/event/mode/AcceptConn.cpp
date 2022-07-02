@@ -31,15 +31,7 @@ void AcceptConn::Run(intptr_t offset) {
     stream_sock_.SetSocketFd(stream_fd);
     stream_sock_.SetAddress(peer_sin);
 
-#ifdef WS_DEBUG
-    std::cout << "=== AcceptConn ==="
-              << "\n"
-              << "listener fd: " << listener_.GetSocketFd() << "\n"
-              << "stream fd  : " << stream_sock_.GetSocketFd() << "\n"
-              << "=================="
-              << "\n"
-              << std::endl;
-#endif
+    printLog();
 }
 
 void AcceptConn::Register() { EventRegister::Instance().AddAcceptEvent(this); }
@@ -51,4 +43,18 @@ IOEvent* AcceptConn::RegisterNext() {
 
     recv_request->Register();
     return recv_request;
+}
+
+int AcceptConn::Close() { return 0; }
+
+void AcceptConn::printLog() {
+#ifdef WS_DEBUG
+    std::cout << "=== AcceptConn ==="
+              << "\n"
+              << "listener fd: " << listener_.GetSocketFd() << "\n"
+              << "stream fd  : " << stream_sock_.GetSocketFd() << "\n"
+              << "=================="
+              << "\n"
+              << std::endl;
+#endif
 }

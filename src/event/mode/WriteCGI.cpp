@@ -18,13 +18,7 @@ WriteCGI::WriteCGI(class CGI cgi, StreamSocket stream, HTTPRequest req)
     : IOEvent(cgi.FdForWriteToCGI(), WRITE_CGI), cgi_(cgi), stream_(stream),
       req_(req) {}
 
-WriteCGI::~WriteCGI() {
-    int fd = polled_fd_;
-    if (fd != -1) {
-        close(fd);
-        polled_fd_ = -1;
-    }
-}
+WriteCGI::~WriteCGI() {}
 
 void WriteCGI::Run(intptr_t offset) {
     UNUSED(offset);
@@ -47,4 +41,19 @@ IOEvent* WriteCGI::RegisterNext() {
     IOEvent* read_cgi = new ReadCGI(cgi_.FdForReadFromCGI(), stream_, req_);
     read_cgi->Register();
     return read_cgi;
+}
+
+int WriteCGI::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
+    }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        std::cerr << "fd: " << polled_fd_ << std::endl;
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }

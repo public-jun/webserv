@@ -19,26 +19,16 @@ SendResponse::SendResponse(StreamSocket stream, std::string buf)
     : IOEvent(stream.GetSocketFd(), SEND_RESPONSE), stream_(stream),
       all_buf_(buf) {}
 
-SendResponse::~SendResponse() {
-    if (stream_.GetSocketFd() == -1) {
-        close(stream_.GetSocketFd());
-    }
-}
+SendResponse::~SendResponse() {}
 
 void SendResponse::Run(intptr_t offset) {
     UNUSED(offset);
+    printLog();
+
     int ret = send(stream_.GetSocketFd(), all_buf_.c_str(), all_buf_.size(), 0);
     if (ret < 0) {
         throw SysError("send", errno);
     }
-#ifdef WS_DEBUG
-    std::cout << "=== SendResponse ==="
-              << "\n"
-              << "stream fd: " << stream_.GetSocketFd() << "\n"
-              << "===================="
-              << "\n"
-              << std::endl;
-#endif
 }
 
 void SendResponse::Register() { EventRegister::Instance().AddWriteEvent(this); }
@@ -49,10 +39,23 @@ void SendResponse::Unregister() {
 
 IOEvent* SendResponse::RegisterNext() {
     // TODO: keep-alive
-    close(stream_.GetSocketFd());
+    if (close(stream_.GetSocketFd()) == -1) {
+        perror("close");
+    }
     this->Unregister();
 
-    // To Do Keep alive
-
     return NULL;
+}
+
+int SendResponse::Close() { return 0; }
+
+void SendResponse::printLog() {
+#ifdef WS_DEBUG
+    std::cout << "=== SendResponse ==="
+              << "\n"
+              << "stream fd: " << stream_.GetSocketFd() << "\n"
+              << "===================="
+              << "\n"
+              << std::endl;
+#endif
 }

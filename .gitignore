@@ -17,7 +17,7 @@
 *.dll
 
 # test libraries
-test/google_test
+google_testlib
 
 # Fortran module files
 *.smod
