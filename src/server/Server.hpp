@@ -4,6 +4,7 @@
 #include "AcceptConn.hpp"
 #include "Config.hpp"
 #include "ConfigParser.hpp"
+#include "EventExecutor.hpp"
 #include "IOEvent.hpp"
 #include "ListeningSocket.hpp"
 #include <arpa/inet.h>
@@ -20,11 +21,13 @@ public:
         return instance;
     }
     void InitServer(std::string config_file_path);
+    void Run();
     void ShutDownServer();
 
 private:
     Server();
     ~Server();
+    EventExecutor&               executor_;
     std::vector<ListeningSocket> listeners_;
     std::vector<IOEvent*>        registered_events_;
     void                         initListeners();
