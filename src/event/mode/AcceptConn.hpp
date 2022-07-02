@@ -16,9 +16,12 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
+    virtual int      Close();
 
 private:
     AcceptConn();
+    void printLog();
+
     // Accept に必要な入力
     ListeningSocket listener_;
 
