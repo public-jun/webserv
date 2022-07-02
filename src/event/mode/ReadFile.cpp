@@ -28,6 +28,7 @@ ReadFile::ReadFile()
 ReadFile::~ReadFile() {}
 
 void ReadFile::Run(intptr_t offset) {
+    printLogStart();
     char buf[BUF_SIZE];
     int  fd = polled_fd_;
 
@@ -42,10 +43,6 @@ void ReadFile::Run(intptr_t offset) {
         finish_ = true;
     }
     file_content_.append(buf, read_size);
-
-#ifdef WS_DEBUG
-    std::cout << "=== ReadFile ===" << std::endl;
-#endif
 }
 
 void ReadFile::Register() { EventRegister::Instance().AddReadEvent(this); }
@@ -64,17 +61,15 @@ IOEvent* ReadFile::RegisterNext() {
     resp_.AppendHeader("Server", "Webserv/1.0.0");
     resp_.PrintInfo();
 
-#ifdef WS_DEBUG
-    std::cout << "================\n" << std::endl;
-#endif
-
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
     this->Unregister();
     send_response->Register();
 
+    printLogEnd();
     return send_response;
 }
+
 
 int ReadFile::Close() {
     if (polled_fd_ == -1) {
@@ -89,4 +84,16 @@ int ReadFile::Close() {
     }
     polled_fd_ = -1;
     return 0;
+}
+
+void ReadFile::printLogStart() {
+#ifdef WS_DEBUG
+    std::cout << "=== ReadFile ===" << std::endl;
+#endif
+}
+
+void ReadFile::printLogEnd() {
+#ifdef WS_DEBUG
+    std::cout << "================\n" << std::endl;
+#endif
 }

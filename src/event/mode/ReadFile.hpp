@@ -23,6 +23,9 @@ public:
 
 private:
     ReadFile();
+    void printLogStart();
+    void printLogEnd();
+
     // ReadFile に必要な入力
     StreamSocket stream_;
     HTTPRequest  req_;

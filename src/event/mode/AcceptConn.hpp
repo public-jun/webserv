@@ -20,6 +20,8 @@ public:
 
 private:
     AcceptConn();
+    void printLog();
+
     // Accept に必要な入力
     ListeningSocket listener_;
 

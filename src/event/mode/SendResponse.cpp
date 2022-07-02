@@ -23,18 +23,12 @@ SendResponse::~SendResponse() {}
 
 void SendResponse::Run(intptr_t offset) {
     UNUSED(offset);
+    printLog();
+
     int ret = send(stream_.GetSocketFd(), all_buf_.c_str(), all_buf_.size(), 0);
     if (ret < 0) {
         throw SysError("send", errno);
     }
-#ifdef WS_DEBUG
-    std::cout << "=== SendResponse ==="
-              << "\n"
-              << "stream fd: " << stream_.GetSocketFd() << "\n"
-              << "===================="
-              << "\n"
-              << std::endl;
-#endif
 }
 
 void SendResponse::Register() { EventRegister::Instance().AddWriteEvent(this); }
@@ -54,3 +48,14 @@ IOEvent* SendResponse::RegisterNext() {
 }
 
 int SendResponse::Close() { return 0; }
+
+void SendResponse::printLog() {
+#ifdef WS_DEBUG
+    std::cout << "=== SendResponse ==="
+              << "\n"
+              << "stream fd: " << stream_.GetSocketFd() << "\n"
+              << "===================="
+              << "\n"
+              << std::endl;
+#endif
+}
