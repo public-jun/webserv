@@ -52,6 +52,16 @@ tidy-fix: ## Run clang-tidy --fix
 debug: CXXFLAGS += -fsanitize=address -D WS_DEBUG=1
 debug: re ## Debug mode rebuild
 
+################# test script ####################
+
+TESTDIR= ./test
+.PHONY: lsof
+lsof: ## Run lsof.sh
+	@bash $(TESTDIR)/lsof.sh
+
+.PHONY: error_conf
+error_conf: ## Run error_conf.sh
+	@bash $(TESTDIR)/error_conf.sh
 
 ################# google test ####################
 
