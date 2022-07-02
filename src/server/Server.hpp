@@ -17,7 +17,6 @@ public:
         static Server instance;
         return instance;
     }
-    void ValidateArgc(int argc);
     void InitServer(std::string config_file_path);
     void Run();
     void ShutDownServer();

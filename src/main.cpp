@@ -1,17 +1,17 @@
-// #include "EventAction.hpp"
-#include "EventRegister.hpp"
 #include "Server.hpp"
-#include <unistd.h>
-#include <vector>
-
 #include <iostream>
+
+void validate_argc(int argc) {
+    if (argc != 2) {
+        throw std::runtime_error("invalid number of arguments");
+    }
+}
 
 int main(int argc, char** argv) {
     int     exit_cd = EXIT_SUCCESS;
     Server& server  = Server::Instance();
     try {
-
-        server.ValidateArgc(argc);
+        validate_argc(argc);
         server.InitServer(argv[1]);
         server.Run();
     } catch (const std::exception& e) {

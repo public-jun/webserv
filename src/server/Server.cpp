@@ -4,12 +4,6 @@ Server::Server() : executor_(EventExecutor::Instance()) {}
 
 Server::~Server() {}
 
-void Server::ValidateArgc(int argc) {
-    if (argc != 2) {
-        throw std::runtime_error("invalid number of arguments");
-    }
-}
-
 void Server::Run() {
     for (;;) {
         executor_.ProcessEvent();
