@@ -12,6 +12,7 @@
 
 #include "ExecveArray.hpp"
 #include "HTTPRequest.hpp"
+#include "HTTPStatus.hpp"
 #include "SysError.hpp"
 #include "URI.hpp"
 
@@ -92,6 +93,13 @@ std::vector<std::string> CGI::makeArgs() {
     // command設定
     args.push_back(COMMANDS.find(uri_.GetExtension())->second);
     // 実行するスクリプトファイルのパス設定
+    // スクリプトファイルをvalidateする
+    const struct stat s = URI::Stat(uri_.GetLocalPath());
+    if (S_ISDIR(s.st_mode) ||
+        access(uri_.GetLocalPath().c_str(), (R_OK | X_OK)) < 0) {
+        throw status::forbidden;
+    }
+
     args.push_back(uri_.GetLocalPath());
     // 残りの引数設定
     args.insert(args.end(), uri_.GetArgs().begin(), uri_.GetArgs().end());

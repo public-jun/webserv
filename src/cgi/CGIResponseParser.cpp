@@ -224,7 +224,7 @@ bool CGIResponseParser::isClientRedirDocumentResponse(
         }
     }
 
-    std::string absoluteURL = cgi_resp.GetHeaderValue("location");
+    std::string absolute_url = cgi_resp.GetHeaderValue("location");
     // TODO absoluteURLをvalidate
 
     return true;
