@@ -138,9 +138,30 @@ const ServerConfig RecvRequest::SearchServerConfig(const HTTPRequest&  req,
     const const_iterator it_end = config_list.end();
 
     for (; it != it_end; it++) {
-        if (it->GetServerName() == req.GetHeaderValue("host")) {
+        std::string host      = req.GetHeaderValue("host");
+        std::string host_name = host.substr(0, host.find(":"));
+        std::string addr      = getAddrByHostName(host_name);
+
+        if (it->GetServerName() == host_name || it->GetHost() == addr) {
             return *it;
         }
     }
     return *config_list.begin();
+}
+
+std::string RecvRequest::getAddrByHostName(std::string host_name) {
+    struct addrinfo  hints = {};
+    struct addrinfo* info;
+    struct in_addr   addr;
+
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags    = AI_ADDRCONFIG | AI_NUMERICSERV;
+    hints.ai_family   = PF_INET;
+
+    if (getaddrinfo(host_name.c_str(), NULL, &hints, &info) != 0)
+        throw status::server_error;
+    addr.s_addr = ((struct sockaddr_in*)(info->ai_addr))->sin_addr.s_addr;
+    freeaddrinfo(info);
+
+    return inet_ntoa(addr);
 }

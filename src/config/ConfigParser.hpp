@@ -11,7 +11,10 @@
 
 class ConfigParser {
 public:
-    static ConfigParser* Instance();
+    static ConfigParser& Instance() {
+        static ConfigParser instance;
+        return instance;
+    }
     static void
     ParseConfigFile(const std::string conf_path = DEFAULT_CONF_PATH);
 

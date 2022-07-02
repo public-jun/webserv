@@ -1,17 +1,23 @@
 #include "Server.hpp"
 
-Server::Server() {}
+Server::Server() : executor_(EventExecutor::Instance()) {}
 
 Server::~Server() {}
 
+void Server::Run() {
+    for (;;) {
+        executor_.ProcessEvent();
+    }
+}
+
 void Server::InitServer(std::string config_file_path) {
     ConfigParser::ParseConfigFile(config_file_path);
+    executor_.Init();
     initListeners();
 }
 
 void Server::initListeners() {
-    server_config_map server_config_map =
-        Config::Instance()->GetServerConfigs();
+    server_config_map server_config_map      = Config::GetServerConfigs();
     server_config_map::const_iterator it_end = server_config_map.end();
 
     for (server_config_map::const_iterator it = server_config_map.begin();
@@ -55,6 +61,7 @@ bool Server::isHostDuplicated(server_config_vec::const_iterator it,
 }
 
 void Server::ShutDownServer() {
+    executor_.ShutDown();
     for (std::vector<ListeningSocket>::iterator it = listeners_.begin();
          it != listeners_.end(); it++) {
         it->Close();

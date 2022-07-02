@@ -9,6 +9,8 @@
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
 #include "URI.hpp"
+#include <arpa/inet.h>
+#include <netdb.h>
 
 class RecvRequest : public IOEvent {
 public:
@@ -28,6 +30,8 @@ public:
     static const std::size_t  BUF_SIZE;
 
 private:
+    static std::string getAddrByHostName(std::string host_name);
+
 private:
     RecvRequest();
 
