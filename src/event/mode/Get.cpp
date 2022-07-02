@@ -60,11 +60,17 @@ void Get::Run() {
     std::cout << "=== Get ===" << std::endl;
 #endif
 
-    std::string       local_path = uri_.GetLocalPath();
-    const struct stat s          = URI::Stat(local_path);
+    std::string                 local_path = uri_.GetLocalPath();
+    std::string                 index      = location_config_.GetIndex();
+    std::pair<int, std::string> redir      = location_config_.GetReturn();
 
-    std::string index = location_config_.GetIndex();
+    // redirect
+    if (hasRedir(redir, uri_.GetRawTarget(), location_config_.GetTarget())) {
+        processRedir(redir);
+        return;
+    }
 
+    const struct stat s = URI::Stat(local_path);
     if (S_ISDIR(s.st_mode)) {
         processDir(index, local_path);
     } else {
@@ -90,6 +96,28 @@ void Get::processDir(std::string index, std::string local_path) {
     }
 }
 
+void Get::processRedir(std::pair<int, std::string> redir) {
+    std::string       url;
+    std::stringstream port;
+    if (*redir.second.begin() == '/') {
+        // return 301 /html/index.htmlを
+        // return 301 http://host:port/html/index.htmlに変換
+        port << uri_.GetServerConfig().GetPort();
+        url = "http://" + uri_.GetServerConfig().GetHost() + ":" + port.str() +
+              redir.second;
+        port << "";
+    } else {
+        // return 301 https://google.com/
+        url = redir.second;
+    }
+
+    HTTPResponse resp;
+    resp.AppendHeader("Location", url);
+    std::cout << "Location: " << url << std::endl;
+    resp.SetStatusCode(redir.first);
+    next_event_ = new SendResponse(stream_, resp.ConvertToStr());
+}
+
 void Get::processIndex(std::string fullpath, std::string local_path) {
     if (existFile(fullpath)) {
         prepareReadFile(fullpath);
@@ -112,6 +140,14 @@ void Get::tryAutoIndex(std::string local_path) {
 
         throw status::not_found;
     }
+}
+
+bool Get::hasRedir(std::pair<int, std::string> redir, std::string path,
+                   std::string target) {
+    if (redir.first != -1 && path == target) {
+        return true;
+    }
+    return false;
 }
 
 bool Get::hasIndex(std::string index) { return index != ""; }
