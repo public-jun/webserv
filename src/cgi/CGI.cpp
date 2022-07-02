@@ -95,8 +95,7 @@ std::vector<std::string> CGI::makeArgs() {
     // 実行するスクリプトファイルのパス設定
     // スクリプトファイルをvalidateする
     const struct stat s = URI::Stat(uri_.GetLocalPath());
-    if (S_ISDIR(s.st_mode) ||
-        access(uri_.GetLocalPath().c_str(), (R_OK | X_OK)) < 0) {
+    if (S_ISDIR(s.st_mode) || !(s.st_mode & S_IRUSR)) {
         throw status::forbidden;
     }
 
