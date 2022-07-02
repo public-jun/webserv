@@ -17,11 +17,15 @@ public:
     virtual void     Register();
     virtual void     Unregister();
     virtual IOEvent* RegisterNext();
+    virtual int      Close();
 
     static const std::size_t BUF_SIZE;
 
 private:
     ReadFile();
+    void printLogStart();
+    void printLogEnd();
+
     // ReadFile に必要な入力
     StreamSocket stream_;
     HTTPRequest  req_;
