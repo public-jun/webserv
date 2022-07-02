@@ -27,6 +27,7 @@ public:
     virtual void     Register()           = 0;
     virtual void     Unregister()         = 0;
     virtual IOEvent* RegisterNext()       = 0;
+    virtual int      Close()              = 0;
 
     void SetPolledFd(int fd) { polled_fd_ = fd; }
     int  GetPolledFd() { return polled_fd_; }

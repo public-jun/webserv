@@ -45,6 +45,8 @@ IOEvent* AcceptConn::RegisterNext() {
     return recv_request;
 }
 
+int AcceptConn::Close() { return 0; }
+
 void AcceptConn::printLog() {
 #ifdef WS_DEBUG
     std::cout << "=== AcceptConn ==="

@@ -1,6 +1,7 @@
 #include "ReadCGI.hpp"
 
 #include <cerrno>
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
@@ -23,13 +24,7 @@ ReadCGI::ReadCGI(int fd_read_from_cgi, StreamSocket stream, HTTPRequest req)
       is_finish_(false), cgi_resp_(CGIResponse()), resp_(HTTPResponse()),
       cgi_parser_(cgi_resp_) {}
 
-ReadCGI::~ReadCGI() {
-    int fd = polled_fd_;
-    if (fd != -1) {
-        close(fd);
-        polled_fd_ = -1;
-    }
-}
+ReadCGI::~ReadCGI() {}
 
 void ReadCGI::Run(intptr_t offset) {
     char buf[BUF_SIZE];
@@ -74,4 +69,18 @@ IOEvent* ReadCGI::RegisterNext() {
 
     this->Unregister();
     return new_event;
+}
+
+int ReadCGI::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
+    }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }

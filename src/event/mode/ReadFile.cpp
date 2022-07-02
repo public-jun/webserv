@@ -25,13 +25,7 @@ ReadFile::ReadFile()
     : IOEvent(READ_FILE), stream_(StreamSocket()), finish_(false),
       resp_(HTTPResponse()) {}
 
-ReadFile::~ReadFile() {
-    int fd = polled_fd_;
-    if (fd != -1) {
-        close(fd);
-        polled_fd_ = -1;
-    }
-}
+ReadFile::~ReadFile() {}
 
 void ReadFile::Run(intptr_t offset) {
     printLogStart();
@@ -42,7 +36,7 @@ void ReadFile::Run(intptr_t offset) {
     // TODO: エラー処理
     if (read_size == -1) {
         perror("read");
-        return;
+        throw status::server_error;
     }
 
     if (read_size == 0 || read_size == offset) {
@@ -74,6 +68,22 @@ IOEvent* ReadFile::RegisterNext() {
 
     printLogEnd();
     return send_response;
+}
+
+
+int ReadFile::Close() {
+    if (polled_fd_ == -1) {
+        return 0;
+    }
+
+    if (close(polled_fd_) == -1) {
+        perror("close");
+        std::cerr << "fd: " << polled_fd_ << std::endl;
+        errno = 0;
+        return -1;
+    }
+    polled_fd_ = -1;
+    return 0;
 }
 
 void ReadFile::printLogStart() {
