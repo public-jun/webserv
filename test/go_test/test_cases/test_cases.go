@@ -106,7 +106,7 @@ func Error() {
 func Get() {
 	log.Printf("%sRUN Get Test%s", blue, reset)
 	defer log.Printf("%sEND Get Test%s", blue, reset)
-	indexHTML, err := ioutil.ReadFile("../../index.html")
+	indexHTML, err := ioutil.ReadFile("../../docs/html/index.html")
 	if err != nil {
 		panic(err)
 	}
