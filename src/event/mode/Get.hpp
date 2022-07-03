@@ -17,11 +17,13 @@ public:
 
 private:
     void processDir(std::string index, std::string path);
+    void processRedir(std::pair<int, std::string> redir);
     void processIndex(std::string fullpath, std::string location_path);
     void tryAutoIndex(std::string path);
     void prepareReadFile(std::string path);
     void prepareSendResponse(std::string content);
     bool existFile(std::string path);
+    bool hasRedir(std::pair<int, std::string> redir, std::string path, std::string target);
     bool hasIndex(std::string index);
     void complementSlash(std::string& path);
 
