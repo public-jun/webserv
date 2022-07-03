@@ -122,11 +122,21 @@ std::vector<std::string> CGI::makeEnvs() {
     env_map["CONTENT_TYPE"]      = req_.GetHeaderValue("content-type");
     env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
     env_map["PATH_INFO"]         = uri_.GetRawPath();
-    env_map["PATH_TRANSLATED"]   = uri_.GetLocalPath();
-    env_map["QUERY_STRING"]      = uri_.GetQuery();
+
+    // PATH_TRANSLATED
+    char path_name[100];
+    memset(path_name, '\0', 100);
+    getcwd(path_name, 100);
+    std::string translated =
+        std::string(path_name).append(uri_.GetLocalPath(), 1);
+    env_map["PATH_TRANSLATED"] = translated;
+
+    env_map["QUERY_STRING"] = uri_.GetQuery();
 
     env_map["REMOTE_ADDR"] = uri_.GetServerConfig().GetHost(); // ipアドレス
-    env_map["REMOTE_HOST"] = uri_.GetServerConfig().GetServerName(); // ipアドレスから逆引きしたホスト名
+    env_map["REMOTE_HOST"] =
+        uri_.GetServerConfig()
+            .GetServerName(); // ipアドレスから逆引きしたホスト名
     env_map["REMOTE_IDENT"] = "";
     env_map["REMOTE_USER"]  = "";
 
