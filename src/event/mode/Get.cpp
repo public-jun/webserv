@@ -156,6 +156,7 @@ void Get::prepareSendResponse(std::string content) {
     resp.AppendHeader("Content-Length", size.str());
     resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
     resp.SetBody(content);
+    resp.PrintInfo();
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
