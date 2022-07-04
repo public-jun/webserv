@@ -70,7 +70,12 @@ IOEvent* RecvRequest::RegisterNext() {
         this->Unregister();
         IOEvent* new_event = PrepareResponse(req_, stream_);
         return new_event;
-    } catch (status::code code) { throw std::make_pair(stream_, code); }
+    } catch (status::code code) {
+        throw std::make_pair(stream_, code);
+    } catch (const std::exception& e) {
+        throw std::make_pair(stream_, status::server_error);
+    }
+
     return NULL;
 }
 
@@ -87,33 +92,21 @@ IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
     HTTPParser::validate_request(uri, req);
 
     if (req.GetMethod() == "GET") {
-        // Uriのパスや拡張子によって ReadFile or ReadCGI
-        if (CGI::IsCGI(uri, "GET")) {
-            class CGI cgi(uri, req);
-            cgi.Run();
-            new_event = new ReadCGI(cgi.FdForReadFromCGI(), stream, req);
-        } else {
-            Get get(stream, uri);
-            get.Run();
-            new_event = get.NextEvent();
-        }
-
-        // this->Unregister();
-        new_event->Register();
+        Get get(stream, uri, req);
+        get.Run();
+        new_event = get.NextEvent();
         return new_event;
     } else if (req.GetMethod() == "POST") {
         if (CGI::IsCGI(uri, "POST")) {
             class CGI cgi(uri, req);
             cgi.Run();
             new_event = new WriteCGI(cgi, stream, req);
-            // this->Unregister();
             new_event->Register();
             return new_event;
         } else {
             Post post(stream, req, uri);
 
             post.Run();
-            // this->Unregister();
             return post.RegisterNext();
         }
     }
@@ -121,7 +114,6 @@ IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
         Delete dlt(stream, uri);
 
         dlt.Run();
-        // this->Unregister();
         return dlt.RegisterNext();
     }
     return NULL;
