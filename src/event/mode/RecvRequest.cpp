@@ -94,8 +94,7 @@ IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
         Post post(stream, req, uri);
         post.Run();
         return post.RegisterNext();
-    }
-    if (req.GetMethod() == "DELETE") {
+    } else if (req.GetMethod() == "DELETE") {
         Delete dlt(stream, uri);
         dlt.Run();
         return dlt.RegisterNext();
