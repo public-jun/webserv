@@ -4,6 +4,7 @@
 #include "IOEvent.hpp"
 #include "StreamSocket.hpp"
 #include "URI.hpp"
+#include <dirent.h>
 
 class Get {
 public:
@@ -35,6 +36,7 @@ private:
     std::string spaces(std::string name, int n);
     std::string timeStamp(time_t* time);
     std::string fileSize(struct stat* s);
+    std::string generateAutoIndexHTML(DIR* dir);
 
     // log
     void printLogStart();

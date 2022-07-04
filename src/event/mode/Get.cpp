@@ -240,29 +240,14 @@ std::string Get::fileSize(struct stat* s) {
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
     complementSlash(path);
     const std::string fullpath = path + std::string(ent->d_name);
-
-    struct stat s = URI::Stat(fullpath);
+    struct stat       s        = URI::Stat(fullpath);
 
     return timeStamp(&s.st_mtime) + fileSize(&s);
 }
 
-void Get::autoIndex() {
-    printLogAutoIndex();
-
-    const std::string& local_path  = uri_.GetLocalPath();
+std::string Get::generateAutoIndexHTML(DIR* dir) {
     const std::string& decode_path = uri_.GetDecodePath();
 
-    errno    = 0;
-    DIR* dir = opendir(local_path.c_str());
-    if (dir == NULL) {
-        perror("opendir");
-        if (errno == EACCES) {
-            throw status::forbidden;
-        }
-        throw status::server_error;
-    }
-
-    // "."を削除
     std::stringstream ss;
     ss << "<html>" << CRLF << "<head>" << CRLF << "<title>"
        << "Index of " << decode_path << "</title>" << CRLF << "</head>" << CRLF
@@ -286,8 +271,25 @@ void Get::autoIndex() {
     }
     ss << "</pre>" << CRLF << "<hr>" << CRLF << "</body>" << CRLF << "</html>"
        << CRLF;
+    return ss.str();
+}
 
-    prepareSendResponse(ss.str());
+void Get::autoIndex() {
+    printLogAutoIndex();
+
+    const std::string& local_path = uri_.GetLocalPath();
+
+    errno    = 0;
+    DIR* dir = opendir(local_path.c_str());
+    if (dir == NULL) {
+        perror("opendir");
+        if (errno == EACCES) {
+            throw status::forbidden;
+        }
+        throw status::server_error;
+    }
+
+    prepareSendResponse(generateAutoIndexHTML(dir));
 }
 
 // log
