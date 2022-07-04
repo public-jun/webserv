@@ -5,7 +5,6 @@
 #include <map>
 #include <unistd.h>
 
-#include "CGI.hpp"
 #include "Delete.hpp"
 #include "EventRegister.hpp"
 #include "Get.hpp"
@@ -13,13 +12,11 @@
 #include "HTTPStatus.hpp"
 #include "LocationConfig.hpp"
 #include "Post.hpp"
-#include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
 #include "ServerConfig.hpp"
 #include "StreamSocket.hpp"
 #include "URI.hpp"
-#include "WriteCGI.hpp"
 
 #include <iostream>
 #include <utility>
@@ -83,8 +80,6 @@ int RecvRequest::Close() { return 0; }
 
 IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
                                       const StreamSocket& stream) {
-    IOEvent* new_event = NULL;
-
     // URI クラス作成
     URI uri(SearchServerConfig(req, stream), req.GetRequestTarget());
     uri.Init();
@@ -94,25 +89,14 @@ IOEvent* RecvRequest::PrepareResponse(const HTTPRequest&  req,
     if (req.GetMethod() == "GET") {
         Get get(stream, uri, req);
         get.Run();
-        new_event = get.NextEvent();
-        return new_event;
+        return get.NextEvent();
     } else if (req.GetMethod() == "POST") {
-        if (CGI::IsCGI(uri, "POST")) {
-            class CGI cgi(uri, req);
-            cgi.Run();
-            new_event = new WriteCGI(cgi, stream, req);
-            new_event->Register();
-            return new_event;
-        } else {
-            Post post(stream, req, uri);
-
-            post.Run();
-            return post.RegisterNext();
-        }
+        Post post(stream, req, uri);
+        post.Run();
+        return post.RegisterNext();
     }
     if (req.GetMethod() == "DELETE") {
         Delete dlt(stream, uri);
-
         dlt.Run();
         return dlt.RegisterNext();
     }

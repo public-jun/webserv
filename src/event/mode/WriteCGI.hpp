@@ -8,7 +8,8 @@
 
 class WriteCGI : public IOEvent {
 public:
-    WriteCGI(class CGI cgi, StreamSocket stream, HTTPRequest req);
+    WriteCGI(int fd_for_write_to_cgi, int fd_for_read_form_cgi,
+             StreamSocket stream, HTTPRequest req);
     virtual ~WriteCGI();
 
     virtual void     Run(intptr_t offset);
@@ -21,7 +22,8 @@ private:
     WriteCGI();
 
 private:
-    class CGI    cgi_;
+    int          fd_for_write_to_cgi_;
+    int          fd_for_read_form_cgi_;
     StreamSocket stream_;
     HTTPRequest  req_;
 };
