@@ -16,19 +16,20 @@ public:
     static const std::string CRLF;
 
 private:
-    void processDir(std::string index, std::string path);
+    void processDir();
     void processRedir(std::pair<int, std::string> redir);
-    void processIndex(std::string fullpath, std::string location_path);
-    void tryAutoIndex(std::string path);
+    void processIndex(std::string fullpath);
+    void tryAutoIndex();
     void prepareReadFile(std::string path);
     void prepareSendResponse(std::string content);
     bool existFile(std::string path);
-    bool hasRedir(std::pair<int, std::string> redir, std::string path, std::string target);
+    bool hasRedir(std::pair<int, std::string> redir, std::string path,
+                  std::string target);
     bool hasIndex(std::string index);
     void complementSlash(std::string& path);
 
     // autoindex
-    void        autoIndex(std::string path);
+    void        autoIndex();
     std::string aElement(struct dirent* ent, std::string path);
     std::string fileInfo(struct dirent* ent, std::string path);
     std::string spaces(std::string name, int n);
