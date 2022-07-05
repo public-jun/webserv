@@ -61,9 +61,7 @@ Get::~Get() {}
 void Get::Run() {
     printLogStart();
 
-    std::string                 local_path = uri_.GetLocalPath();
-    std::string                 index      = location_config_.GetIndex();
-    std::pair<int, std::string> redir      = location_config_.GetReturn();
+    std::pair<int, std::string> redir = location_config_.GetReturn();
 
     // CGI
     if (CGI::IsCGI(uri_, "GET")) {
@@ -79,12 +77,12 @@ void Get::Run() {
         return;
     }
 
-    // Index or AutoIndex
-    const struct stat s = URI::Stat(local_path);
+    const struct stat s = URI::Stat(uri_.GetLocalPath());
+
     if (S_ISDIR(s.st_mode)) {
-        processDir(index, local_path);
+        processDir();
     } else {
-        prepareReadFile(local_path);
+        prepareReadFile(uri_.GetLocalPath());
     }
     printLogEnd();
 }
@@ -94,13 +92,15 @@ IOEvent* Get::NextEvent() {
     return next_event_;
 }
 
-void Get::processDir(std::string index, std::string local_path) {
+void Get::processDir() {
+    std::string local_path = uri_.GetLocalPath();
+    std::string index      = location_config_.GetIndex();
     complementSlash(local_path);
 
     if (hasIndex(index)) {
-        processIndex(local_path + index, local_path);
+        processIndex(local_path + index);
     } else {
-        tryAutoIndex(local_path);
+        tryAutoIndex();
     }
 }
 
@@ -126,17 +126,17 @@ void Get::processRedir(std::pair<int, std::string> redir) {
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
-void Get::processIndex(std::string fullpath, std::string local_path) {
+void Get::processIndex(std::string fullpath) {
     if (existFile(fullpath)) {
         prepareReadFile(fullpath);
     } else {
-        tryAutoIndex(local_path);
+        tryAutoIndex();
     }
 }
 
-void Get::tryAutoIndex(std::string local_path) {
+void Get::tryAutoIndex() {
     if (location_config_.GetAutoIndex() == ON) {
-        autoIndex(local_path);
+        autoIndex();
     } else {
         printLogNotFound();
         throw status::not_found;
@@ -171,6 +171,7 @@ void Get::prepareSendResponse(std::string content) {
     resp.AppendHeader("Content-Length", size.str());
     resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
     resp.SetBody(content);
+    resp.PrintInfo();
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
@@ -253,31 +254,19 @@ std::string Get::fileSize(struct stat* s) {
 
 std::string Get::fileInfo(struct dirent* ent, std::string path) {
     complementSlash(path);
-    const std::string fullpath = "." + path + std::string(ent->d_name);
+    const std::string fullpath = path + std::string(ent->d_name);
     struct stat       s        = URI::Stat(fullpath);
 
     return timeStamp(&s.st_mtime) + fileSize(&s);
 }
 
-void Get::autoIndex(std::string path) {
-    printLogAutoIndex();
+std::string Get::generateAutoIndexHTML(DIR* dir) {
+    const std::string& decode_path = uri_.GetDecodePath();
 
-    errno    = 0;
-    DIR* dir = opendir(path.c_str());
-    if (dir == NULL) {
-        perror("opendir");
-        if (errno == EACCES) {
-            throw status::forbidden;
-        }
-        throw status::server_error;
-    }
-
-    // "."を削除
-    path = path.substr(1);
     std::stringstream ss;
     ss << "<html>" << CRLF << "<head>" << CRLF << "<title>"
-       << "Index of " << path << "</title>" << CRLF << "</head>" << CRLF
-       << "<body>" << CRLF << "<h1> Index of " << path << "</h1>" << CRLF
+       << "Index of " << decode_path << "</title>" << CRLF << "</head>" << CRLF
+       << "<body>" << CRLF << "<h1> Index of " << decode_path << "</h1>" << CRLF
        << "<hr>" << CRLF << "<pre>" << CRLF;
 
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
@@ -285,9 +274,9 @@ void Get::autoIndex(std::string path) {
             continue;
         }
 
-        ss << aElement(ent, path);
+        ss << aElement(ent, decode_path);
         if (std::string("..") != ent->d_name) {
-            ss << fileInfo(ent, path);
+            ss << fileInfo(ent, uri_.GetLocalPath());
         }
         ss << CRLF;
     }
@@ -297,8 +286,25 @@ void Get::autoIndex(std::string path) {
     }
     ss << "</pre>" << CRLF << "<hr>" << CRLF << "</body>" << CRLF << "</html>"
        << CRLF;
+    return ss.str();
+}
 
-    prepareSendResponse(ss.str());
+void Get::autoIndex() {
+    printLogAutoIndex();
+
+    const std::string& local_path = uri_.GetLocalPath();
+
+    errno    = 0;
+    DIR* dir = opendir(local_path.c_str());
+    if (dir == NULL) {
+        perror("opendir");
+        if (errno == EACCES) {
+            throw status::forbidden;
+        }
+        throw status::server_error;
+    }
+
+    prepareSendResponse(generateAutoIndexHTML(dir));
 }
 
 // log

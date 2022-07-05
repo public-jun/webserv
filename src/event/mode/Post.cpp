@@ -51,6 +51,6 @@ std::string Post::generateFileName() {
     char              buf[128];
 
     strftime(buf, sizeof(buf), "%Y%m%d%H%M%S", local);
-    ss << buf;
+    ss << buf << "_" << rand();
     return (ss.str());
 }
