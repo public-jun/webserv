@@ -58,6 +58,8 @@ IOEvent* RecvRequest::RegisterNext() {
     if (state_.Phase() != HTTPParser::DONE) {
         return this;
     }
+    stream_.SetRequest(req_);
+
 #ifdef WS_DEBUG
     req_.PrintInfo();
 #else

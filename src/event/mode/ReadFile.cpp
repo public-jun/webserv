@@ -18,8 +18,9 @@
 
 const std::size_t ReadFile::BUF_SIZE = 2048;
 
-ReadFile::ReadFile(StreamSocket stream, int fd)
-    : IOEvent(fd, READ_FILE), stream_(stream), finish_(false) {}
+ReadFile::ReadFile(StreamSocket stream, int fd, status::code status_code)
+    : IOEvent(fd, READ_FILE), stream_(stream), finish_(false),
+      status_code_(status_code) {}
 
 ReadFile::ReadFile()
     : IOEvent(READ_FILE), stream_(StreamSocket()), finish_(false),
@@ -56,6 +57,7 @@ IOEvent* ReadFile::RegisterNext() {
     // response 作成
     std::stringstream ss;
     ss << file_content_.size() << std::flush;
+    resp_.SetStatusCode(status_code_);
     resp_.AppendHeader("Content-Length", ss.str());
     resp_.SetBody(file_content_);
     resp_.AppendHeader("Server", "Webserv/1.0.0");
@@ -69,7 +71,6 @@ IOEvent* ReadFile::RegisterNext() {
     printLogEnd();
     return send_response;
 }
-
 
 int ReadFile::Close() {
     if (polled_fd_ == -1) {

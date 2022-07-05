@@ -5,12 +5,14 @@
 
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
+#include "HTTPStatus.hpp"
 #include "IOEvent.hpp"
 #include "StreamSocket.hpp"
 
 class ReadFile : public IOEvent {
 public:
-    ReadFile(StreamSocket stream, int fd);
+    ReadFile(StreamSocket stream, int fd,
+             status::code status_code = status::ok);
     virtual ~ReadFile();
 
     virtual void     Run(intptr_t offset);
@@ -30,6 +32,7 @@ private:
     StreamSocket stream_;
     HTTPRequest  req_;
     bool         finish_;
+    status::code status_code_;
 
     // ReadFile によってできる出力
     std::string  file_content_;
