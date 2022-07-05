@@ -60,12 +60,7 @@ IOEvent* RecvRequest::RegisterNext() {
     }
     stream_.SetRequest(req_);
 
-#ifdef WS_DEBUG
-    req_.PrintInfo();
-#else
-    std::cout << req_.GetMethod() << " " << req_.GetRequestTarget() << " "
-              << req_.GetVersion() << std::endl;
-#endif
+    printLog();
 
     // methodによって次のイベントが分岐
     try {
@@ -166,4 +161,13 @@ std::string RecvRequest::getAddrByHostName(std::string host_name) {
     freeaddrinfo(info);
 
     return inet_ntoa(addr);
+}
+
+void RecvRequest::printLog() {
+#ifdef WS_DEBUG
+    req_.PrintInfo();
+#else
+    std::cout << req_.GetMethod() << " " << req_.GetRequestTarget() << " "
+              << req_.GetVersion() << std::endl;
+#endif
 }
