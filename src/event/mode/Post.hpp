@@ -31,7 +31,10 @@ private:
     StreamSocket stream_;
     URI&         uri_;
     HTTPRequest  req_;
-    int          fd_;
+    IOEvent*     write_event_;
+    bool         is_cgi_;
+    int          fd_read_from_cgi_;
+    int          write_fd_;
     std::string  generateFileName();
 };
 

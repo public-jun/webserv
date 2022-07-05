@@ -1,7 +1,9 @@
 #include "Get.hpp"
+#include "CGI.hpp"
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
 #include "LocationConfig.hpp"
+#include "ReadCGI.hpp"
 #include "ReadFile.hpp"
 #include "SendResponse.hpp"
 #include "URI.hpp"
@@ -19,8 +21,9 @@
 
 const std::string Get::CRLF = "\r\n";
 
-Get::Get(StreamSocket stream, URI& uri)
-    : stream_(stream), uri_(uri), location_config_(uri_.GetLocationConfig()) {}
+Get::Get(StreamSocket stream, URI& uri, const HTTPRequest& req)
+    : stream_(stream), uri_(uri), req_(req),
+      location_config_(uri_.GetLocationConfig()) {}
 
 Get::~Get() {}
 
@@ -60,6 +63,14 @@ void Get::Run() {
 
     std::pair<int, std::string> redir = location_config_.GetReturn();
 
+    // CGI
+    if (CGI::IsCGI(uri_, "GET")) {
+        class CGI cgi(uri_, req_);
+        cgi.Run();
+        next_event_ = new ReadCGI(cgi.FdForReadFromCGI(), stream_, req_);
+        return;
+    }
+
     // redirect
     if (hasRedir(redir, uri_.GetRawTarget(), location_config_.GetTarget())) {
         processRedir(redir);
@@ -67,6 +78,7 @@ void Get::Run() {
     }
 
     const struct stat s = URI::Stat(uri_.GetLocalPath());
+
     if (S_ISDIR(s.st_mode)) {
         processDir();
     } else {
@@ -75,7 +87,10 @@ void Get::Run() {
     printLogEnd();
 }
 
-IOEvent* Get::NextEvent() { return next_event_; }
+IOEvent* Get::NextEvent() {
+    next_event_->Register();
+    return next_event_;
+}
 
 void Get::processDir() {
     std::string local_path = uri_.GetLocalPath();

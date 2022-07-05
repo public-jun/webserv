@@ -1,6 +1,7 @@
 #ifndef GET_HPP
 #define GET_HPP
 
+#include "HTTPRequest.hpp"
 #include "IOEvent.hpp"
 #include "StreamSocket.hpp"
 #include "URI.hpp"
@@ -8,7 +9,7 @@
 
 class Get {
 public:
-    Get(StreamSocket stream, URI& uri);
+    Get(StreamSocket stream, URI& uri, const HTTPRequest& req);
     ~Get();
 
     void     Run();
@@ -48,6 +49,7 @@ private:
     StreamSocket          stream_;
     IOEvent*              next_event_;
     URI&                  uri_;
+    const HTTPRequest&    req_;
     const LocationConfig& location_config_;
 };
 
