@@ -25,21 +25,22 @@ IOEvent* SendError::RegisterNext() {
         RecvRequest::SearchServerConfig(stream_.GetRequest(), stream_);
     std::string error_page = server_config.GetErrorPage()[status_code_];
 
-    if (existErrorPage(error_page)) {
-        try {
-            URI uri(server_config, error_page);
-            uri.Init();
-
-            int fd = open(uri.GetLocalPath().c_str(), O_RDONLY | O_NONBLOCK);
-            if (fd == -1) {
-                perror("SendError: open");
-                return sendResponse();
-            }
-
-            return readFile(fd);
-        } catch (status::code) { return sendResponse(); }
+    if (!existErrorPage(error_page)) {
+        return sendResponse();
     }
-    return sendResponse();
+    // エラーが起きたらsendResponseでデフォルトページを返す
+    try {
+        URI uri(server_config, error_page);
+        uri.Init();
+
+        int fd = open(uri.GetLocalPath().c_str(), O_RDONLY | O_NONBLOCK);
+        if (fd == -1) {
+            perror("SendError: open");
+            return sendResponse();
+        }
+
+        return readFile(fd);
+    } catch (...) { return sendResponse(); }
 }
 
 int SendError::Close() { return 0; }
