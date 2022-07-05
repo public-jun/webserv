@@ -1,13 +1,14 @@
 #ifndef GET_HPP
 #define GET_HPP
 
+#include "HTTPRequest.hpp"
 #include "IOEvent.hpp"
 #include "StreamSocket.hpp"
 #include "URI.hpp"
 
 class Get {
 public:
-    Get(StreamSocket stream, URI& uri);
+    Get(StreamSocket stream, URI& uri, const HTTPRequest& req);
     ~Get();
 
     void     Run();
@@ -23,7 +24,8 @@ private:
     void prepareReadFile(std::string path);
     void prepareSendResponse(std::string content);
     bool existFile(std::string path);
-    bool hasRedir(std::pair<int, std::string> redir, std::string path, std::string target);
+    bool hasRedir(std::pair<int, std::string> redir, std::string path,
+                  std::string target);
     bool hasIndex(std::string index);
     void complementSlash(std::string& path);
 
@@ -45,6 +47,7 @@ private:
     StreamSocket          stream_;
     IOEvent*              next_event_;
     URI&                  uri_;
+    const HTTPRequest&    req_;
     const LocationConfig& location_config_;
 };
 
