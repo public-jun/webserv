@@ -28,8 +28,10 @@ IOEvent* SendError::RegisterNext() {
     if (!existErrorPage(error_page)) {
         return sendResponse();
     }
-    // エラーが起きたらsendResponseでデフォルトページを返す
+
+    // エラーが起きた場合、sendResponseでデフォルトページを返す
     try {
+        // エラーページのpathからlocal pathを取得
         URI uri(server_config, error_page);
         uri.Init();
 
