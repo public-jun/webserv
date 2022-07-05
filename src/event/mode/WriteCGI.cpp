@@ -14,9 +14,11 @@
 
 #include <iostream>
 
-WriteCGI::WriteCGI(class CGI cgi, StreamSocket stream, HTTPRequest req)
-    : IOEvent(cgi.FdForWriteToCGI(), WRITE_CGI), cgi_(cgi), stream_(stream),
-      req_(req) {}
+WriteCGI::WriteCGI(int fd_for_write_to_cgi, int fd_for_read_form_cgi,
+                   StreamSocket stream, HTTPRequest req)
+    : IOEvent(fd_for_write_to_cgi, WRITE_CGI),
+      fd_for_write_to_cgi_(fd_for_write_to_cgi),
+      fd_for_read_form_cgi_(fd_for_read_form_cgi), stream_(stream), req_(req) {}
 
 WriteCGI::~WriteCGI() {}
 
@@ -38,7 +40,7 @@ void WriteCGI::Unregister() { EventRegister::Instance().DelWriteEvent(this); }
 IOEvent* WriteCGI::RegisterNext() {
     Unregister();
 
-    IOEvent* read_cgi = new ReadCGI(cgi_.FdForReadFromCGI(), stream_, req_);
+    IOEvent* read_cgi = new ReadCGI(fd_for_read_form_cgi_, stream_, req_);
     read_cgi->Register();
     return read_cgi;
 }
