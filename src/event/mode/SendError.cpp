@@ -53,7 +53,7 @@ bool SendError::existErrorPage(const std::string& error_page) {
 
 IOEvent* SendError::readFile(int fd) {
     IOEvent* read_file = new ReadFile(stream_, fd, status_code_);
-    EventRegister::Instance().AddReadEvent(read_file);
+    read_file->Register();
     return read_file;
 }
 
