@@ -178,6 +178,7 @@ void Get::prepareSendResponse(std::string content) {
 void Get::prepareReadFile(std::string path) {
     printLogReadFile();
 
+    // size0のファイルはイベントで通知されないため、ReadFileイベントは作らない
     if (URI::Stat(path).st_size == 0) {
         prepareEmptySendResponse();
         return;
@@ -198,6 +199,7 @@ void Get::prepareEmptySendResponse() {
     HTTPResponse resp;
 
     resp.AppendHeader("Content-Length", "0");
+    resp.PrintInfo();
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
