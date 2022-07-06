@@ -32,8 +32,7 @@ void ReadFile::Run(intptr_t offset) {
     char buf[BUF_SIZE];
     int  fd = polled_fd_;
 
-    int read_size = read(fd, buf, BUF_SIZE);
-    // TODO: エラー処理
+    ssize_t read_size = read(fd, buf, BUF_SIZE);
     if (read_size == -1) {
         perror("read");
         throw status::server_error;
@@ -69,7 +68,6 @@ IOEvent* ReadFile::RegisterNext() {
     printLogEnd();
     return send_response;
 }
-
 
 int ReadFile::Close() {
     if (polled_fd_ == -1) {

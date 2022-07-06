@@ -24,6 +24,7 @@ private:
     void tryAutoIndex();
     void prepareReadFile(std::string path);
     void prepareSendResponse(std::string content);
+    void prepareEmptySendResponse();
     bool existFile(std::string path);
     bool hasRedir(std::pair<int, std::string> redir, std::string path,
                   std::string target);
