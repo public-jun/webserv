@@ -34,7 +34,7 @@ void AcceptConn::Run(intptr_t offset) {
     printLog();
 }
 
-void AcceptConn::Register() { EventRegister::Instance().AddAcceptEvent(this); }
+void AcceptConn::Register() { EventRegister::Instance().AddReadEvent(this); }
 
 void AcceptConn::Unregister() { EventRegister::Instance().DelReadEvent(this); }
 

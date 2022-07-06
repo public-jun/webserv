@@ -16,7 +16,6 @@ public:
     std::vector<struct kevent>& RegisteredEvents();
 
     // Add I/O event
-    bool AddAcceptEvent(IOEvent* event);
     bool AddReadEvent(IOEvent* event);
     bool AddWriteEvent(IOEvent* event);
 
