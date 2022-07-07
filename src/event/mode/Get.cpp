@@ -178,6 +178,12 @@ void Get::prepareSendResponse(std::string content) {
 void Get::prepareReadFile(std::string path) {
     printLogReadFile();
 
+    // size0のファイルはイベントで通知されないため、ReadFileイベントは作らない
+    if (URI::Stat(path).st_size == 0) {
+        prepareEmptySendResponse();
+        return;
+    }
+
     int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
     if (fd == -1) {
         perror("open");
@@ -187,6 +193,14 @@ void Get::prepareReadFile(std::string path) {
         throw status::server_error;
     }
     next_event_ = new ReadFile(stream_, fd);
+}
+
+void Get::prepareEmptySendResponse() {
+    HTTPResponse resp;
+
+    resp.AppendHeader("Content-Length", "0");
+    resp.PrintInfo();
+    next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }
 
 // ####### autoindexの実装 ########
