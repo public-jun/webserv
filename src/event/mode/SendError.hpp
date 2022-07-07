@@ -17,6 +17,10 @@ public:
     virtual int      Close();
 
 private:
+    bool     existErrorPage(const std::string& error_page);
+    IOEvent* sendResponse();
+    IOEvent* readFile(int fd);
+
     StreamSocket& stream_;
     status::code  status_code_;
 };

@@ -34,6 +34,7 @@ private:
 
 private:
     RecvRequest();
+    void printLog();
 
     // RecvRequestに必要な入力
     StreamSocket stream_;
