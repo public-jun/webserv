@@ -171,7 +171,7 @@ void CGI::createPipe() {
             throw status::server_error;
         }
         fcntlCloseExe(pipe_for_cgi_read_[0]);
-        fcntlNonBlock(pipe_for_cgi_read_[0]);
+        fcntlNonBlock(pipe_for_cgi_read_[1]);
     }
     if (pipe(pipe_for_cgi_write_) < 0) {
         throw status::server_error;
