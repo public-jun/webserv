@@ -31,6 +31,8 @@ private:
     void                     childOperatePipe();
     void                     execute();
     void                     parentOperatePipe();
+    void                     fcntlCloseExe(int fd);
+    void                     fcntlNonBlock(int fd);
 
 private:
     // To do request から必要な情報を受け取る
