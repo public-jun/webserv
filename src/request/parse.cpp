@@ -38,6 +38,10 @@ void validate_method(const std::string& method) {
             throw status::bad_request;
         }
     }
+
+    if (method != "GET" && method != "POST" && method != "DELETE") {
+        throw status::not_implemented;
+    }
 }
 
 void validate_request_target(const std::string& request_target) {

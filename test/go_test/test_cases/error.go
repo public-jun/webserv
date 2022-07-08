@@ -34,12 +34,26 @@ func Error() {
 			expectStatus: http.StatusNotFound,
 		},
 		{
-			name: "MethodNotAllowed",
+			name: "MethodNotImplemented",
 			request: func() *http.Request {
 				port := ":1111"
 				target := ""
 				url := baseURL + port + target
 				req, err := http.NewRequest("HOGE", url, nil)
+				if err != nil {
+					panic(fmt.Errorf("NewRequest: %w", err))
+				}
+				return req
+			}(),
+			expectStatus: http.StatusNotImplemented,
+		},
+		{
+			name: "MethodNotAllowed",
+			request: func() *http.Request {
+				port := ":1111"
+				target := ""
+				url := baseURL + port + target
+				req, err := http.NewRequest("DELETE", url, nil)
 				if err != nil {
 					panic(fmt.Errorf("NewRequest: %w", err))
 				}
