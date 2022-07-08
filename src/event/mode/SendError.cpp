@@ -21,16 +21,15 @@ void SendError::Register() {}
 void SendError::Unregister() {}
 
 IOEvent* SendError::RegisterNext() {
-    ServerConfig server_config =
-        RecvRequest::SearchServerConfig(stream_.GetRequest(), stream_);
-    std::string error_page = server_config.GetErrorPage()[status_code_];
-
-    if (!existErrorPage(error_page)) {
-        return sendResponse();
-    }
-
     // エラーが起きた場合、sendResponseでデフォルトページを返す
     try {
+        ServerConfig server_config =
+            RecvRequest::SearchServerConfig(stream_.GetRequest(), stream_);
+        std::string error_page = server_config.GetErrorPage()[status_code_];
+
+        if (!existErrorPage(error_page)) {
+            return sendResponse();
+        }
         // エラーページのpathからlocal pathを取得
         URI uri(server_config, error_page);
         uri.Init();
