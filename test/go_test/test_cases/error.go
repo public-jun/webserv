@@ -13,6 +13,7 @@ import (
 func Error() {
 	log.Printf("%sRUN Error Test%s", blue, reset)
 	defer log.Printf("%sEND Error Test%s", blue, reset)
+
 	tests := []struct {
 		name         string
 		request      *http.Request
