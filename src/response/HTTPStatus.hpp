@@ -21,6 +21,7 @@ const code request_entity_too_large = 413;
 const code uri_too_long             = 414;
 const code unsupported_media_type   = 415;
 const code server_error             = 500;
+const code not_implemented          = 501;
 const code bad_gateway              = 502;
 const code version_not_suppoted     = 505;
 } // namespace status

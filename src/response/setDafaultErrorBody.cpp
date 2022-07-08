@@ -33,8 +33,9 @@ std::map<status::code, std::string> HTTPResponse::setDefaultErrorBody() {
     body[status::uri_too_long] = error_html("414 URI Too Long");
     body[status::unsupported_media_type] =
         error_html("415 Unsupported Media Type");
-    body[status::server_error] = error_html("500 Internal Server Error");
-    body[status::bad_gateway]  = error_html("502 Bad Gateway");
+    body[status::server_error]    = error_html("500 Internal Server Error");
+    body[status::not_implemented] = error_html("501 Not Implemented");
+    body[status::bad_gateway]     = error_html("502 Bad Gateway");
     body[status::version_not_suppoted] =
         error_html("505 HTTP Version Not Supported");
 

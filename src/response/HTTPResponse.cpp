@@ -7,20 +7,25 @@ const std::string HTTPResponse::DEFAULT_VERSION = "HTTP/1.1";
 
 std::map<int, std::string> make_status_text() {
     std::map<int, std::string> status_text;
-    status_text[status::ok]                     = "OK";
-    status_text[status::moved_permanently]      = "Moved Permanently";
-    status_text[status::found]                  = "Found";
-    status_text[status::see_other]              = "See Other";
-    status_text[status::temporary_redirect]     = "Temporary Redirect";
-    status_text[status::permanent_redirect]     = "Permanent Redirect";
-    status_text[status::bad_request]            = "Bad Request";
-    status_text[status::forbidden]              = "Forbidden";
-    status_text[status::not_found]              = "Not Found";
-    status_text[status::method_not_allowed]     = "Method Not Allowed";
-    status_text[status::unsupported_media_type] = "Unsupported Methid Type";
-    status_text[status::server_error]           = "Internal Server Error";
-    status_text[status::bad_gateway]            = "Bad Gateway";
-    status_text[status::version_not_suppoted]   = "HTTP Version Not Supported";
+    status_text[status::ok]                       = "OK";
+    status_text[status::created]                  = "Created";
+    status_text[status::no_content]               = "No Content";
+    status_text[status::moved_permanently]        = "Moved Permanently";
+    status_text[status::found]                    = "Found";
+    status_text[status::see_other]                = "See Other";
+    status_text[status::temporary_redirect]       = "Temporary Redirect";
+    status_text[status::permanent_redirect]       = "Permanent Redirect";
+    status_text[status::bad_request]              = "Bad Request";
+    status_text[status::forbidden]                = "Forbidden";
+    status_text[status::not_found]                = "Not Found";
+    status_text[status::method_not_allowed]       = "Method Not Allowed";
+    status_text[status::request_entity_too_large] = "Request Entity Too Large";
+    status_text[status::uri_too_long]             = "Request URI Too Long";
+    status_text[status::unsupported_media_type]   = "Unsupported Methid Type";
+    status_text[status::server_error]             = "Internal Server Error";
+    status_text[status::not_implemented]          = "Not Implemented";
+    status_text[status::bad_gateway]              = "Bad Gateway";
+    status_text[status::version_not_suppoted] = "HTTP Version Not Supported";
     return status_text;
 }
 
