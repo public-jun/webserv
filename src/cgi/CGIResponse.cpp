@@ -1,4 +1,5 @@
 #include "CGIResponse.hpp"
+#include "Response.hpp"
 
 #include <sstream>
 #include <string>
@@ -6,37 +7,25 @@
 
 #include <iostream>
 
-CGIResponse::CGIResponse() : type_(NONE), status_code_(200) {}
+CGIResponse::CGIResponse() : Response(), type_(NONE) {}
 
 CGIResponse::~CGIResponse() {}
 
 void CGIResponse::SetResponseType(ResponseType type) { type_ = type; }
-
-void CGIResponse::SetStatusCode(int status) { status_code_ = status; }
-
-void CGIResponse::SetBody(std::string body) { body_ = body; }
-
-void CGIResponse::AppendHeader(std::string key, std::string value) {
-    header_.insert(std::make_pair(key, value));
-}
-
-void CGIResponse::AppendHeader(std::pair<std::string, std::string> pair) {
-    header_.insert(pair);
-}
 
 CGIResponse::ResponseType CGIResponse::GetResponseType() const { return type_; }
 
 int CGIResponse::GetStatusCode() const { return status_code_; }
 
 const std::map<std::string, std::string>& CGIResponse::GetHeader() const {
-    return header_;
+    return headers_;
 }
 
 const std::string CGIResponse::GetHeaderValue(const std::string key) const {
     typedef std::map<std::string, std::string>::const_iterator const_iterator;
 
-    const_iterator it = header_.find(key);
-    if (it == header_.end()) {
+    const_iterator it = headers_.find(key);
+    if (it == headers_.end()) {
         return "";
     }
     return it->second;
@@ -49,13 +38,14 @@ void CGIResponse::GenerateHTTPResponse(HTTPResponse& http_resp) {
 
     if (!body_.empty()) {
         ss << body_.size() << std::flush;
-        header_.insert(std::make_pair(std::string("Content-Length"), ss.str()));
+        headers_.insert(
+            std::make_pair(std::string("Content-Length"), ss.str()));
         ss << "";
     }
 
     typedef std::map<std::string, std::string>::const_iterator const_iterator;
 
-    for (const_iterator it = header_.begin(); it != header_.end(); it++) {
+    for (const_iterator it = headers_.begin(); it != headers_.end(); it++) {
         if (it->first == "status") {
             continue;
         }
@@ -83,7 +73,7 @@ void CGIResponse::PrintInfo() {
     std::cout << "TYPE :" << type << std::endl;
 
     std::cout << "======    HEADER    ======" << std::endl;
-    for (const_iterator it = header_.begin(); it != header_.end(); it++) {
+    for (const_iterator it = headers_.begin(); it != headers_.end(); it++) {
         std::cout << it->first << ":" << it->second << std::endl;
     }
     std::cout << "======  HEADER END  ======" << std::endl;
