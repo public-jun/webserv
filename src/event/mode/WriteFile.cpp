@@ -27,6 +27,7 @@ IOEvent* WriteFile::RegisterNext() {
     resp_.AppendHeader("Content-Length", "0");
     resp_.AppendHeader("Server", "Webserv/1.0.0");
     resp_.SetStatusCode(status::created);
+    resp_.PrintInfo();
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());
 
     send_response->Register();
