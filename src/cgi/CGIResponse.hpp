@@ -6,8 +6,9 @@
 #include <utility>
 
 #include "HTTPResponse.hpp"
+#include "Response.hpp"
 
-class CGIResponse {
+class CGIResponse : public Response {
 public:
     enum ResponseType {
         NONE,
@@ -21,10 +22,6 @@ public:
     ~CGIResponse();
 
     void SetResponseType(ResponseType type);
-    void SetStatusCode(int status);
-    void SetBody(std::string body);
-    void AppendHeader(std::string key, std::string value);
-    void AppendHeader(std::pair<std::string, std::string> pair);
 
     ResponseType                              GetResponseType() const;
     int                                       GetStatusCode() const;
@@ -37,9 +34,6 @@ public:
 
 private:
     ResponseType                       type_;
-    int                                status_code_;
-    std::map<std::string, std::string> header_;
-    std::string                        body_;
 };
 
 #endif

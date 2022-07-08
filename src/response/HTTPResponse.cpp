@@ -1,5 +1,6 @@
 #include "HTTPResponse.hpp"
 #include "HTTPStatus.hpp"
+#include "Response.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -29,8 +30,7 @@ std::map<int, std::string> HTTPResponse::status_text_ = make_status_text();
 std::map<status::code, std::string> HTTPResponse::default_error_body_ =
     setDefaultErrorBody();
 
-HTTPResponse::HTTPResponse()
-    : HTTPVersion_(DEFAULT_VERSION), status_code_(status::ok) {}
+HTTPResponse::HTTPResponse() : Response(), HTTPVersion_(DEFAULT_VERSION) {}
 
 HTTPResponse::~HTTPResponse() {}
 
@@ -38,15 +38,7 @@ std::string HTTPResponse::GetDefaultErrorBody(status::code code) {
     return default_error_body_[code];
 }
 
-void HTTPResponse::AppendHeader(std::string key, std::string value) {
-    headers_.insert(std::make_pair(key, value));
-}
-
-void HTTPResponse::SetBody(std::string body) { body_ = body; }
-
 void HTTPResponse::SetVersion(std::string version) { HTTPVersion_ = version; }
-
-void HTTPResponse::SetStatusCode(int status) { status_code_ = status; }
 
 std::string HTTPResponse::ConvertToStr() const {
     std::stringstream ss;
