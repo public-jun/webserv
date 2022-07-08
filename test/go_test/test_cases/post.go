@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -55,17 +54,12 @@ func PostChunkedData() {
 	}
 
 	client := http.DefaultClient
-
-	f, err := os.Open("./test_cases/chunked_data.txt")
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	body := strings.NewReader("HelloWorld")
 
 	go func() {
 		for {
 			buf := make([]byte, 3)
-			n, err := f.Read(buf)
+			n, err := body.Read(buf)
 			if n == 0 {
 				break
 			}
