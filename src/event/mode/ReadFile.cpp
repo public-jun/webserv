@@ -60,6 +60,7 @@ IOEvent* ReadFile::RegisterNext() {
     resp_.AppendHeader("Content-Length", ss.str());
     resp_.SetBody(file_content_);
     resp_.AppendHeader("Server", "Webserv/1.0.0");
+    resp_.AppendHeader("Connection", "close");
     resp_.PrintInfo();
 
     IOEvent* send_response = new SendResponse(stream_, resp_.ConvertToStr());

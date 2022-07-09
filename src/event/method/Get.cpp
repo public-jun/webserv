@@ -121,6 +121,7 @@ void Get::processRedir(std::pair<int, std::string> redir) {
 
     HTTPResponse resp;
     resp.AppendHeader("Location", url);
+    resp.AppendHeader("Connection", "close");
     std::cout << "Location: " << url << std::endl;
     resp.SetStatusCode(redir.first);
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
@@ -170,6 +171,7 @@ void Get::prepareSendResponse(std::string content) {
     size << content.size();
     resp.AppendHeader("Content-Length", size.str());
     resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
+    resp.AppendHeader("Connection", "close");
     resp.SetBody(content);
     resp.PrintInfo();
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
@@ -199,6 +201,7 @@ void Get::prepareEmptySendResponse() {
     HTTPResponse resp;
 
     resp.AppendHeader("Content-Length", "0");
+    resp.AppendHeader("Connection", "close");
     resp.PrintInfo();
     next_event_ = new SendResponse(stream_, resp.ConvertToStr());
 }

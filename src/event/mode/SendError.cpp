@@ -67,6 +67,7 @@ IOEvent* SendError::sendResponse() {
 
     resp.AppendHeader("Content-Length", body_size.str());
     resp.AppendHeader("Content-Type", "text/html; charset=utf-8");
+    resp.AppendHeader("Connection", "close");
     resp.PrintInfo();
 
     IOEvent* send_response = new SendResponse(stream_, resp.ConvertToStr());
