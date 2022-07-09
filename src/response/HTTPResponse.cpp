@@ -20,6 +20,7 @@ std::map<int, std::string> make_status_text() {
     status_text[status::forbidden]                = "Forbidden";
     status_text[status::not_found]                = "Not Found";
     status_text[status::method_not_allowed]       = "Method Not Allowed";
+    status_text[status::length_required]          = "Length Required";
     status_text[status::request_entity_too_large] = "Request Entity Too Large";
     status_text[status::uri_too_long]             = "Request URI Too Long";
     status_text[status::unsupported_media_type]   = "Unsupported Methid Type";

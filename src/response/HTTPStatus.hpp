@@ -17,6 +17,7 @@ const code bad_request              = 400;
 const code forbidden                = 403;
 const code not_found                = 404;
 const code method_not_allowed       = 405;
+const code length_required          = 411;
 const code request_entity_too_large = 413;
 const code uri_too_long             = 414;
 const code unsupported_media_type   = 415;

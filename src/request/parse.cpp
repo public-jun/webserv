@@ -383,7 +383,7 @@ void update_state(State& state, const std::string new_buf) {
                 if (req.GetHeaderValue("transfer-encoding") == "chunked") {
                     might_set_chunked_body(state);
                 } else if (req.GetHeaderValue("content-length") == "") {
-                    throw status::bad_request;
+                    throw status::length_required;
                 } else {
                     might_set_body_with_content_length(
                         state, buf,
