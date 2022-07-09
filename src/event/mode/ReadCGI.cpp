@@ -55,13 +55,13 @@ IOEvent* ReadCGI::RegisterNext() {
         req_.SetMethod("GET");
         req_.SetRequestTarget(cgi_resp_.GetHeaderValue("location"));
         req_.SetBody("");
-        // req_.PrintInfo();
         new_event = RecvRequest::PrepareResponse(req_, stream_);
     } else {
         cgi_resp_.GenerateHTTPResponse(resp_);
 
         resp_.SetVersion(req_.GetVersion());
         resp_.AppendHeader("Server", "Webserv/1.0.0");
+        resp_.AppendHeader("connection", "close");
 
         new_event = new SendResponse(stream_, resp_.ConvertToStr());
         new_event->Register();
