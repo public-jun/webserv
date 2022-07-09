@@ -71,9 +71,13 @@ void CGI::Run() {
 
 void CGI::ShutDown() {
     if (req_.GetMethod() == "POST") {
-        close(pipe_for_cgi_read_[1]);
+        if (close(pipe_for_cgi_read_[1]) < 0) {
+            throw status::server_error;
+        }
     }
-    close(pipe_for_cgi_write_[0]);
+    if (close(pipe_for_cgi_write_[0]) < 0) {
+        throw status::server_error;
+    }
 }
 
 int CGI::FdForReadFromCGI() { return pipe_for_cgi_write_[0]; }
@@ -164,20 +168,16 @@ std::vector<std::string> CGI::makeEnvs() {
 void CGI::createPipe() {
     if (req_.GetMethod() == "POST") {
         if (pipe(pipe_for_cgi_read_) < 0) {
-            throw SysError("pipe", errno);
+            throw status::server_error;
         }
-        int flags = fcntl(pipe_for_cgi_read_[0], F_GETFD);
-        fcntl(pipe_for_cgi_read_[0], F_SETFD, flags | FD_CLOEXEC);
-        flags = fcntl(pipe_for_cgi_read_[0], F_GETFL);
-        fcntl(pipe_for_cgi_read_[0], F_SETFL, flags | O_NONBLOCK);
+        fcntlCloseExe(pipe_for_cgi_read_[0]);
+        fcntlNonBlock(pipe_for_cgi_read_[1]);
     }
     if (pipe(pipe_for_cgi_write_) < 0) {
-        throw SysError("pipe", errno);
+        throw status::server_error;
     }
-    int flags = fcntl(pipe_for_cgi_write_[1], F_GETFD);
-    fcntl(pipe_for_cgi_write_[1], F_SETFD, flags | FD_CLOEXEC);
-    flags = fcntl(pipe_for_cgi_write_[0], F_GETFL);
-    fcntl(pipe_for_cgi_write_[0], F_SETFL, flags | O_NONBLOCK);
+    fcntlCloseExe(pipe_for_cgi_write_[1]);
+    fcntlNonBlock(pipe_for_cgi_write_[0]);
 }
 
 void CGI::cgiFork() {
@@ -186,7 +186,7 @@ void CGI::cgiFork() {
     pid_t pid;
     pid = fork();
     if (pid < 0) {
-        throw SysError("fork", errno);
+        throw status::server_error;
     } else if (pid == 0) {
         childOperatePipe();
         execute();
@@ -198,17 +198,21 @@ void CGI::cgiFork() {
 void CGI::childOperatePipe() {
     // stdin
     if (req_.GetMethod() == "POST") {
-        close(pipe_for_cgi_read_[1]);
-        close(STDIN_FILENO);
-        dup2(pipe_for_cgi_read_[0], STDIN_FILENO);
-        close(pipe_for_cgi_read_[0]);
+        if (close(pipe_for_cgi_read_[1]) < 0 || close(STDIN_FILENO) < 0 ||
+            dup2(pipe_for_cgi_read_[0], STDIN_FILENO) < 0 ||
+            close(pipe_for_cgi_read_[0]) < 0) {
+            perror("child");
+            std::exit(1);
+        }
     }
 
     // stdout
-    close(pipe_for_cgi_write_[0]);
-    close(STDOUT_FILENO);
-    dup2(pipe_for_cgi_write_[1], STDOUT_FILENO);
-    close(pipe_for_cgi_write_[1]);
+    if (close(pipe_for_cgi_write_[0]) < 0 || close(STDOUT_FILENO) < 0 ||
+        dup2(pipe_for_cgi_write_[1], STDOUT_FILENO) < 0 ||
+        close(pipe_for_cgi_write_[1]) < 0) {
+        perror("child");
+        std::exit(1);
+    }
 }
 
 void CGI::execute() {
@@ -221,10 +225,36 @@ void CGI::execute() {
 
 void CGI::parentOperatePipe() {
     if (req_.GetMethod() == "POST") {
-        close(pipe_for_cgi_read_[0]);
+        if (close(pipe_for_cgi_read_[0]) < 0) {
+            close(pipe_for_cgi_read_[1]);
+            throw status::server_error;
+        }
     }
 
-    close(pipe_for_cgi_write_[1]);
+    if (close(pipe_for_cgi_write_[1]) < 0) {
+        close(pipe_for_cgi_write_[0]);
+        throw status::server_error;
+    }
+}
+
+void CGI::fcntlCloseExe(int fd) {
+    int flags = fcntl(fd, F_GETFD);
+    if (flags < 0) {
+        throw status::server_error;
+    }
+    if (fcntl(fd, F_SETFD, flags | FD_CLOEXEC) < 0) {
+        throw status::server_error;
+    }
+}
+
+void CGI::fcntlNonBlock(int fd) {
+    int flags = fcntl(fd, F_GETFL);
+    if (flags < 0) {
+        throw status::server_error;
+    }
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+        throw status::server_error;
+    }
 }
 
 std::map<std::string, std::string> CGI::setBinaries() {

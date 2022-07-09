@@ -280,6 +280,9 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size,
         for (;;) {
             std::string                         line, nl;
             std::pair<std::string, std::string> element;
+            if (read_size == 0) {
+                phase_ = DONE;
+            }
             switch (phase_) {
             case HEADER_LINE:
                 if (!canParseLine(left_buf_, line, nl)) {
@@ -301,19 +304,18 @@ void CGIResponseParser::operator()(std::string new_buf, ssize_t read_size,
                     phase_ = mightSetContentLenBody(
                         left_buf_,
                         strToUlong(cgi_resp_.GetHeaderValue("content-length")));
-                    selectResponse();
                     break;
                 } else if (read_size == 0 || read_size == offset) {
                     // EOF
                     cgi_resp_.SetBody(left_buf_);
                     phase_ = DONE;
-                    selectResponse();
                     break;
                 } else {
                     return;
                 }
 
             case DONE:
+                    selectResponse();
                 return;
             }
         }
