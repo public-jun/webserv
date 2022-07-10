@@ -130,11 +130,16 @@ std::string RecvRequest::getAddrByHostName(std::string host_name) {
     hints.ai_flags    = AI_ADDRCONFIG | AI_NUMERICSERV;
     hints.ai_family   = PF_INET;
 
-    if (getaddrinfo(host_name.c_str(), NULL, &hints, &info) != 0)
-        throw status::server_error;
+    int res = getaddrinfo(host_name.c_str(), NULL, &hints, &info);
+    if (res != 0) {
+        if (res == EAI_NONAME)
+            std::cout << gai_strerror(res) << std::endl;
+        else
+            throw status::server_error;
+        return "";
+    }
     addr.s_addr = ((struct sockaddr_in*)(info->ai_addr))->sin_addr.s_addr;
     freeaddrinfo(info);
-
     return inet_ntoa(addr);
 }
 
