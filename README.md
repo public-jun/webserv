@@ -1,5 +1,5 @@
 # webserv
-NginxのようなHTTP/1.1に準拠したWebserverです。
+NginxのようなWebserverです。
 
 ## 使い方
 ### ダウンロード && ビルド
