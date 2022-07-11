@@ -12,6 +12,10 @@ void Server::Run() {
 }
 
 void Server::InitServer(std::string config_file_path) {
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+        perror("signal");
+        std::runtime_error("init error");
+    }
     ConfigParser::ParseConfigFile(config_file_path);
     executor_.Init();
     initListeners();
