@@ -297,6 +297,7 @@ std::string Get::generateAutoIndexHTML(DIR* dir) {
         }
         ss << CRLF;
     }
+    closedir(dir);
     if (errno == EBADF) {
         perror("readdir");
         throw status::server_error;
