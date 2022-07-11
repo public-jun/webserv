@@ -41,6 +41,13 @@ void RecvRequest::Run(intptr_t offset) {
     if (recv_size == -1) {
         throw std::make_pair(stream_, status::server_error);
     }
+    if (recv_size == 0) {
+        return;
+    }
+
+#ifdef WS_DEBUG
+    std::cout << "recv_size: " << recv_size << std::endl;
+#endif
 
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
