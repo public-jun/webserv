@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <cstdio>
 
 Server::Server() : executor_(EventExecutor::Instance()) {}
 
@@ -68,7 +69,9 @@ void Server::ShutDownServer() {
     }
     for (std::vector<IOEvent*>::iterator it = registered_events_.begin();
          it != registered_events_.end(); it++) {
-        close((*it)->GetPolledFd());
+        if (close((*it)->GetPolledFd()) == -1) {
+            perror("close");
+        }
         delete (*it);
     }
 }

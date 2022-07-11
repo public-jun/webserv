@@ -36,8 +36,11 @@ RecvRequest::~RecvRequest() {}
 
 void RecvRequest::Run(intptr_t offset) {
     UNUSED(offset);
-    char buf[BUF_SIZE];
-    int  recv_size = recv(stream_.GetSocketFd(), buf, BUF_SIZE, 0);
+    char    buf[BUF_SIZE];
+    ssize_t recv_size = recv(stream_.GetSocketFd(), buf, BUF_SIZE, 0);
+    if (recv_size == -1) {
+        throw std::make_pair(stream_, status::server_error);
+    }
 
     try {
         HTTPParser::update_state(state_, std::string(buf, recv_size));
