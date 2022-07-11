@@ -1,6 +1,7 @@
 #include "SendResponse.hpp"
 
 #include <cerrno>
+#include <cstdio>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -28,7 +29,7 @@ void SendResponse::Run(intptr_t offset) {
     ssize_t ret =
         send(stream_.GetSocketFd(), all_buf_.c_str(), all_buf_.size(), 0);
     if (ret < 0) {
-        throw SysError("send", errno);
+        perror("send");
     }
 }
 
