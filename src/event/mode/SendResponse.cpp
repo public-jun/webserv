@@ -25,7 +25,8 @@ void SendResponse::Run(intptr_t offset) {
     UNUSED(offset);
     printLog();
 
-    int ret = send(stream_.GetSocketFd(), all_buf_.c_str(), all_buf_.size(), 0);
+    ssize_t ret =
+        send(stream_.GetSocketFd(), all_buf_.c_str(), all_buf_.size(), 0);
     if (ret < 0) {
         throw SysError("send", errno);
     }
