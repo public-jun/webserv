@@ -286,6 +286,7 @@ std::string Get::generateAutoIndexHTML(DIR* dir) {
        << "<body>" << CRLF << "<h1> Index of " << decode_path << "</h1>" << CRLF
        << "<hr>" << CRLF << "<pre>" << CRLF;
 
+    errno = 0;
     for (struct dirent* ent = readdir(dir); ent != NULL; ent = readdir(dir)) {
         if (std::string(".") == ent->d_name) {
             continue;

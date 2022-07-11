@@ -24,12 +24,17 @@ void ListeningSocket::Bind(const std::string& ip, int port) {
     }
 
     int sock_optval = 1;
-    setsockopt(sock_fd_, SOL_SOCKET, SO_REUSEADDR, &sock_optval,
-               sizeof(sock_optval));
+    if (setsockopt(sock_fd_, SOL_SOCKET, SO_REUSEADDR, &sock_optval,
+                   sizeof(sock_optval)) == -1) {
+        throw SysError("setsockopt", errno);
+    }
 
     addr_.sin_family      = AF_INET;
     addr_.sin_port        = htons(port);
     addr_.sin_addr.s_addr = inet_addr(ip.c_str());
+    if (addr_.sin_addr.s_addr == INADDR_NONE) {
+        throw SysError("inet_addr", errno);
+    }
 
     if (bind(sock_fd_, (struct sockaddr*)&addr_, sizeof(addr_)) < 0) {
         throw SysError("bind", errno);

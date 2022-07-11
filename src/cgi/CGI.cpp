@@ -130,7 +130,9 @@ std::vector<std::string> CGI::makeEnvs() {
     // PATH_TRANSLATED
     char path_name[100];
     memset(path_name, '\0', 100);
-    getcwd(path_name, 100);
+    if (getcwd(path_name, 100) == NULL) {
+        throw status::server_error;
+    }
     std::string translated =
         std::string(path_name).append(uri_.GetLocalPath(), 1);
     env_map["PATH_TRANSLATED"] = translated;
@@ -181,7 +183,9 @@ void CGI::createPipe() {
 }
 
 void CGI::cgiFork() {
-    signal(SIGCHLD, SIG_IGN);
+    if (signal(SIGCHLD, SIG_IGN) == SIG_ERR) {
+        throw status::server_error;
+    }
 
     pid_t pid;
     pid = fork();
