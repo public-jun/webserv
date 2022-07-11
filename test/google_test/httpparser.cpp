@@ -406,6 +406,16 @@ TEST(HTTPParser, ChunkedBodyNotCRLFAfterData) {
 // =======================
 // == OTHER STATUS CASE ==
 
+TEST(HTTPParser, LengthRequired) {
+    string            message = "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n";
+    HTTPRequest       req;
+    HTTPParser::State state(req);
+
+    try {
+        HTTPParser::update_state(state, message);
+    } catch (status::code code) { EXPECT_EQ(status::length_required, code); }
+}
+
 TEST(HTTPParser, VersionNotSupported) {
     string            message = "GET / HTTP/3.0\r\nHost: localhost\r\n\r\n";
     HTTPRequest       req;

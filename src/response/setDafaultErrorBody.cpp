@@ -28,6 +28,7 @@ std::map<status::code, std::string> HTTPResponse::setDefaultErrorBody() {
     body[status::forbidden]          = error_html("403 Forbidden");
     body[status::not_found]          = error_html("404 Not Found");
     body[status::method_not_allowed] = error_html("405 Not Allowed");
+    body[status::length_required]    = error_html("411 Length Required");
     body[status::request_entity_too_large] =
         error_html("413 Request Entity Too Long");
     body[status::uri_too_long] = error_html("414 URI Too Long");
