@@ -264,7 +264,6 @@ void CGI::fcntlNonBlock(int fd) {
 std::map<std::string, std::string> CGI::setBinaries() {
     std::map<std::string, std::string> binaries_map;
 
-    binaries_map[".php"] = "/usr/bin/php";
     binaries_map[".py"]  = "/usr/bin/python3";
     binaries_map[".pl"]  = "/usr/local/bin/perl";
 
@@ -274,7 +273,6 @@ std::map<std::string, std::string> CGI::setBinaries() {
 std::map<std::string, std::string> CGI::setCommands() {
     std::map<std::string, std::string> commands_map;
 
-    commands_map[".php"] = "php";
     commands_map[".py"]  = "python3";
     commands_map[".pl"]  = "perl";
 
