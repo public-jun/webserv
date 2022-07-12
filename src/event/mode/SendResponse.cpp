@@ -40,7 +40,6 @@ void SendResponse::Unregister() {
 }
 
 IOEvent* SendResponse::RegisterNext() {
-    // TODO: keep-alive
     if (close(stream_.GetSocketFd()) == -1) {
         perror("close");
     }
