@@ -1,0 +1,12 @@
+name: google_test
+
+on: [pull_request]
+
+jobs:
+  google_test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: google_test
+        run: make gtest && ./tester
+

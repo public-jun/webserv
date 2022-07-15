@@ -16,8 +16,10 @@
 *.dylib
 *.dll
 
+# test libraries
+google_testlib
+
 # Fortran module files
-*.mod
 *.smod
 
 # Compiled Static libraries
@@ -30,3 +32,11 @@
 *.exe
 *.out
 *.app
+webserv
+tester
+webserv_tester
+
+#others
+compile_commands.json
+*.dSYM
+.cache/*
