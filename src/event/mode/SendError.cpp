@@ -10,7 +10,7 @@
 #include <sstream>
 
 SendError::SendError(StreamSocket& stream, status::code code)
-    : stream_(stream), status_code_(code) {}
+    : IOEvent(SEND_RESPONSE), stream_(stream), status_code_(code) {}
 
 SendError::~SendError() {}
 
