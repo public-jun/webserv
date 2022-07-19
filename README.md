@@ -1,7 +1,14 @@
 # webserv
 NginxのようなWebserverです。
 
+
 ## 使い方
+### 環境
+```bash
+ProductName:	Mac OS X
+ProductVersion:	10.15.7
+BuildVersion:	19H1615
+```
 ### ダウンロード && ビルド
 ```bash
 https://github.com/public-jun/webserv.git
